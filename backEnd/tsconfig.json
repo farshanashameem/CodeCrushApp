@@ -1,0 +1,60 @@
+{
+  "compilerOptions": {
+    // =========================
+    // 🔧 BASIC SETTINGS
+    // =========================
+    "target": "ES2021",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // =========================
+    // 🌍 NODE TYPES (FIXES YOUR ERROR)
+    // =========================
+    "types": ["node"],
+
+    // =========================
+    // 📁 PATHS & STRUCTURE
+    // =========================
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+
+  
+
+    // =========================
+    // 🧠 TYPE SAFETY
+    // =========================
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+
+    // =========================
+    // ⚙️ INTEROP
+    // =========================
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    // =========================
+    // ⚡ PERFORMANCE & DX
+    // =========================
+    "incremental": true,
+
+    // =========================
+    // 🧹 OUTPUT CONTROL
+    // =========================
+    "forceConsistentCasingInFileNames": true,
+
+    // =========================
+    // 🧪 DEBUGGING
+    // =========================
+    "sourceMap": true,
+
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "logs"]
+}

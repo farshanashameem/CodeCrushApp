@@ -1,0 +1,7 @@
+enum UserStatus{
+    ACTIVE = "ACTIVE",
+    BLOCKED = "BLOCKED",
+    DELETED = "DELETED"
+}
+
+export default UserStatus;

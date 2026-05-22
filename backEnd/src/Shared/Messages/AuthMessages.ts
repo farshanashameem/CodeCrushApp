@@ -1,0 +1,78 @@
+export const authMessages = {
+    success: {
+        // AUTH
+        PARENT_REGISTER_SUCCESS: "Parent registered successfully",
+        PARENT_LOGIN_SUCCESS: "Parent logged in successfully",
+        ADMIN_LOGIN_SUCCESS: "Admin logged in successfully",
+
+        LOGOUT_SUCCESS: "Logged out successfully",
+        TOKEN_REFRESHED: "Token refreshed successfully",
+
+         //USER STATUS 
+        USER_STATUS_UPDATED: "User status updated",
+
+        //  OTP
+        OTP_SENT: "OTP sent to email",
+        OTP_VERIFIED: "OTP verified successfully",
+        PASSWORD_RESET_SUCCESS: "Password reset successfully",
+
+        //  CHILD
+        CHILD_ADDED: "Child added successfully",
+        CHILD_UPDATED: "Child updated successfully",
+        CHILD_DELETED: "Child deleted successfully",
+
+        //  PARENT
+        PARENT_PROFILE_UPDATED: "Parent profile updated successfully",
+    },
+
+    error: {
+        //  AUTH
+        INVALID_CREDENTIALS: "Invalid email or password",
+        UNAUTHORIZED: "Unauthorized access",
+        FORBIDDEN: "Access denied",
+        INTERNAL_SERVER_ERROR: "Internal server error",
+        USER_NOT_FOUND : "User not found",
+        
+        //ADMIN
+        ADMIN_NOT_FOUND : "Admin not found",
+        
+
+        // PARENT
+        PARENT_NOT_FOUND: "Parent not found",
+        PARENT_ALREADY_EXISTS: "Parent with this email already exists",
+        PARENT_BLOCKED: "Parent is blocked",
+        PARENT_DELETED: "Parent is deleted",
+
+        // CHILD
+        CHILD_NOT_FOUND: "Child not found",
+        CHILD_ALREADY_EXISTS: "Child already exists under this parent",
+
+        //  OTP
+        OTP_EXPIRED: "OTP expired",
+        INVALID_OTP: "Invalid OTP",
+        OTP_NOT_FOUND: "OTP not found",
+
+        // EMAIL
+        EMAIL_NOT_FOUND: "Email not found",
+
+        // TOKEN
+        REFRESH_TOKEN_NOT_FOUND: "Refresh token missing",
+        INVALID_REFRESH_TOKEN: "Invalid refresh token",
+        ACCESS_TOKEN_EXPIRED: "Access token expired",
+        INVALID_RESET_TOKEN: "Invalid reset token",
+
+        // SYSTEM
+        ENV_VALIDATION_FAILED: "Environment validation failed",
+        ACCESS_TOKEN_SECRET_MISSING: "Access token secret not found",
+        REFRESH_TOKEN_SECRET_MISSING: "Refresh token secret not found",
+        RESET_TOKEN_SECRET_MISSING: "Reset token secret not found",
+
+        //ACTION
+        INVALID_ACTION :"Invalid Action",
+
+       
+
+        //OTP RESEND 
+        MAXIMUM_RESEND_LIMIT: "Maximum Resend limit reached" 
+    }
+};

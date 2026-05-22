@@ -1,0 +1,196 @@
+/* main container */
+
+.loading-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #84daff;
+  overflow: hidden;
+}
+
+/* background image */
+
+.bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* center content */
+
+.content {
+  z-index: 10;
+  text-align: center;
+  padding: 20px;
+}
+
+/* floating stars */
+
+/* floating + twinkling stars */
+
+.stars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(white 1px, transparent 1px),
+    radial-gradient(white 1.5px, transparent 1.5px),
+    radial-gradient(white 2px, transparent 2px);
+
+  background-size:
+    40px 40px,
+    70px 70px,
+    120px 120px;
+
+  background-position:
+    0 0,
+    25px 40px,
+    50px 80px;
+
+  animation:
+    moveStars 60s linear infinite,
+    twinkle 3s ease-in-out infinite alternate;
+
+  opacity: 0.8;
+}
+
+/* stars slowly moving */
+
+@keyframes moveStars {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-200px);
+  }
+}
+
+/* stars brightness changing */
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* loading title */
+
+.loading-text {
+  font-size: clamp(32px, 6vw, 70px);
+  font-weight: 900;
+  font-family: "Baloo 2", sans-serif;
+
+  background: linear-gradient(to bottom, #ffe066, #ff8c00);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  -webkit-text-stroke: 3px #8a4a00;
+
+  text-shadow:
+    0px 4px 0px #dc7907,
+    0px 8px 15px rgba(0,0,0,0.3);
+
+  margin-bottom: clamp(15px, 3vh, 25px);
+}
+
+/* dots animation */
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: clamp(6px, 1.5vw, 12px);
+  margin-bottom: clamp(15px, 3vh, 25px);
+}
+
+.dot {
+  width: clamp(8px, 1.2vw, 12px);
+  height: clamp(8px, 1.2vw, 12px);
+  background: gold;
+  border-radius: 50%;
+  animation: bounce 1s infinite;
+}
+
+.delay1 { animation-delay: 0.2s }
+.delay2 { animation-delay: 0.4s }
+
+@keyframes bounce {
+  0%,100% { transform: translateY(0) }
+  50% { transform: translateY(-10px) }
+}
+
+/* progress bar */
+
+.progress-container {
+  width: clamp(200px, 40vw, 320px);
+  height: clamp(12px, 2vh, 18px);
+
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+
+  box-shadow: 0px 5px 12px rgba(0,0,0,0.25);
+}
+
+.loadingBar {
+  height: 100%;
+  width: 0%;
+
+  background: linear-gradient(
+    90deg,
+    red,
+    orange,
+    yellow,
+    green,
+    cyan,
+    blue
+  );
+
+  animation: loadBar 4s linear forwards;
+}
+
+@keyframes loadBar {
+  from { width: 0% }
+  to { width: 100% }
+}
+
+/* logo */
+
+.logo {
+  position: absolute;
+  top: clamp(20px, 5vh, 40px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: clamp(120px, 12vw, 180px);
+  z-index: 20;
+
+  animation: floatLogo 3s ease-in-out infinite;
+}
+
+/* floating logo animation */
+
+@keyframes floatLogo {
+  0% { transform: translate(-50%,0); }
+  50% { transform: translate(-50%,-10px); }
+  100% { transform: translate(-50%,0); }
+}
