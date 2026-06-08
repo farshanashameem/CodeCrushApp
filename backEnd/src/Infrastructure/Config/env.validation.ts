@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const envSchema = z.object({
 
@@ -16,4 +16,4 @@ export const envSchema = z.object({
     FRONTEND_URL: z.string().min(1),
     BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(8).max(15)
 
-})
+});

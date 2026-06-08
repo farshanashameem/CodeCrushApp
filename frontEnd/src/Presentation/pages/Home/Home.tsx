@@ -25,7 +25,7 @@ const HomePage = () => {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-60 -z-30"
+        className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-95 z-0"
       >
         <source src={BGVideo} type="video/mp4" />
       </video>
@@ -37,7 +37,7 @@ const HomePage = () => {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-contain z-0"
+        className="absolute inset-0 w-full h-full object-contain z-10"
       >
         <source src={BGVideo} type="video/mp4" />
       </video>
@@ -50,7 +50,7 @@ const HomePage = () => {
         <img
           src={Logo}
           alt="Logo"
-          className="w-[120px] sm:w-[160px] md:w-[220px]"
+          className="w-[100px] sm:w-[160px] md:w-[220px]"
         />
       </div>
 
@@ -75,12 +75,12 @@ const HomePage = () => {
       </div>
 
       {/* Hero Content - Forces the container to be the size of the screen */}
-      <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center z-40">
+     <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center pt-24 md:pt-32 z-40">
         {/* Start Image */}
         <img
           src={Start}
           alt="Start"
-          className="w-[220px] sm:w-[320px] md:w-[420px] lg:w-[500px]"
+          className="w-[220px] sm:w-[320px] md:w-[380px] lg:w-[400px]"
         />
 
         {/* Begin Button */}

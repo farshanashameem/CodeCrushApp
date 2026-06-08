@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../../redux/store";
 import { logoutUser } from "../../../redux/Slices/authSlice";
 import { getMe } from "../../../redux/Slices/authSlice";
+import { fetchChildren } from "../../../redux/Slices/ChildManagementSlice";
+import { avatarMap } from "../../../Constants/avatarMap";
 
 const ParentDashboard = () => {
   const navigate = useNavigate();
@@ -15,226 +17,186 @@ const ParentDashboard = () => {
 
   const [showChildren, setShowChildren] = useState(false);
   const [animate, setAnimate] = useState(false);
+  const { children, loading } = useSelector(
+    (state: RootState) => state.childManagement,
+  );
 
   useEffect(() => {
     setAnimate(true);
   }, []);
 
- const isAuthenticated = useSelector(
-  (state: RootState) =>
-    state.auth.isAuthenticated
-);
+  useEffect(() => {
+    dispatch(fetchChildren());
+  }, [dispatch]);
 
-useEffect(() => {
-  if (!isAuthenticated) {
-    dispatch(getMe());
-  }
-}, [dispatch, isAuthenticated]);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      dispatch(getMe());
+    }
+  }, [dispatch, isAuthenticated]);
 
   // get logged in user from redux
-  const parent = useSelector(
-    (state: RootState) => state.auth.user
-  );
+  const parent = useSelector((state: RootState) => state.auth.user);
 
   const handleLogout = async () => {
-  await dispatch(logoutUser());
-
-  navigate(
-    "/parent/auth",
-    { replace: true }
-  );
-};
-
-  const children = [
-    {
-      id: 1,
-      name: "Ayaan",
-      age: 6,
-      avatar:
-        "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
-    },
-    {
-      id: 2,
-      name: "Mia",
-      age: 8,
-      avatar:
-        "https://cdn-icons-png.flaticon.com/512/4140/4140051.png",
-    },
-  ];
+    await dispatch(logoutUser());
+    navigate("/parent/auth", { replace: true });
+  };
 
   return (
     <AuthLayout>
       <div
-        className={`w-full max-w-5xl mx-auto px-6
-        flex flex-col items-center transition-all duration-700
-        ${
-          animate
-            ? "translate-y-0 opacity-100"
-            : "translate-y-10 opacity-0"
-        }`}
+        className={`w-full max-w-5xl mx-auto px-4 sm:px-6
+        flex flex-col items-center transition-all duration-700 ease-out
+        ${animate ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
       >
-        <div className="mb-4">
-          <img
-            src={icon}
-            alt="parent"
-            className="w-16 h-16 object-contain"
-          />
+        {/* HEADER SECTION */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="mb-3 p-1">
+            {/* Added md:w-16 md:h-16 so the logo scales up beautifully on larger screens */}
+            <img
+              src={icon}
+              alt="parent"
+              className="w-12 h-12 md:w-16 md:h-16 object-contain"
+            />
+          </div>
+          <h2 className="font-mochiy text-[#1a3a6d] text-2xl tracking-wide mb-1">
+            PARENT DASHBOARD
+          </h2>
+          <p className="text-sm text-gray-500 text-center font-medium">
+            Manage your explorers and track their learning
+          </p>
         </div>
 
-        <h2 className="font-mochiy text-[#1a3a6d] text-xl mb-2">
-          PARENT DASHBOARD
-        </h2>
-
-        <p className="text-sm text-gray-500 text-center mb-8">
-          Manage your explorers and track their learning
-        </p>
-
         {/* PROFILE CARD */}
-        <div className="w-full bg-[#e1f5fe] rounded-[35px] p-8 shadow-lg mb-8">
+        <div className="w-full bg-gradient-to-br from-[#e1f5fe] to-[#b3e5fc]/40 rounded-3xl p-6 md:p-8 shadow-md border border-blue-100/50 mb-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* User Info Block */}
+            <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left w-full md:w-auto">
+              <div
+                className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-500 to-blue-400
+                flex items-center justify-center text-3xl font-bold text-white
+                shadow-md transform -rotate-3 hover:rotate-0 transition-transform duration-300"
+              >
+                {parent?.name?.charAt(0).toUpperCase()}
+              </div>
 
-          <div className="flex flex-col items-center">
-
-            {/* PROFILE IMAGE */}
-            <div className="w-28 h-28 rounded-full bg-blue-200
-            flex items-center justify-center
-            text-4xl font-bold text-blue-700
-            shadow-lg mb-5">
-
-              {parent?.name?.charAt(0).toUpperCase()}
-
+              <div>
+                <h3 className="font-mochiy text-[#1a3a6d] text-xl mb-1">
+                  {parent?.name}
+                </h3>
+                <p className="text-gray-600 text-sm bg-white/60 px-3 py-1 rounded-full inline-block border border-blue-100">
+                  {parent?.email}
+                </p>
+              </div>
             </div>
 
-            {/* DYNAMIC NAME */}
-            <h3 className="font-mochiy text-[#1a3a6d] text-xl">
-
-              {parent?.name}
-
-            </h3>
-
-            {/* DYNAMIC EMAIL */}
-            <p className="text-gray-600 mt-3">
-
-              {parent?.email}
-
-            </p>
-
-            {/* BUTTONS */}
-            <div className="flex flex-wrap justify-center gap-4 mt-8">
-
+            {/* Action Buttons */}
+            <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto border-t md:border-t-0 border-blue-200/40 pt-4 md:pt-0">
               <button
-                onClick={() =>
-                  setShowChildren(!showChildren)
-                }
-                className="bg-green-700
-                hover:bg-green-800
-                text-white
-                px-7 py-3
-                rounded-full
-                font-mochiy"
+                onClick={() => setShowChildren(!showChildren)}
+                className="bg-green-600 hover:bg-green-700 active:scale-95 text-white px-6 py-3 rounded-full font-mochiy text-sm shadow-sm transition-all"
               >
-                {showChildren
-                  ? "Hide Children"
-                  : "View Children"}
+                {showChildren ? "Hide Children" : "View Children"}
               </button>
 
               <button
-                onClick={() =>
-                  navigate("/parent/edit-profile")
-                }
-                className="bg-white border
-                px-7 py-3
-                rounded-full
-                font-mochiy"
+                onClick={() => navigate("/parent/edit-profile")}
+                className="bg-white hover:bg-gray-50 active:scale-95 text-[#1a3a6d] border border-gray-200 px-6 py-3 rounded-full font-mochiy text-sm shadow-sm transition-all"
               >
                 Edit Profile
               </button>
 
               <button
                 onClick={handleLogout}
-                className="bg-red-500
-                hover:bg-red-600
-                text-white
-                px-7 py-3
-                rounded-full
-                font-mochiy"
+                className="bg-red-50 hover:bg-red-100 active:scale-95 text-red-600 px-6 py-3 rounded-full font-mochiy text-sm transition-all border border-red-200"
               >
                 Logout
               </button>
-
             </div>
           </div>
         </div>
 
         {/* CHILD SECTION */}
         {showChildren && (
-          <div className="w-full">
-
+          <div className="w-full transition-all duration-300">
             {children.length === 0 ? (
-              <div className="text-center">
-
-                <p className="text-gray-500 mb-5">
+              <div className="text-center bg-gray-50 rounded-2xl p-10 border-2 border-dashed border-gray-200">
+                <p className="text-gray-500 mb-5 font-medium">
                   No children added yet
                 </p>
-
                 <button
-                  onClick={() =>
-                    navigate("/parent/add-child")
-                  }
-                  className="bg-green-700 text-white
-                  py-3 px-6 rounded-full"
+                  onClick={() => navigate("/parent/add-child")}
+                  className="bg-green-600 hover:bg-green-700 text-white font-mochiy text-sm py-3 px-8 rounded-full shadow-md transition-all"
                 >
                   Add Child +
                 </button>
-
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-
-                {children.map((child) => (
-                  <div
-                    key={child.id}
-                    onClick={() =>
-                      navigate(
-                        `/parent/child/${child.id}`
-                      )
-                    }
-                    className="bg-white p-4 rounded-3xl
-                    shadow-md hover:scale-105
-                    transition cursor-pointer"
-                  >
-                    <img
-                      src={child.avatar}
-                      alt={child.name}
-                      className="w-24 h-24 mx-auto rounded-2xl"
-                    />
-
-                    <p className="font-bold text-center mt-3 text-[#1a3a6d]">
-                      {child.name}
-                    </p>
-
-                    <p className="text-center text-sm text-gray-500">
-                      Age {child.age}
-                    </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {loading ? (
+                  <div className="col-span-full text-center py-12 text-gray-500 font-medium">
+                    <span className="inline-block animate-pulse">
+                      Loading children...
+                    </span>
                   </div>
-                ))}
+                ) : (
+                  <>
+                    {children.map((child) => (
+                      <div
+                        key={child.id}
+                        onClick={() => navigate(`/parent/children/${child.id}`)}
+                        className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm
+                        hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center group"
+                      >
+                        <div className="relative w-fit mx-auto">
+                          <div className="overflow-hidden rounded-full w-20 h-20 bg-gradient-to-b from-blue-50 to-blue-100 p-1 mb-3 border border-blue-100 shadow-inner">
+                            <img
+                              src={
+                                avatarMap[
+                                  child.avatar as keyof typeof avatarMap
+                                ]
+                              }
+                              alt={child.name}
+                              className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
 
-                <div
-                  onClick={() =>
-                    navigate("/parent/add-child")
-                  }
-                  className="bg-white rounded-3xl
-                  border-2 border-dashed
-                  h-[180px]
-                  flex flex-col
-                  items-center
-                  justify-center
-                  cursor-pointer"
-                >
-                  <span className="text-5xl">+</span>
+                          {child.status === "DELETED" && (
+                            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full font-semibold shadow">
+                              Deleted
+                            </span>
+                          )}
+                        </div>
 
-                  <p>Add Child</p>
-                </div>
+                        <p className="font-bold text-[#1a3a6d] text-base truncate px-1">
+                          {child.name}
+                        </p>
+                      </div>
+                    ))}
 
+                    {/* DASHED ADD BUTTON */}
+                    <div
+                      onClick={() => navigate("/parent/add-child")}
+                      className="bg-gray-50/40 rounded-2xl border-2 border-dashed border-gray-200
+                      hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-300
+                      flex flex-col items-center justify-center p-4 min-h-[162px] cursor-pointer group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors mb-2">
+                        <span className="text-xl text-gray-400 group-hover:text-blue-600 transition-transform group-hover:scale-110">
+                          +
+                        </span>
+                      </div>
+                      <p className="font-semibold text-gray-400 group-hover:text-blue-600 text-xs tracking-wide">
+                        Add Child
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -243,4 +205,5 @@ useEffect(() => {
     </AuthLayout>
   );
 };
+
 export default ParentDashboard;

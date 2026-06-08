@@ -1,11 +1,11 @@
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { IParentGetChildUseCase } from "../../Interfaces/ChildManagementInterfaces/IGetChildUseCase";
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { getChildDetailInputDTO, GetChildDetailOutputDTO } from "../../dto/getChild.parent.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { ChildGameDTO } from "../../dto/ChildGame.dto";
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { IParentGetChildUseCase } from '../../Interfaces/ChildManagementInterfaces/IGetChildUseCase';
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { getChildDetailInputDTO, GetChildDetailOutputDTO } from '../../dto/getChild.parent.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { ChildGameDTO } from '../../dto/ChildGame.dto';
 
 export class ParentGetChildUseCase implements IParentGetChildUseCase {
     constructor (
@@ -42,6 +42,6 @@ export class ParentGetChildUseCase implements IParentGetChildUseCase {
                 score: game.getTotalScore(),
                 lastPlayed: game.getLastPlayedAt()
             }))
-        }
+        };
     }
 }

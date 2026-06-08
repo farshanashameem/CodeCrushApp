@@ -1,4 +1,4 @@
-import OTPType from "@/Domain/enums/OTPType.enum";
+import OTPType from '@/Domain/enums/OTPType.enum';
 
 export interface SendOTPInputDTO {
     email: string;

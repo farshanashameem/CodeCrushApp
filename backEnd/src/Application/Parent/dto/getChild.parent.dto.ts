@@ -1,6 +1,5 @@
-import ChildEntity from "@/Domain/Entities/Child.entity";
-import UserStatus from "@/Domain/enums/UserStatus.enum";
-import { ChildGameDTO } from "./ChildGame.dto";
+import UserStatus from '@/Domain/enums/UserStatus.enum';
+import { ChildGameDTO } from './ChildGame.dto';
 
 export interface getChildDetailInputDTO {
     id: string;

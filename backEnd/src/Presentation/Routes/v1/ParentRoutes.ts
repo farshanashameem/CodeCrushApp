@@ -1,9 +1,12 @@
-import Express  from "express";
-import { parentAuthController } from "@/Presentation/Factory/ParentFactory";
-import { ROUTES } from "@/Shared/Routes";
-import { loginSchema } from "@/Presentation/Validators/LoginValidator";
-import { validate } from "@/Presentation/Middlewares/Validate";
-import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema } from "@/Presentation/Validators/RegisterValidator";
+import Express  from 'express';
+import { parentAuthController } from '@/Presentation/Factory/ParentFactory';
+import { ROUTES } from '@/Shared/Routes';
+import { loginSchema } from '@/Presentation/Validators/LoginValidator';
+import { validate } from '@/Presentation/Middlewares/Validate';
+import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
+import { tokenService } from '@/Presentation/Factory/ParentFactory';
+import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema } from '@/Presentation/Validators/RegisterValidator';
+import { childManagementcontroller } from '@/Presentation/Factory/ParentFactory';
 const router = Express.Router();
 
 router.post(ROUTES.PARENT.LOGIN,validate(loginSchema, 'body'), parentAuthController.login);
@@ -12,5 +15,13 @@ router.post(ROUTES.PARENT.VERIFY_OTP, validate(otpSchema, 'body' ), parentAuthCo
 router.post(ROUTES.PARENT.RESEND_OTP, validate(resendOtpSchema, 'body'), parentAuthController.ResendOTP);
 router.post(ROUTES.PARENT.FORGOT_PASSWORD, validate( forgotPasswordSchema, 'body'), parentAuthController.forgotPassword);
 router.post(ROUTES.PARENT.RESET_PASSWORD, validate( resetPasswordSchema, 'body'), parentAuthController.resetPassword);
+
+router.use( authHandler(tokenService));
+router.get( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BASE,childManagementcontroller.getAllChildren);
+router.get( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BY_ID, childManagementcontroller.getChildDetails);
+router.post( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BASE, childManagementcontroller.addChild );
+router.put( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BY_ID, childManagementcontroller.updateChild );
+router.patch( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.STATUS, childManagementcontroller.toggleChildStatus );
+
 
 export default router;

@@ -1,5 +1,4 @@
-import OTPType from "@/Domain/enums/OTPType.enum";
-import { boolean } from "zod";
+import OTPType from '@/Domain/enums/OTPType.enum';
 
 export interface ResendOTPInputDTO {
     email: string;

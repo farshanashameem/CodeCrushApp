@@ -16,15 +16,15 @@ app.use(
 app.use( cors ({
      origin: 'http://localhost:5173',
     credentials: true
-}))
+}));
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
 connectDB().catch(( err: any )=> {
-    logger.error({err}, 'Database connection failed')
-    process.exit(1)
+    logger.error({err}, 'Database connection failed');
+    process.exit(1);
 });
 
 app.use('/api', routes );

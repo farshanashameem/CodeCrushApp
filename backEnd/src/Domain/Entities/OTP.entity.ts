@@ -1,4 +1,4 @@
-import OTPType from "../enums/OTPType.enum";
+import OTPType from '../enums/OTPType.enum';
 
 export class OTPEntity {
     private name?: string;

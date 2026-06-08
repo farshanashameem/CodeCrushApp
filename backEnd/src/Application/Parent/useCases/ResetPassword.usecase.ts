@@ -1,12 +1,11 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IResetPasswordUseCase } from "../Interfaces/IResetPasswordUseCase";
-import { IOTPService } from "@/Application/Interfaces/Services/IOTPService";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { ITokenservice } from "@/Application/Interfaces/Services/ITokenService";
-import { ResetPasswordInputDTO, ResetPasswordOutputDTO } from "../dto/resetPassword.parent.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IResetPasswordUseCase } from '../Interfaces/IResetPasswordUseCase';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { ITokenservice } from '@/Application/Interfaces/Services/ITokenService';
+import { ResetPasswordInputDTO, ResetPasswordOutputDTO } from '../dto/resetPassword.parent.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
     constructor(
@@ -29,7 +28,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
         const hashedPassword =await this._hashService.hash(Request.newPassword);
         await this._parentRepository.updatePassword(parent.getId()!, hashedPassword);
 
-        return { success: true }
+        return { success: true };
         
         
     }

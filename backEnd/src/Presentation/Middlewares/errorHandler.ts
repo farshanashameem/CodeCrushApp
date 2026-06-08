@@ -1,9 +1,9 @@
-import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
-import { AppError } from "@/Domain/Errors/app.error";
-import { success, ZodError } from "zod";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import { error } from "node:console";
+import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+import { AppError } from '@/Domain/Errors/app.error';
+import {  ZodError } from 'zod';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+
 
 export const errorHandler: ErrorRequestHandler = (
     error: unknown,
@@ -19,13 +19,13 @@ export const errorHandler: ErrorRequestHandler = (
             success: false,
             message: error.message
         });
-        return
+        return;
     }  else if( error instanceof ZodError ) {
         const errorMessage = error.issues.map((err) => err.message)[0];
         res.status(StatusCodes.BAD_REQUEST).json({
             success: false,
             message: errorMessage
-        })
+        });
         return;
     }  else {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -33,4 +33,4 @@ export const errorHandler: ErrorRequestHandler = (
             message: authMessages.error.INTERNAL_SERVER_ERROR
         });
     }
-}
+};

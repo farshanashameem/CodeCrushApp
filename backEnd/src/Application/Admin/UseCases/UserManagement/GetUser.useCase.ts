@@ -1,9 +1,9 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IAdminGetUserUseCase } from "../../Interfaces/UserManagement/IAdminGetUser.useCase";
-import { AdminGetParentInputDTO, AdminGetParentOutputDTO } from "../../dto/UserManagement/getParent.admin.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IAdminGetUserUseCase } from '../../Interfaces/UserManagement/IAdminGetUser.useCase';
+import { AdminGetParentInputDTO, AdminGetParentOutputDTO } from '../../dto/UserManagement/getParent.admin.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class GetUserUseCase implements IAdminGetUserUseCase {
     constructor(
@@ -29,6 +29,6 @@ export class GetUserUseCase implements IAdminGetUserUseCase {
             email: parent.getEmail(),
             status: parent.getStatus(),
             childrenIds: parent.getChildrenIds()
-        }
+        };
     }
 }

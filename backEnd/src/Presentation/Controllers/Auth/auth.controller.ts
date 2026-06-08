@@ -1,14 +1,12 @@
-import { Request, Response, NextFunction } from "express";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { success } from "zod";
-import { IGetMeUseCase } from "@/Application/Common/Interfaces/IGetMeUseCase";
-import { IRefreshTokenUseCase } from "@/Application/Common/Interfaces/IRefreshTokenUseCase";
-import { ILogoutUseCase } from "@/Application/Common/Interfaces/ILogoutUseCase";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import { GetMeInputDTO } from "@/Application/Common/dto/getMe.dto";
-import UserRole from "@/Domain/enums/UserRole.enum";
-import logger from "@/Infrastructure/Services/Logger";
-import { env } from "@/Infrastructure/Config/env";
+import { Request, Response, NextFunction } from 'express';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { IGetMeUseCase } from '@/Application/Common/Interfaces/IGetMeUseCase';
+import { IRefreshTokenUseCase } from '@/Application/Common/Interfaces/IRefreshTokenUseCase';
+import { ILogoutUseCase } from '@/Application/Common/Interfaces/ILogoutUseCase';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { GetMeInputDTO } from '@/Application/Common/dto/getMe.dto';
+import logger from '@/Infrastructure/Services/Logger';
+import { env } from '@/Infrastructure/Config/env';
 
 export class AuthController {
     constructor (
@@ -33,19 +31,19 @@ export class AuthController {
             const payload:GetMeInputDTO = {
                 id: id,
                 role: role
-            }
+            };
 
             const user = await this._getMeUseCase.execute( payload );
             return res.status( StatusCodes.OK).json({
                 success: true,
                 user
-            })
+            });
 
 
         } catch ( error) {
-            next(error)
+            next(error);
         }
-    }
+    };
 
     refreshToken = async ( req: Request, res: Response, next : NextFunction) => {
         try {
@@ -55,55 +53,55 @@ export class AuthController {
 
             const tokens = await this._refreshTokenUseCase.execute({token: refreshToken});
 
-            res.cookie("refreshToken", tokens.refreshToken, {
+            res.cookie('refreshToken', tokens.refreshToken, {
                 httpOnly: true,
                 secure: false,
-                sameSite: "lax",
+                sameSite: 'lax',
                 maxAge: env.JWT_REFRESH_TOKEN_MAX_AGE,
                 path: '/'
-            })
+            });
 
-             res.cookie("accessToken", tokens.accessToken, {
+             res.cookie('accessToken', tokens.accessToken, {
                 httpOnly: true,
                 secure: false,
-                sameSite: "lax",
+                sameSite: 'lax',
                 maxAge: env.JWT_ACCESS_TOKEN_MAX_AGE,
                 path: '/'
-            })
+            });
 
             return res.status( StatusCodes.OK).json({
                 success: true,
                 message: authMessages.success.TOKEN_REFRESHED
-            })
+            });
         } catch(error) {
-            next( error)
+            next( error);
         }
         
-    }
+    };
 
     logout = async ( req: Request, res: Response, next: NextFunction ) => {
         try {
 
-            const refreshToken = req.cookies.refreshToken
+            const refreshToken = req.cookies.refreshToken;
             await this._logoutuseCase.execute( refreshToken);
 
             res.clearCookie('refreshToken', {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: 'lax',
                 secure: false,
-                path: "/"
-            })
+                path: '/'
+            });
 
             res.clearCookie('accessToken', {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: 'lax',
                 secure: false,
-                path: "/"
-            })
+                path: '/'
+            });
 
             return res.status( StatusCodes.NO_CONTENT).send();
         } catch(error ) {
-            next( error)
+            next( error);
         }
-    }
+    };
 }

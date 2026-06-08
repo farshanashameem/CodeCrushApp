@@ -1,0 +1,74 @@
+import { AdminGetChildUseCase } from '@/Application/Admin/UseCases/UserManagement/GetChild.usecase';
+import { AdminToggleChildStatus } from '@/Application/Admin/UseCases/UserManagement/ToggleChildStatus.usecase';
+import { ToggleUserStatusInputDTO } from '@/Application/Common/dto/UserStatus.dto';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { AppError } from '@/Domain/Errors/app.error';
+import { updateStatusSchema, userIdSchema } from '@/Presentation/Validators/AdminValidator';
+import { childIdSchema } from '@/Presentation/Validators/child_management.validator';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { NextFunction, Request, Response } from 'express';
+
+
+export class ChildManagementController {
+    constructor (
+        private _toggleStatus: AdminToggleChildStatus,
+        private _getChild: AdminGetChildUseCase
+    ) {}
+
+    toggleStatus = async( req: Request, res: Response, next: NextFunction ) : Promise<Response | void > => {
+        try {
+
+            const { id } = userIdSchema.parse(req.params);
+            const { action } = updateStatusSchema.parse( req.body );
+
+            const requesterId = req.user?.id;
+            if(!requesterId ) {
+                throw new AppError(authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED );
+            }
+
+            const payload: ToggleUserStatusInputDTO = {
+                    requesterId,
+                    targetId: id,
+                    action,
+                  };
+
+            const result = await this._toggleStatus.execute( payload );
+
+            return res.status( StatusCodes.OK).json({
+                success: true,
+                message: authMessages.success.CHILD_STATUS_UPDATED,
+                data: result
+            });
+
+        }catch(error){
+            next(error);
+        }
+    };
+
+    childDetails= async ( req: Request, res: Response, next: NextFunction ) : Promise< Response | void > => {
+        try {
+
+            const requesterId = req.user?.id;
+            const { childId } = childIdSchema.parse(req.params);
+            
+            
+            if(!requesterId ) {
+                throw new AppError(authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED );
+            }
+
+            const payload = {
+                id: childId
+            };
+
+            const child = await this._getChild.execute( payload );
+
+            return res.status(StatusCodes.OK).json({
+                success: true,
+                data: child,
+            });
+
+        }catch ( error ) {
+            next( error );
+        }
+    };
+}

@@ -1,9 +1,8 @@
-import { AccessTokenPayload, ITokenservice, RefreshTokenPayload, ResetTokenPayload } from "@/Application/Interfaces/Services/ITokenService";
-import { jwtConfig } from "../Config/jwt.config";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import crypto from 'crypto';
+import { AccessTokenPayload, ITokenservice, RefreshTokenPayload, ResetTokenPayload } from '@/Application/Interfaces/Services/ITokenService';
+import { jwtConfig } from '../Config/jwt.config';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import jwt from 'jsonwebtoken';
 
 export class TokenService implements ITokenservice {

@@ -1,5 +1,5 @@
-import { Model, Types } from "mongoose";
-import { IBaseRepository } from "@/Domain/RepositoryInterface/IBase.repository";
+import { Model, Types } from 'mongoose';
+import { IBaseRepository } from '@/Domain/RepositoryInterface/IBase.repository';
 
 
 

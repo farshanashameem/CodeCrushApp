@@ -1,5 +1,5 @@
-import { OTPEntity } from "@/Domain/Entities/OTP.entity";
-import { IOtp } from "@/Infrastructure/Database/Model/OTPModel";
+import { OTPEntity } from '@/Domain/Entities/OTP.entity';
+import { IOtp } from '@/Infrastructure/Database/Model/OTPModel';
 
 
 /**
@@ -18,7 +18,7 @@ export class OtpMapper {
             doc.createdAt,
             doc.pendingData?.name,
             doc.pendingData?.password
-        )
+        );
     };
 
     //Entity to DB
@@ -34,7 +34,7 @@ export class OtpMapper {
                 password: entity.getPassword()
             }: undefined,
             createdAt: entity.getCreatedAt()
-        }
+        };
     }
    
 }

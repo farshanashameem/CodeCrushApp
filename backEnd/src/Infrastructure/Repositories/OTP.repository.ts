@@ -1,8 +1,8 @@
-import { IOTPRepository } from "@/Domain/RepositoryInterface/IOTP.repository";
-import { OtpModel } from "../Database/Model/OTPModel";
-import { OTPEntity } from "@/Domain/Entities/OTP.entity";
-import OTPType from "@/Domain/enums/OTPType.enum";
-import { OtpMapper } from "@/Application/Mappers/Otp.mapper";
+import { IOTPRepository } from '@/Domain/RepositoryInterface/IOTP.repository';
+import { OtpModel } from '../Database/Model/OTPModel';
+import { OTPEntity } from '@/Domain/Entities/OTP.entity';
+import OTPType from '@/Domain/enums/OTPType.enum';
+import { OtpMapper } from '@/Application/Mappers/Otp.mapper';
 
 
 export class OTPRepository implements IOTPRepository {

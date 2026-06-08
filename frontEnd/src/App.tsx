@@ -17,19 +17,16 @@ import OTPPage from "./Presentation/pages/Auth/OTPPage";
 import ForgotPasswordPage from "./Presentation/pages/Auth/ForgotPasswordPage";
 import ResetPasswordPage from "./Presentation/pages/Auth/ResetPasswordPage";
 
-const ParentDashboard = lazy(
-  () => import("./Presentation/pages/Parent/Dashboard")
-);
 
-const AdminLogin = lazy(
-  () => import("./Presentation/pages/Admin/AdminLogin")
-);
 
-const AdminDashBoard = lazy(
-  () => import("./Presentation/pages/Admin/AdminDashBoard")
-);
+const ParentDashboard = lazy( () => import("./Presentation/pages/Parent/Dashboard"));
+const AddChildPage = lazy( () => import("./Presentation/pages/Parent/AddChildPage"));
+const ChildProgressPage = lazy( ()=> import( "./Presentation/pages/Parent/ChildProgressPage"))
 
-const Users = lazy ( ()=> import("./Presentation/pages/Admin/Users"))
+const AdminLogin = lazy( () => import("./Presentation/pages/Admin/AdminLogin"));
+const AdminDashBoard = lazy( () => import("./Presentation/pages/Admin/AdminDashBoard") );
+const Users = lazy ( ()=> import("./Presentation/pages/Admin/Users"));
+const UserDetails = lazy( ()=> import('./Presentation/pages/Admin/UserDetails'));
 
 function App() {
 
@@ -108,13 +105,28 @@ function App() {
           {/* Parent protected */}
           <Route
             path={ROUTES.PARENT.DASHBOARD}
+            element={  <ProtectedRoute  allowedRole="parent"  >
+                       <ParentDashboard />  </ProtectedRoute>  }
+          />
+
+          <Route
+            path="/parent/add-child"
+            element={  <ProtectedRoute  allowedRole="parent"  >
+                       <AddChildPage />  </ProtectedRoute>  }
+          />
+
+          <Route
+            path={ ROUTES.PARENT.CHILD_DETAILS}
+            element={  <ProtectedRoute  allowedRole="parent"  >
+                       <ChildProgressPage />  </ProtectedRoute>  }
+          />
+
+          <Route
+            path="/parent/child/edit/:id"
             element={
-              <ProtectedRoute
-                allowedRole="parent"
-              >
-                <ParentDashboard />
-              </ProtectedRoute>
-            }
+              <ProtectedRoute allowedRole="parent">
+                <AddChildPage />
+              </ProtectedRoute> }
           />
 
           {/* redirect /admin */}
@@ -153,6 +165,17 @@ function App() {
                 allowedRole="admin"
               >
                 <Users />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.ADMIN.USER_DETAILS}
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+              >
+                <UserDetails />
               </ProtectedRoute>
             }
           />

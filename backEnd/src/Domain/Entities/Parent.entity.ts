@@ -1,8 +1,8 @@
-import BaseUser from "./BaseUser.entity";
-import UserRole from "../enums/UserRole.enum";
-import UserStatus from "../enums/UserStatus.enum";
-import BaseStatusEntity from "./BaseStatus.entity";
-import { IStatusEntity } from "./IStatusEntity";
+import BaseUser from './BaseUser.entity';
+import UserRole from '../enums/UserRole.enum';
+import UserStatus from '../enums/UserStatus.enum';
+import BaseStatusEntity from './BaseStatus.entity';
+import { IStatusEntity } from './IStatusEntity';
 
 export default class ParentEntity extends BaseUser implements IStatusEntity {
 
@@ -16,7 +16,7 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
         id?: string,
         childrenIds: string[] = [],
         status: UserStatus = UserStatus.ACTIVE,
-        refreshToken: string= "",
+        refreshToken: string= '',
         createdAt?: Date,
         updatedAt?: Date
     ) {

@@ -1,4 +1,4 @@
-import UserStatus from "../enums/UserStatus.enum";
+import UserStatus from '../enums/UserStatus.enum';
 
 export interface IStatusEntity {
     getId(): string | undefined;

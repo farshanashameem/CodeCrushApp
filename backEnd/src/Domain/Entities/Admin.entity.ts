@@ -1,5 +1,5 @@
-import UserRole from "../enums/UserRole.enum";
-import BaseUser from "./BaseUser.entity";
+import UserRole from '../enums/UserRole.enum';
+import BaseUser from './BaseUser.entity';
 
 export default class AdminEntity extends BaseUser {
     private refreshToken: string;
@@ -8,7 +8,7 @@ export default class AdminEntity extends BaseUser {
         email: string,
         password: string,
         id: string,
-        refreshToken: string= "",
+        refreshToken: string= '',
         createdAt: Date, 
         updatedAt : Date
     ) {

@@ -1,14 +1,13 @@
-import UserRole from "@/Domain/enums/UserRole.enum";
-import { IGetMeUseCase } from "../Interfaces/IGetMeUseCase";
-import { IBaseRepository } from "@/Domain/RepositoryInterface/IBase.repository";
-import ParentEntity from "@/Domain/Entities/Parent.entity";
-import AdminEntity from "@/Domain/Entities/Admin.entity";
-import { GetMeInputDTO, GetMeOutputDTO } from "../dto/getMe.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { IStatusEntity } from "@/Domain/Entities/IStatusEntity";
-import UserStatus from "@/Domain/enums/UserStatus.enum";
+import UserRole from '@/Domain/enums/UserRole.enum';
+import { IGetMeUseCase } from '../Interfaces/IGetMeUseCase';
+import { IBaseRepository } from '@/Domain/RepositoryInterface/IBase.repository';
+import ParentEntity from '@/Domain/Entities/Parent.entity';
+import AdminEntity from '@/Domain/Entities/Admin.entity';
+import { GetMeInputDTO, GetMeOutputDTO } from '../dto/getMe.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import UserStatus from '@/Domain/enums/UserStatus.enum';
 
 export class GetMeUseCase implements IGetMeUseCase {
     constructor(
@@ -29,7 +28,7 @@ export class GetMeUseCase implements IGetMeUseCase {
             throw new AppError(authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
         }
 
-        if ("getStatus" in user) {
+        if ('getStatus' in user) {
     const status = user.getStatus();
 
     if (status === UserStatus.BLOCKED) {
@@ -53,7 +52,7 @@ export class GetMeUseCase implements IGetMeUseCase {
             name: user.getName(),
             email: user.getEmail(),
             role: user.getRole()
-        }
+        };
     }
     
 }

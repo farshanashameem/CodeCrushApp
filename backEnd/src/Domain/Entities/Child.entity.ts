@@ -1,7 +1,9 @@
-import ChildGameEntity from "./ChildGame.entity";
-import UserStatus from "../enums/UserStatus.enum";
-import BaseStatusEntity from "./BaseStatus.entity";
-import { IStatusEntity } from "./IStatusEntity";
+import ChildGameEntity from './ChildGame.entity';
+import UserStatus from '../enums/UserStatus.enum';
+import BaseStatusEntity from './BaseStatus.entity';
+import { IStatusEntity } from './IStatusEntity';
+import { ChildUpdateData } from '../Types/ChildUpdateData';
+import { BlockedBy } from '../enums/blockedBy.enum';
 
 export default class ChildEntity extends BaseStatusEntity implements IStatusEntity{
   private id?: string;
@@ -10,6 +12,7 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
   private age: number;
   private dob?: Date;
   private avatar: string;
+  private blockedBy: BlockedBy | null;
   private createdAt: Date;
 
   private totalPlayTime: number;
@@ -26,6 +29,7 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     dob?: Date,
     createdAt?: Date,
     status: UserStatus = UserStatus.ACTIVE,
+    blockedBy: BlockedBy | null = null,
     totalPlayedTime: number = 0,
     totalGamesPlayed: number = 0,
     lastPlayed?: Date,
@@ -38,6 +42,7 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     this.age = age;
     this.dob = dob;
     this.avatar = avatar;
+    this.blockedBy = blockedBy;
     this.id = id;
     this.createdAt = createdAt ?? new Date();
     this.totalGamesPlayed = totalGamesPlayed;
@@ -66,6 +71,18 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     return this.avatar;
   }
 
+  public getBlockedBy(): BlockedBy | null {
+    return this.blockedBy;
+  }
+
+  public setBlockedBy(blockedBy: BlockedBy): void {
+      this.blockedBy = blockedBy;
+  }
+
+  public clearBlockedBy(): void {
+    this.blockedBy = null;
+  }
+
   public getDob(): Date | undefined {
     return this.dob;
   }
@@ -85,4 +102,24 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
   public getTotalPlayedTime(): number {
     return this.totalPlayTime;
   }
+
+   public update(data: ChildUpdateData): void {
+
+    if (data.name !== undefined) {
+      this.name = data.name;
+    }
+
+    if (data.age !== undefined) {
+      this.age = data.age;
+    }
+
+    if (data.avatar !== undefined) {
+      this.avatar = data.avatar;
+    }
+
+    if (data.dob !== undefined) {
+      this.dob = data.dob;
+    }
+  }
+
 }

@@ -81,6 +81,63 @@ export const resetPasswordSchema = z.object({
     
 })
 
+export const addChildSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(30, "Name must be at most 30 characters")
+    .regex(
+      /^[A-Za-z]+( [A-Za-z]+)*$/,
+      "Name must contain only letters"
+    ),
+
+  age: z.coerce
+    .number()
+    .min(1, "Age must be at least 1")
+    .max(18, "Age must be less than or equal to 18"),
+
+  avatar: z
+    .string()
+    .trim()
+    .min(1, "Please select an avatar"),
+
+  dob: z
+    .string()
+    .optional(),
+});
+
+export const updateChildSchema = z.object({
+  id: z
+    .string()
+    .trim()
+    .min(1, "Child id is required"),
+
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(30, "Name must be at most 30 characters")
+    .regex(
+      /^[A-Za-z]+( [A-Za-z]+)*$/,
+      "Name must contain only letters"
+    ),
+
+  age: z.coerce
+    .number()
+    .min(1, "Age must be at least 1")
+    .max(18, "Age must be less than or equal to 18"),
+
+  avatar: z
+    .string()
+    .trim()
+    .min(1, "Please select an avatar"),
+
+  dob: z
+    .string()
+    .optional(),
+});
+
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>

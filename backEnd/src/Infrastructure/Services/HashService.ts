@@ -1,7 +1,7 @@
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { env } from "../Config/env";
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { env } from '../Config/env';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto' 
+import crypto from 'crypto'; 
 
 export class HashService implements IHashService {
 
@@ -15,6 +15,6 @@ export class HashService implements IHashService {
     }
 
     hashToken(token: string): string {
-        return crypto.createHash('sha256').update(token).digest("hex");
+        return crypto.createHash('sha256').update(token).digest('hex');
     }
 }

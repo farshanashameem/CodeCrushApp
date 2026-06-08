@@ -11,6 +11,7 @@ export interface User {
       | "DELETED";
 
     childrenIds: string[];
+    createdAt: Date;
 }
  
 

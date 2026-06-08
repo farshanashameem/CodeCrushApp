@@ -1,4 +1,4 @@
-import UserRole from "../enums/UserRole.enum";
+import UserRole from '../enums/UserRole.enum';
 
 export default class BaseUser {
     protected id?: string;
