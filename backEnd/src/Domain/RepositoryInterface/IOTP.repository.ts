@@ -1,5 +1,5 @@
-import { OTPEntity } from "../Entities/OTP.entity";
-import OTPType from "../enums/OTPType.enum";
+import { OTPEntity } from '../Entities/OTP.entity';
+import OTPType from '../enums/OTPType.enum';
 
 
 export interface IOTPRepository {

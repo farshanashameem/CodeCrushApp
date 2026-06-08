@@ -1,13 +1,13 @@
-import UserRole from "@/Domain/enums/UserRole.enum";
-import { ILogoutUseCase } from "../Interfaces/ILogoutUseCase";
-import { IAuthRepository } from "@/Domain/RepositoryInterface/IAuth.repository";
-import AdminEntity from "@/Domain/Entities/Admin.entity";
-import ParentEntity from "@/Domain/Entities/Parent.entity";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { ITokenservice } from "@/Application/Interfaces/Services/ITokenService";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import UserRole from '@/Domain/enums/UserRole.enum';
+import { ILogoutUseCase } from '../Interfaces/ILogoutUseCase';
+import { IAuthRepository } from '@/Domain/RepositoryInterface/IAuth.repository';
+import AdminEntity from '@/Domain/Entities/Admin.entity';
+import ParentEntity from '@/Domain/Entities/Parent.entity';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { ITokenservice } from '@/Application/Interfaces/Services/ITokenService';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class LogoutUseCase implements ILogoutUseCase {
     constructor (
@@ -39,8 +39,8 @@ export class LogoutUseCase implements ILogoutUseCase {
             throw new AppError ( authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
         }
 
-        const hashedRefreshToken = await this._hashService.hash( refreshToken)
-        await repository.updateToken(id, hashedRefreshToken)
+        const hashedRefreshToken = await this._hashService.hash( refreshToken);
+        await repository.updateToken(id, hashedRefreshToken);
 
     }
 }

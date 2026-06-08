@@ -1,5 +1,6 @@
-import mongoose, { Types, Document, Schema, Model } from "mongoose";
-import UserStatus from "@/Domain/enums/UserStatus.enum";
+import mongoose, { Types, Document, Schema, Model } from 'mongoose';
+import UserStatus from '@/Domain/enums/UserStatus.enum';
+import { BlockedBy } from '@/Domain/enums/blockedBy.enum';
 
 export interface IChildGame {
     gameId: Types.ObjectId;
@@ -20,6 +21,7 @@ export interface IChild extends Document {
     dob?: Date;
     avatar: string;
     status: UserStatus;
+    blockedBy: BlockedBy | null;
     totalPlayTime: number;
     totalGamesPlayed: number;
     lastPlayed?: Date;
@@ -33,7 +35,7 @@ const ChildGameSchema: Schema<IChildGame> = new Schema(
 {
     gameId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Game",
+        ref: 'Game',
         required: true
     },
     gameName: {
@@ -72,7 +74,7 @@ const ChildSchema: Schema<IChild> = new Schema(
 {
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Parent",
+        ref: 'Parent',
         required: true,
         index: true
     },
@@ -102,6 +104,12 @@ const ChildSchema: Schema<IChild> = new Schema(
         default: UserStatus.ACTIVE
     },
 
+    blockedBy: {
+        type: String,
+        enum: Object.values(BlockedBy),
+        default: null
+    },
+
     totalPlayTime: {
         type: Number,
         default: 0
@@ -126,6 +134,6 @@ const ChildSchema: Schema<IChild> = new Schema(
 );
 
 export const ChildModel: Model<IChild> = mongoose.model<IChild>(
-    "Child",
+    'Child',
     ChildSchema
 );

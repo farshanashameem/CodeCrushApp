@@ -1,0 +1,21 @@
+import av1 from "../assets/avatar/av1.png";
+import av2 from "../assets/avatar/av2.png";
+import av3 from "../assets/avatar/av3.png";
+import av4 from "../assets/avatar/av4.png";
+import av5 from "../assets/avatar/av5.png";
+import av6 from "../assets/avatar/av6.png";
+import av7 from "../assets/avatar/av7.png";
+import av8 from "../assets/avatar/av8.png";
+import av9 from "../assets/avatar/av9.png";
+import av10 from "../assets/avatar/av10.png";
+import av11 from "../assets/avatar/av11.png";
+import av12 from "../assets/avatar/av12.png";
+import av13 from "../assets/avatar/av13.png";
+import av14 from "../assets/avatar/av14.png";
+import av15 from "../assets/avatar/av15.png";
+import av16 from "../assets/avatar/av16.png";
+import av17 from "../assets/avatar/av17.png";
+import av18 from "../assets/avatar/av18.png";
+import av19 from "../assets/avatar/av19.png";
+
+export const avatarMap = { av1, av2, av3, av4, av5, av6, av7, av8,av9, av10, av11, av12, av13, av14, av15, av16, av17, av18, av19};

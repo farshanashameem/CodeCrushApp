@@ -1,6 +1,6 @@
-import ParentEntity from "@/Domain/Entities/Parent.entity";
-import UserRole from "@/Domain/enums/UserRole.enum";
-import { IParent } from "@/Infrastructure/Database/Model/ParentModel";
+import ParentEntity from '@/Domain/Entities/Parent.entity';
+import UserRole from '@/Domain/enums/UserRole.enum';
+import { IParent } from '@/Infrastructure/Database/Model/ParentModel';
 
 export class ParentMapper {
 
@@ -14,7 +14,7 @@ export class ParentMapper {
             doc._id.toString(),
             doc.childrenIds?.map(id => id.toString()) ?? [],
             doc.status,
-            doc.refreshToken ?? "",
+            doc.refreshToken ?? '',
             doc.createdAt,
             doc.updatedAt
         );

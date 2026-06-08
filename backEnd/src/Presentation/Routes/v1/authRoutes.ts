@@ -1,8 +1,8 @@
-import { authHandler } from "@/Presentation/Middlewares/AuthMiddleware";
-import { tokenService } from "@/Presentation/Factory/ParentFactory";
-import { ROUTES } from "@/Shared/Routes";
-import Express from "express";
-import { authController } from "@/Presentation/Factory/AuthFactory";
+import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
+import { tokenService } from '@/Presentation/Factory/ParentFactory';
+import { ROUTES } from '@/Shared/Routes';
+import Express from 'express';
+import { authController } from '@/Presentation/Factory/AuthFactory';
 
 const router = Express.Router();
 

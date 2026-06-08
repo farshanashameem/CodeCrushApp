@@ -1,11 +1,11 @@
-import { AppError } from "@/Domain/Errors/app.error";
-import { IAdminRepository } from "@/Domain/RepositoryInterface/IAdmin.repository";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { ITokenservice } from "@/Application/Interfaces/Services/ITokenService";
-import { LoginUserInputDTO, LoginUserOutputDTO } from "@/Application/Common/dto/Login.User.dto";
-import { IAdminLoginUseCase } from "../../Interfaces/Auth/IAdminLoginUseCase";
+import { AppError } from '@/Domain/Errors/app.error';
+import { IAdminRepository } from '@/Domain/RepositoryInterface/IAdmin.repository';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { ITokenservice } from '@/Application/Interfaces/Services/ITokenService';
+import { LoginUserInputDTO, LoginUserOutputDTO } from '@/Application/Common/dto/Login.User.dto';
+import { IAdminLoginUseCase } from '../../Interfaces/Auth/IAdminLoginUseCase';
 
 
 export class AdminLoginUseCase implements IAdminLoginUseCase {
@@ -41,7 +41,7 @@ export class AdminLoginUseCase implements IAdminLoginUseCase {
         const refreshToken = this._tokenService.generateRefreshToken({ id: id, role: admin.getRole()});
         const accessToken = this._tokenService.generateAccessToken({ id: id,email: admin.getEmail(), role: admin.getRole(),});
 
-        const hashedRefreshToken = await this._hashService.hashToken(refreshToken);
+        const hashedRefreshToken =  this._hashService.hashToken(refreshToken);
         await this._adminRepository.updateToken(id, hashedRefreshToken);
 
         return {
@@ -53,7 +53,7 @@ export class AdminLoginUseCase implements IAdminLoginUseCase {
                 name: admin.getName(),
                 role: admin.getRole()
             
-        }
+        };
 
     }
 }

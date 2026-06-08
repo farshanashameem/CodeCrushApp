@@ -1,40 +1,43 @@
-import ChildEntity from "@/Domain/Entities/Child.entity";
-import { IChild, IChildGame } from "@/Infrastructure/Database/Model/ChildModel";
-import ChildGameEntity from "@/Domain/Entities/ChildGame.entity";
+import ChildEntity from '@/Domain/Entities/Child.entity';
+import { IChild, IChildGame } from '@/Infrastructure/Database/Model/ChildModel';
+import ChildGameEntity from '@/Domain/Entities/ChildGame.entity';
 
 export class ChildMapper {
 
     // DB → Entity
-    static toEntity(doc: IChild): ChildEntity {
+   static toEntity(doc: IChild): ChildEntity {
 
-        const games = doc.games.map((g: IChildGame) =>
-            new ChildGameEntity(
-                g.gameId.toString(),
-                g.gameName,
-                g.currentLevel,
-                g.currentLevelHighScore,
-                g.playTime,
-                g.totalScore,
-                g.averageScore,
-                g.lastPlayedAt?? new Date()
-            )
-        );
+    const games = (doc.games ?? []).map(
+        (g:IChildGame)=>
 
-        return new ChildEntity(
-            doc.parentId.toString(),
-            doc.name,
-            doc.age,
-            doc.avatar,
-            doc._id.toString(),
-            doc.dob,
-            doc.createdAt,
-            doc.status,
-            doc.totalPlayTime,
-            doc.totalGamesPlayed,
-            doc.lastPlayed ,
-            games
-        );
-    }
+        new ChildGameEntity(
+            g.gameId.toString(),
+            g.gameName,
+            g.currentLevel,
+            g.currentLevelHighScore,
+            g.playTime,
+            g.totalScore,
+            g.averageScore,
+            g.lastPlayedAt ?? new Date()
+        )
+    );
+
+    return new ChildEntity(
+        doc.parentId.toString(),
+        doc.name,
+        doc.age,
+        doc.avatar,
+        doc._id?.toString(),
+        doc.dob,
+        doc.createdAt,
+        doc.status,
+        doc.blockedBy,
+        doc.totalPlayTime,
+        doc.totalGamesPlayed,
+        doc.lastPlayed,
+        games
+    );
+}
 
     // Entity → DB
     static toDocument(entity: ChildEntity) {
@@ -46,6 +49,7 @@ export class ChildMapper {
             dob: entity.getDob(),
             avatar: entity.getAvatar(),
             status: entity.getStatus(),
+            blockedBy: entity.getBlockedBy(),
 
             totalPlayTime: entity.getTotalPlayedTime(),
             totalGamesPlayed: entity.getTotalGamesPlayed(),

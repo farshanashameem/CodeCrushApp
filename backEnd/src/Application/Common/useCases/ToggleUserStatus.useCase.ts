@@ -1,11 +1,11 @@
-import { IUserStatusRepository } from "@/Domain/RepositoryInterface/IUserStatus.repository";
-import { IToggleUserStatusUseCase } from "../Interfaces/IToggleUseStatusUserCase";
-import { ToggleUserStatusInputDTO, ToggleUserStatusOutputDTO } from "../dto/UserStatus.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { UserAction } from "@/Application/enums/userAction.enum";
-import UserStatus from "@/Domain/enums/UserStatus.enum";
+import { IUserStatusRepository } from '@/Domain/RepositoryInterface/IUserStatus.repository';
+import { IToggleUserStatusUseCase } from '../Interfaces/IToggleUseStatusUserCase';
+import { ToggleUserStatusInputDTO, ToggleUserStatusOutputDTO } from '../dto/UserStatus.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { UserAction } from '@/Application/enums/userAction.enum';
+
 
 export class ToggleUserStatusUseCase implements IToggleUserStatusUseCase {
     constructor(
@@ -47,7 +47,7 @@ export class ToggleUserStatusUseCase implements IToggleUserStatusUseCase {
                     break;
                 }
                 default: {
-                    throw new AppError( authMessages.error.INVALID_ACTION, StatusCodes.BAD_REQUEST)
+                    throw new AppError( authMessages.error.INVALID_ACTION, StatusCodes.BAD_REQUEST);
                 }
             }
 
@@ -57,7 +57,7 @@ export class ToggleUserStatusUseCase implements IToggleUserStatusUseCase {
             return {
                 id: user.getId()!,
                 status: user.getStatus()
-            }
+            };
         
     }
 }

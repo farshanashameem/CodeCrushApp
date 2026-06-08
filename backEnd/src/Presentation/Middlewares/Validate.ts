@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { ZodSchema, ZodTypeAny, z } from "zod";
+import { Request, Response, NextFunction } from 'express';
 
-type RequestProperty = "body" | "query" | "params";
+type RequestProperty = 'body' | 'query' | 'params';
 
 export const validate = <T extends z.ZodTypeAny>( schema:T, property: RequestProperty) => (
     req: Request, res: Response, next: NextFunction
@@ -12,9 +11,9 @@ export const validate = <T extends z.ZodTypeAny>( schema:T, property: RequestPro
     if( property === 'query') {
         req.validatedQuery = parsed;
     }else if( property === 'params') {
-        req.validateParams = parsed
+        req.validateParams = parsed;
     } else {
         req[property] = parsed;
     }
     next();
-}
+};

@@ -1,24 +1,23 @@
-import { LoginUserInputDTO } from "@/Application/Common/dto/Login.User.dto";
-import { ForgotPasswordInputDTO } from "@/Application/Parent/dto/forgotPassword.parent.dto";
-import { RegisterParentInputDTO } from "@/Application/Parent/dto/register.parent.dto";
-import { ResendOTPInputDTO } from "@/Application/Parent/dto/resendOTP.parent.dto";
-import { ResetPasswordInputDTO } from "@/Application/Parent/dto/resetPassword.parent.dto";
-import { verifyOTPInputDTO } from "@/Application/Parent/dto/verifyOTP.parent.dto";
-import { IForgotPasswordUseCase } from "@/Application/Parent/Interfaces/IForgotPasswordUseCase";
-import { IParentLoginUseCase } from "@/Application/Parent/Interfaces/IParentLoginUseCase";
-import { IParentRegisterUseCase } from "@/Application/Parent/Interfaces/IParentRegisterUseCase";
-import { IResendOTPUseCase } from "@/Application/Parent/Interfaces/IResendOTPUseCase";
-import { IResetPasswordUseCase } from "@/Application/Parent/Interfaces/IResetPasswordUseCase";
-import { IVerifyOTPUseCase } from "@/Application/Parent/Interfaces/IVerifyOTPUseCase";
-import OTPType from "@/Domain/enums/OTPType.enum";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { env } from "@/Infrastructure/Config/env";
-import logger from "@/Infrastructure/Services/Logger";
-import { loginSchema } from "@/Presentation/Validators/LoginValidator";
-import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema } from "@/Presentation/Validators/RegisterValidator";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import { NextFunction, Request, Response } from "express";
-import { success } from "zod";
+import { LoginUserInputDTO } from '@/Application/Common/dto/Login.User.dto';
+import { ForgotPasswordInputDTO } from '@/Application/Parent/dto/forgotPassword.parent.dto';
+import { RegisterParentInputDTO } from '@/Application/Parent/dto/register.parent.dto';
+import { ResendOTPInputDTO } from '@/Application/Parent/dto/resendOTP.parent.dto';
+import { ResetPasswordInputDTO } from '@/Application/Parent/dto/resetPassword.parent.dto';
+import { verifyOTPInputDTO } from '@/Application/Parent/dto/verifyOTP.parent.dto';
+import { IForgotPasswordUseCase } from '@/Application/Parent/Interfaces/IForgotPasswordUseCase';
+import { IParentLoginUseCase } from '@/Application/Parent/Interfaces/IParentLoginUseCase';
+import { IParentRegisterUseCase } from '@/Application/Parent/Interfaces/IParentRegisterUseCase';
+import { IResendOTPUseCase } from '@/Application/Parent/Interfaces/IResendOTPUseCase';
+import { IResetPasswordUseCase } from '@/Application/Parent/Interfaces/IResetPasswordUseCase';
+import { IVerifyOTPUseCase } from '@/Application/Parent/Interfaces/IVerifyOTPUseCase';
+import OTPType from '@/Domain/enums/OTPType.enum';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { env } from '@/Infrastructure/Config/env';
+import { loginSchema } from '@/Presentation/Validators/LoginValidator';
+import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema } from '@/Presentation/Validators/RegisterValidator';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { NextFunction, Request, Response } from 'express';
+
 
 export class ParentAuthController {
     constructor(
@@ -38,7 +37,7 @@ export class ParentAuthController {
                 name: parsed.name,
                 email: parsed.email,
                 password: parsed.password
-            }
+            };
 
             await this._registerUseCase.execute( payload );
 
@@ -47,9 +46,9 @@ export class ParentAuthController {
                 message: authMessages.success.OTP_SENT
             });
         } catch ( error) {
-            next(error)
+            next(error);
         }
-    }
+    };
 
     VerifyOTP = async( req: Request, res: Response, next: NextFunction ) => {
         try {
@@ -58,7 +57,7 @@ export class ParentAuthController {
                 email: parsed.email,
                 otp: parsed.otp,
                 type: parsed.type
-            }
+            };
 
             const result = await this._verifyOtp.execute( payload);
 
@@ -70,11 +69,11 @@ export class ParentAuthController {
                 success: true,
                 message,
                 data: result
-            })
+            });
         } catch( error){
             next(error);
         }
-    }
+    };
 
     ResendOTP = async( req: Request, res: Response,next: NextFunction ) => {
         try {
@@ -82,18 +81,18 @@ export class ParentAuthController {
             const payload : ResendOTPInputDTO = {
                 email: parsed.email,
                 type: parsed.type
-            }
+            };
 
             await this._resendOtp.execute(payload);
 
             return res.status( StatusCodes.OK).json({
                 success: true,
                 message: authMessages.success.OTP_SENT
-            })
+            });
         } catch (error) {
             next( error );
         }
-    }
+    };
 
     login = async ( req: Request, res: Response, next: NextFunction ) => {
 
@@ -101,21 +100,21 @@ export class ParentAuthController {
             const payload : LoginUserInputDTO = loginSchema.parse(req.body);
             const { accessToken, refreshToken, ...parent} = await this._loginUseCase.execute(payload);
 
-            res.cookie("refreshToken", refreshToken, {
+            res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 secure: false,
-                sameSite: "lax",
+                sameSite: 'lax',
                 maxAge: env.JWT_REFRESH_TOKEN_MAX_AGE,
                 path: '/'
-            })
+            });
 
-             res.cookie("accessToken", accessToken, {
+             res.cookie('accessToken', accessToken, {
                 httpOnly: true,
                 secure: false,
-                sameSite: "lax",
+                sameSite: 'lax',
                 maxAge: env.JWT_ACCESS_TOKEN_MAX_AGE,
                 path: '/'
-            })
+            });
 
             return res.status( StatusCodes.OK).json({
                 success: true,
@@ -123,18 +122,18 @@ export class ParentAuthController {
                 message: authMessages.success.PARENT_LOGIN_SUCCESS
             });
         } catch( error) {
-            next( error )
+            next( error );
         }
-    }
+    };
 
     forgotPassword = async ( req: Request, res: Response, next: NextFunction ) => {
         try {
             const parsed = forgotPasswordSchema.parse( req.body );
             const payload: ForgotPasswordInputDTO = {
                 email: parsed.email
-            }
+            };
 
-            logger.info( `From controller: ${payload}`);
+            //logger.info( `From controller: ${payload}`);
 
             await this._forgotPasswordUseCase.execute(payload);
 
@@ -146,7 +145,7 @@ export class ParentAuthController {
         } catch ( error) {
             next( error);
         }
-    }
+    };
 
     resetPassword = async( req: Request, res:Response, next: NextFunction) => {
         try {
@@ -156,17 +155,17 @@ export class ParentAuthController {
                 newPassword: parsed.newPassword,
                 confirmPassword: parsed.confirmPassword,
                 token: parsed.token
-            }
+            };
 
             await this._resetPasswordUseCase.execute(payload);
             return res.status(StatusCodes.OK).json({
                 success: true,
                 message: authMessages.success.PASSWORD_RESET_SUCCESS
-            })
+            });
         } catch( error){
-            next(error)
+            next(error);
 
         }
-    }
+    };
 
 }

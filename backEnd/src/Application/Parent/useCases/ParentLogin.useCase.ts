@@ -1,12 +1,12 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IParentLoginUseCase } from "../Interfaces/IParentLoginUseCase";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { ITokenservice } from "@/Application/Interfaces/Services/ITokenService";
-import { LoginUserInputDTO, LoginUserOutputDTO } from "@/Application/Common/dto/Login.User.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import UserStatus from "@/Domain/enums/UserStatus.enum";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IParentLoginUseCase } from '../Interfaces/IParentLoginUseCase';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { ITokenservice } from '@/Application/Interfaces/Services/ITokenService';
+import { LoginUserInputDTO, LoginUserOutputDTO } from '@/Application/Common/dto/Login.User.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import UserStatus from '@/Domain/enums/UserStatus.enum';
 
 export class ParentLoginUseCase implements IParentLoginUseCase {
 
@@ -56,8 +56,8 @@ export class ParentLoginUseCase implements IParentLoginUseCase {
             throw new AppError( authMessages.error.INVALID_CREDENTIALS, StatusCodes.BAD_REQUEST);
         }
 
-        const refreshToken = await this._tokenService.generateRefreshToken({ id: id, role: parent.getRole()});
-        const accessToken = await this._tokenService.generateAccessToken({ id: id, email: parent.getEmail(), role: parent.getRole()});
+        const refreshToken = this._tokenService.generateRefreshToken({ id: id, role: parent.getRole()});
+        const accessToken =  this._tokenService.generateAccessToken({ id: id, email: parent.getEmail(), role: parent.getRole()});
 
         const hashedRefreshToken = this._hashService.hashToken( refreshToken);
         await this._parentRepository.updateToken(id, hashedRefreshToken );
@@ -70,6 +70,6 @@ export class ParentLoginUseCase implements IParentLoginUseCase {
             email: parent.getEmail(),
             role: parent.getRole()
 
-        }
+        };
     }
 }

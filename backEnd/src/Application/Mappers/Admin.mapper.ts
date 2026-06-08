@@ -1,5 +1,5 @@
-import AdminEntity from "@/Domain/Entities/Admin.entity";
-import { IAdmin } from "@/Infrastructure/Database/Model/AdminModel";
+import AdminEntity from '@/Domain/Entities/Admin.entity';
+import { IAdmin } from '@/Infrastructure/Database/Model/AdminModel';
 
 export class AdminMapper {
 
@@ -9,7 +9,7 @@ export class AdminMapper {
             doc.email,
             doc.password,
             doc._id.toString(),
-            doc.refreshToken ?? "",
+            doc.refreshToken ?? '',
             doc.createdAt,
             doc.updatedAt
         );

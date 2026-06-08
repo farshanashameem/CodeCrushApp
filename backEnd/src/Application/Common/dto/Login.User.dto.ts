@@ -1,5 +1,5 @@
-import UserRole from "@/Domain/enums/UserRole.enum";
-import { AuthTokenDTO } from "./AuthToken.dto";
+import UserRole from '@/Domain/enums/UserRole.enum';
+import { AuthTokenDTO } from './AuthToken.dto';
 
 export interface LoginUserInputDTO {
     email : string;

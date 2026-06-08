@@ -1,14 +1,14 @@
-import { IOTPService } from "@/Application/Interfaces/Services/IOTPService";
-import { IVerifyOTPUseCase } from "../Interfaces/IVerifyOTPUseCase";
-import { IOTPRepository } from "@/Domain/RepositoryInterface/IOTP.repository";
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { verifyOTPInputDTO, verifyOTPOutputDTO } from "../dto/verifyOTP.parent.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import ParentEntity from "@/Domain/Entities/Parent.entity";
-import OTPType from "@/Domain/enums/OTPType.enum";
-import { ITokenservice, ResetTokenPayload } from "@/Application/Interfaces/Services/ITokenService";
+import { IOTPService } from '@/Application/Interfaces/Services/IOTPService';
+import { IVerifyOTPUseCase } from '../Interfaces/IVerifyOTPUseCase';
+import { IOTPRepository } from '@/Domain/RepositoryInterface/IOTP.repository';
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { verifyOTPInputDTO, verifyOTPOutputDTO } from '../dto/verifyOTP.parent.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import ParentEntity from '@/Domain/Entities/Parent.entity';
+import OTPType from '@/Domain/enums/OTPType.enum';
+import { ITokenservice, ResetTokenPayload } from '@/Application/Interfaces/Services/ITokenService';
 
 /**
  * Handles OTP verification for both registration and password reset flows.
@@ -39,16 +39,16 @@ export class VerifyOTPUseCase implements IVerifyOTPUseCase {
     async execute(request: verifyOTPInputDTO): Promise<verifyOTPOutputDTO> {
         
 
-        console.log("Incoming request:", request.email);
+       
 
         const otpRecord = await this._otpRepository.findByEmailAndType(
             request.email,
             request.type
         );
-        console.log("OTP Record:", otpRecord);
+        
 
         if (!otpRecord) {
-            throw new AppError("OTP not found", StatusCodes.NOT_FOUND);
+            throw new AppError('OTP not found', StatusCodes.NOT_FOUND);
         }
 
         
@@ -74,7 +74,7 @@ export class VerifyOTPUseCase implements IVerifyOTPUseCase {
 
             // Ensure required registration data exists in OTP payload
             if (!otpRecord.getName() || !otpRecord.getPassword()) {
-                throw new AppError("Invalid registration data", StatusCodes.BAD_REQUEST);
+                throw new AppError('Invalid registration data', StatusCodes.BAD_REQUEST);
             }
 
             const parentData = new ParentEntity(

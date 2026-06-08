@@ -1,4 +1,4 @@
-import UserStatus from "@/Domain/enums/UserStatus.enum";
+import UserStatus from '@/Domain/enums/UserStatus.enum';
 
 export interface AdminGetParentInputDTO {
     id: string;

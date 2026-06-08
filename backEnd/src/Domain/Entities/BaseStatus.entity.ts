@@ -1,5 +1,5 @@
-import UserStatus from "../enums/UserStatus.enum";
-import { DomainError } from "../Errors/DomainError";
+import UserStatus from '../enums/UserStatus.enum';
+import { DomainError } from '../Errors/DomainError';
 
 export default  class BaseStatusEntity {
     protected status: UserStatus;
@@ -14,11 +14,11 @@ export default  class BaseStatusEntity {
 
     public block(): void {
         if (this.status === UserStatus.BLOCKED) {
-            throw new DomainError("User already blocked");
+            throw new DomainError('User already blocked');
         }
 
         if (this.status === UserStatus.DELETED) {
-            throw new DomainError("Cannot block deleted user");
+            throw new DomainError('Cannot block deleted user');
         }
 
         this.status = UserStatus.BLOCKED;
@@ -26,7 +26,7 @@ export default  class BaseStatusEntity {
 
     public unblock(): void {
         if (this.status !== UserStatus.BLOCKED) {
-            throw new DomainError("User is not blocked");
+            throw new DomainError('User is not blocked');
         }
 
         this.status = UserStatus.ACTIVE;
@@ -34,7 +34,7 @@ export default  class BaseStatusEntity {
 
     public delete(): void {
         if (this.status === UserStatus.DELETED) {
-            throw new DomainError("User already deleted");
+            throw new DomainError('User already deleted');
         }
 
         this.status = UserStatus.DELETED;
@@ -42,7 +42,7 @@ export default  class BaseStatusEntity {
 
     public restore(): void {
         if (this.status !== UserStatus.DELETED) {
-            throw new DomainError("Only deleted users can be restored");
+            throw new DomainError('Only deleted users can be restored');
         }
 
         this.status = UserStatus.ACTIVE;

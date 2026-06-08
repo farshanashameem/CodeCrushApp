@@ -1,11 +1,11 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IForgotPasswordUseCase } from "../Interfaces/IForgotPasswordUseCase";
-import { ForgotPasswordInputDTO, ForgotPasswordOutputDTO } from "../dto/forgotPassword.parent.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { ISendOTPUseCase } from "../Interfaces/ISendOTPUseCase";
-import OTPType from "@/Domain/enums/OTPType.enum";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IForgotPasswordUseCase } from '../Interfaces/IForgotPasswordUseCase';
+import { ForgotPasswordInputDTO, ForgotPasswordOutputDTO } from '../dto/forgotPassword.parent.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { ISendOTPUseCase } from '../Interfaces/ISendOTPUseCase';
+import OTPType from '@/Domain/enums/OTPType.enum';
 
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     constructor(

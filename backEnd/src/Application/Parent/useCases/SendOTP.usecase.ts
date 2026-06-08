@@ -1,10 +1,10 @@
-import { IOTPRepository } from "@/Domain/RepositoryInterface/IOTP.repository";
-import { ISendOTPUseCase } from "../Interfaces/ISendOTPUseCase";
-import { SendOTPInputDTO } from "../dto/SendOTP.dto";
-import { IOTPService } from "@/Application/Interfaces/Services/IOTPService";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { IEmailService } from "@/Application/Interfaces/Services/IEmailService";
-import { OTPEntity } from "@/Domain/Entities/OTP.entity";
+import { IOTPRepository } from '@/Domain/RepositoryInterface/IOTP.repository';
+import { ISendOTPUseCase } from '../Interfaces/ISendOTPUseCase';
+import { SendOTPInputDTO } from '../dto/SendOTP.dto';
+import { IOTPService } from '@/Application/Interfaces/Services/IOTPService';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { IEmailService } from '@/Application/Interfaces/Services/IEmailService';
+import { OTPEntity } from '@/Domain/Entities/OTP.entity';
 
 export class SendOTPUseCase implements ISendOTPUseCase {
     constructor (
@@ -16,7 +16,7 @@ export class SendOTPUseCase implements ISendOTPUseCase {
     async execute(input: SendOTPInputDTO): Promise<void> {
         await this._otpRepository.deleteByEmailAndType(input.email, input.type);
 
-        const otp = await this._otpService.generateOTP();
+        const otp = this._otpService.generateOTP();
         const hashedOtp = await this._hashService.hash( otp );
         
          await this._mailService.sendOTP(input.email, otp);

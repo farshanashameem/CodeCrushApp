@@ -1,6 +1,6 @@
-import mongoose, { Types, Document, Schema, Model } from "mongoose";
-import UserStatus from "@/Domain/enums/UserStatus.enum";
-import UserRole from "@/Domain/enums/UserRole.enum";
+import mongoose, { Types, Document, Schema, Model } from 'mongoose';
+import UserStatus from '@/Domain/enums/UserStatus.enum';
+import UserRole from '@/Domain/enums/UserRole.enum';
 
 export interface IParent extends Document {
     _id: Types.ObjectId;
@@ -49,7 +49,7 @@ const ParentSchema: Schema<IParent> = new Schema(
     childrenIds: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Child",
+            ref: 'Child',
             default: []
         }
     ],
@@ -63,6 +63,6 @@ const ParentSchema: Schema<IParent> = new Schema(
 );
 
 export const ParentModel: Model<IParent> = mongoose.model<IParent>(
-    "Parent",
+    'Parent',
     ParentSchema
 );

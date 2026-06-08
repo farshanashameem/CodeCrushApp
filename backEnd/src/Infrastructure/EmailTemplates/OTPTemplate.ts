@@ -9,4 +9,4 @@ export const OTPMailTemplate = (otp: string )=> `<!DOCTYPE html>
 <p>your otp is: ${otp}</p>
 </body>
 </html>
-`
+`;

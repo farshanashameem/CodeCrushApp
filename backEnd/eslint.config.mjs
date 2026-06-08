@@ -74,7 +74,7 @@ export default tseslint.config(
         },
       ],
 
-      '@typescript-eslint/no-explicit-any': 'warn',
+     '@typescript-eslint/no-explicit-any': 'off',
 
       // 🔴 CRITICAL BUG PREVENTION
       '@typescript-eslint/no-floating-promises': 'error',

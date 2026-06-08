@@ -1,5 +1,5 @@
-import OTPType from "@/Domain/enums/OTPType.enum";
-import mongoose, { Schema, Document, Model } from "mongoose";
+import OTPType from '@/Domain/enums/OTPType.enum';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // Interfaces
 
@@ -68,6 +68,6 @@ OtpSchema.index({ email: 1, type: 1 }, { unique: true });
 
 // Model
 export const OtpModel: Model<IOtp> = mongoose.model<IOtp>(
-    "Otp",
+    'Otp',
     OtpSchema
 );

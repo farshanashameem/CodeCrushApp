@@ -1,5 +1,5 @@
-import { access } from "node:fs";
-import { env } from "./env";
+import { access } from 'node:fs';
+import { env } from './env';
 
 export const jwtConfig = {
     accessToken: {
@@ -16,4 +16,4 @@ export const jwtConfig = {
         expiresIn: env.JWT_RESET_TOKEN_MAX_AGE
     }
 
-}
+};

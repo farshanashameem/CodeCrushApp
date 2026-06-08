@@ -1,5 +1,5 @@
-import UserRole from "@/Domain/enums/UserRole.enum";
-import mongoose,{ Types, Document, Schema, Model } from "mongoose";
+import UserRole from '@/Domain/enums/UserRole.enum';
+import mongoose,{ Types, Document, Schema, Model } from 'mongoose';
 
 
 export interface IAdmin extends Document {
@@ -47,4 +47,4 @@ const AdminSchema: Schema<IAdmin>= new Schema(
 { timestamps: true }
 );
 
-export const AdminModel: Model<IAdmin> = mongoose.model<IAdmin>("Admin", AdminSchema);
+export const AdminModel: Model<IAdmin> = mongoose.model<IAdmin>('Admin', AdminSchema);

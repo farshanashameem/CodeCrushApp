@@ -1,15 +1,15 @@
-import { IOTPRepository } from "@/Domain/RepositoryInterface/IOTP.repository";
-import { IResendOTPUseCase } from "../Interfaces/IResendOTPUseCase";
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IOTPService } from "@/Application/Interfaces/Services/IOTPService";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { IEmailService } from "@/Application/Interfaces/Services/IEmailService";
-import { ResendOTPInputDTO } from "../dto/resendOTP.parent.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { OTPEntity } from "@/Domain/Entities/OTP.entity";
-import OTPType from "@/Domain/enums/OTPType.enum";
+import { IOTPRepository } from '@/Domain/RepositoryInterface/IOTP.repository';
+import { IResendOTPUseCase } from '../Interfaces/IResendOTPUseCase';
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IOTPService } from '@/Application/Interfaces/Services/IOTPService';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { IEmailService } from '@/Application/Interfaces/Services/IEmailService';
+import { ResendOTPInputDTO } from '../dto/resendOTP.parent.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { OTPEntity } from '@/Domain/Entities/OTP.entity';
+import OTPType from '@/Domain/enums/OTPType.enum';
 
 export class ResendOTPUsecase implements IResendOTPUseCase {
     constructor(
@@ -40,7 +40,7 @@ export class ResendOTPUsecase implements IResendOTPUseCase {
             throw new AppError( authMessages.error.MAXIMUM_RESEND_LIMIT, StatusCodes.TOO_MANY_REQUESTS);
         }
 
-        const newOtpCode = await this._otpService.generateOTP();
+        const newOtpCode =  this._otpService.generateOTP();
         const hashedOtp = await this._hashService.hash(newOtpCode);
         const newExpiry = new Date(Date.now() + 60000);
           
@@ -53,7 +53,7 @@ export class ResendOTPUsecase implements IResendOTPUseCase {
             otpRecord.getCreatedAt(),
             otpRecord.getName(),
             otpRecord.getPassword()
-        )
+        );
 
         await this._otpRepository.save(updatedOtpEntity);
         await this._emailService.sendOTP( Request.email, newOtpCode);

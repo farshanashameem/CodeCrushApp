@@ -1,15 +1,15 @@
-import UserRole from "@/Domain/enums/UserRole.enum";
-import { IRefreshTokenUseCase } from "../Interfaces/IRefreshTokenUseCase";
-import { IAuthRepository } from "@/Domain/RepositoryInterface/IAuth.repository";
-import ParentEntity from "@/Domain/Entities/Parent.entity";
-import AdminEntity from "@/Domain/Entities/Admin.entity";
-import { ITokenservice } from "@/Application/Interfaces/Services/ITokenService";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
-import { RefreshTokenInputDTO, RefreshTokenOutputDTO } from "../dto/RefreshToken.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import logger from "@/Infrastructure/Services/Logger";
+import UserRole from '@/Domain/enums/UserRole.enum';
+import { IRefreshTokenUseCase } from '../Interfaces/IRefreshTokenUseCase';
+import { IAuthRepository } from '@/Domain/RepositoryInterface/IAuth.repository';
+import ParentEntity from '@/Domain/Entities/Parent.entity';
+import AdminEntity from '@/Domain/Entities/Admin.entity';
+import { ITokenservice } from '@/Application/Interfaces/Services/ITokenService';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import { RefreshTokenInputDTO, RefreshTokenOutputDTO } from '../dto/RefreshToken.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import logger from '@/Infrastructure/Services/Logger';
 
 export class RefreshTokenUseCase implements IRefreshTokenUseCase{
     constructor(
@@ -26,7 +26,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase{
 
         const payload = this._tokenService.verifyRefreshToken(Request.token);
         const { id, role } = payload;
-        logger.info({ role: role, id: id}, " From refresh token");
+        logger.info({ role: role, id: id}, ' From refresh token');
 
         if(!id || ! role) {
             throw new AppError( authMessages.error.INVALID_REFRESH_TOKEN, StatusCodes.UNAUTHORIZED);
@@ -52,6 +52,6 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase{
             id: user.getId()!,
             accessToken: newAccessToken,
             refreshToken: newRefreshRoken
-        }
+        };
     }
 }

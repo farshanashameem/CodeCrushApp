@@ -1,6 +1,6 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IAdminGetAllUsersUseCase } from "../../Interfaces/UserManagement/IAdminGetAllUsers.usecase";
-import { AdminUserQueryDTO, AdminPaginatedUserDTO } from "../../dto/UserManagement/getAllUsers.admin.dto";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IAdminGetAllUsersUseCase } from '../../Interfaces/UserManagement/IAdminGetAllUsers.usecase';
+import { AdminUserQueryDTO, AdminPaginatedUserDTO } from '../../dto/UserManagement/getAllUsers.admin.dto';
 
 export class GetAllUsersUseCase implements IAdminGetAllUsersUseCase {
     constructor(

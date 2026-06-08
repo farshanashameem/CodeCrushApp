@@ -16,9 +16,14 @@ export const API_ROUTES = {
 
   PARENT: {
     LOGIN: "/parent/login",
-    ALL_CHILDREN: "/parent/children",
-    CHILD_DETAILS: "/parent/children/:id",
     DASHBOARD: "/parent/dashboard",
+    CHILDREN: {
+      GET_ALL: "/auth/parent/children",
+      BY_ID: (id: string ) =>`/auth/parent/children/${id}`,
+      ADD: "/auth/parent/children",
+      UPDATE: (id: string) => `/auth/parent/children/${id}`,
+      STATUS: (id: string) => `/auth/parent/child/${id}/status`,
+    }
   },
 
   ADMIN: {
@@ -26,10 +31,12 @@ export const API_ROUTES = {
     DASHBOARD: "/admin/dashboard",
     USERS: {
       GET_ALL: "/auth/admin/users",
-
       BY_ID: (id: string) => `/auth/admin/users/${id}`,
-
       STATUS: (id: string) => `/auth/admin/users/${id}/status`,
     },
+    CHILDREN: {
+      STATUS: (id: string) => `/auth/admin/children/${id}/status`,
+      BY_ID: (id: string ) => `/auth/admin/children/${id}`
+   }
   },
 };

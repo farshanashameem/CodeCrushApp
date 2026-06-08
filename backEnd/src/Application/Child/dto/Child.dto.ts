@@ -1,4 +1,4 @@
-import UserStatus from "@/Domain/enums/UserStatus.enum";
+import UserStatus from '@/Domain/enums/UserStatus.enum';
 
 export interface ChildDTO {
     id: string;
@@ -10,17 +10,5 @@ export interface ChildDTO {
     status: UserStatus
 } 
 
-export interface createChildDTO {
-    parentId: string;
-    name: string;
-    age: number;
-    avatar: string;
-    dob?: Date;
-}
 
-export interface UpdateChildDTO {
-    name?: string;
-    age?: number;
-    avatar?: string;
-    dob?: Date;
-}
+

@@ -1,4 +1,4 @@
-import UserRole from "@/Domain/enums/UserRole.enum";
+import UserRole from '@/Domain/enums/UserRole.enum';
 
 export interface ParentDTO {
     id: string,
