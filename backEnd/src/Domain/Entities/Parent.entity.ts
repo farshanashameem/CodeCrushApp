@@ -3,6 +3,7 @@ import UserRole from '../enums/UserRole.enum';
 import UserStatus from '../enums/UserStatus.enum';
 import BaseStatusEntity from './BaseStatus.entity';
 import { IStatusEntity } from './IStatusEntity';
+import { ParentUpdateData } from '../Types/ParentUpdateData';
 
 export default class ParentEntity extends BaseUser implements IStatusEntity {
 
@@ -57,5 +58,19 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
 
     public getRefreshToken(): string {
         return this.refreshToken;
+    }
+
+    public update( data:ParentUpdateData ) {
+        if (data.name !== undefined) {
+            this.name = data.name;
+        }
+
+        if (data.email !== undefined) {
+            this.email = data.email;
+        }
+
+        if (data.password !== undefined) {
+            this.password = data.password;
+        }
     }
 }

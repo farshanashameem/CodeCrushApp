@@ -10,6 +10,7 @@ export const ROUTES = {
         FORGOT_PASSWORD: '/parent/forgot-password',
         RESET_PASSWORD: '/parent/reset-password',
         DASHBOARD: '/parent/dashboard',
+        PROFILE: '/parent/profile',
         CHILDREN: '/parent/children',
         CHILD_DETAILS: '/parent/children/:id'
 

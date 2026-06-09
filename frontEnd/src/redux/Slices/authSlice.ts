@@ -12,6 +12,7 @@ import api from "../../Lib/axios";
 import type { AxiosError } from "axios";
 import type { AdminLoginPayload } from "../../Types/admin";
 import { API_ROUTES } from "../../Constants/api.routes";
+import type { Parent, ParentPayload, UpdateProfilePayload } from "../../Types/parent";
 
 const initialState: AuthState = {
   user: null,
@@ -24,18 +25,11 @@ const initialState: AuthState = {
 
 
 // ================= REGISTER =================
-export const registerUser = createAsyncThunk<
-  { email: string; role: UserRole },
-  RegisterPayload,
-  { rejectValue: string }
->(
+export const registerUser = createAsyncThunk< { email: string; role: UserRole }, RegisterPayload, { rejectValue: string } >(
   "auth/register",
   async ({ role, data }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        API_ROUTES.AUTH.REGISTER(role),
-        data
-      );
+      const response = await api.post( API_ROUTES.AUTH.REGISTER(role), data );
 
       if (!response.data.success) {
         return rejectWithValue("Registration failed");
@@ -56,19 +50,11 @@ export const registerUser = createAsyncThunk<
 
 
 // ================= LOGIN =================
-export const loginUser = createAsyncThunk<
-  { user: User; role: UserRole },
-  LoginPayload,
-  { rejectValue: string }
->(
+export const loginUser = createAsyncThunk< { user: User; role: UserRole }, LoginPayload, { rejectValue: string } >(
   "auth/login",
   async ({ role, data }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        API_ROUTES.AUTH.LOGIN(role),
-        data
-      );
-      console.log("FULL RESPONSE:", response.data);
+      const response = await api.post( API_ROUTES.AUTH.LOGIN(role), data );
       const user =
         response.data.parent ||
         response.data.admin;
@@ -81,8 +67,6 @@ export const loginUser = createAsyncThunk<
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
 
-  console.log("LOGIN ERROR:", err.response?.data);
-
   return rejectWithValue(
     err.response?.data?.message ||
     "Failed to login"
@@ -93,18 +77,11 @@ export const loginUser = createAsyncThunk<
 
 
 // ================= ADMIN LOGIN =================
-export const adminLogin = createAsyncThunk<
-  { admin: User },
-  AdminLoginPayload,
-  { rejectValue: string }
->(
+export const adminLogin = createAsyncThunk< { admin: User }, AdminLoginPayload, { rejectValue: string } >(
   "admin/login",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        API_ROUTES.ADMIN.LOGIN,
-        { email, password }
-      );
+      const response = await api.post( API_ROUTES.ADMIN.LOGIN, { email, password } );
 
       const admin = response.data.data;
 
@@ -124,11 +101,7 @@ export const adminLogin = createAsyncThunk<
 
 
 // ================= LOGOUT =================
-export const logoutUser = createAsyncThunk<
-  void,
-  void,
-  { rejectValue: string }
->(
+export const logoutUser = createAsyncThunk< void, void, { rejectValue: string } >(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
@@ -144,19 +117,11 @@ export const logoutUser = createAsyncThunk<
 
 
 // ================= GET ME =================
-export const getMe = createAsyncThunk<
-  { user: User },
-  void,
-  { rejectValue: string }
->(
+export const getMe = createAsyncThunk< { user: User },  void, { rejectValue: string } >(
   "auth/getMe",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get(
-        API_ROUTES.AUTH.ME
-      );
-
-      console.log("GETME:", response.data);
+      const response = await api.get( API_ROUTES.AUTH.ME );
 
       const user = response.data.user;
 
@@ -195,22 +160,16 @@ type VerifyOtpResult =
 
 // ================= VERIFY OTP =================
 export const verifyOtp = createAsyncThunk<
-  VerifyOtpResult,
-  {
+  VerifyOtpResult,  {
     role: UserRole;
     email: string;
     otp: string;
     type: "REGISTRATION" | "FORGOT_PASSWORD";
-  },
-  { rejectValue: string }
->(
+  }, { rejectValue: string } >(
   "auth/verify-otp",
   async ({ role, otp, email, type }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        API_ROUTES.AUTH.VERIFY_OTP(role),
-        { email, otp, type }
-      );
+      const response = await api.post(  API_ROUTES.AUTH.VERIFY_OTP(role),  { email, otp, type }  );
 
       const data = response.data;
 
@@ -256,9 +215,7 @@ export const resendOtp = createAsyncThunk<
     role: UserRole;
     email: string;
     type: "REGISTRATION" | "FORGOT_PASSWORD";
-  },
-  { rejectValue: string }
->(
+  }, { rejectValue: string } >(
   "auth/resend-otp",
   async (
     { role, email, type },
@@ -266,13 +223,7 @@ export const resendOtp = createAsyncThunk<
   ) => {
     try {
 
-      const response = await api.post(
-        API_ROUTES.AUTH.RESEND_OTP(role),
-        {
-          email,
-          type
-        }
-      );
+      const response = await api.post(  API_ROUTES.AUTH.RESEND_OTP(role),  { email, type  } );
 
       if (!response.data.success) {
         return rejectWithValue(
@@ -302,18 +253,11 @@ export const resendOtp = createAsyncThunk<
 
 
 // ================= FORGOT PASSWORD =================
-export const forgotPassword = createAsyncThunk<
-  { role: UserRole; email: string },
-  { role: UserRole; email: string },
-  { rejectValue: string }
->(
+export const forgotPassword = createAsyncThunk< { role: UserRole; email: string },  { role: UserRole; email: string }, { rejectValue: string } >(
   "auth/forgot-password",
   async ({ role, email }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        API_ROUTES.AUTH.FORGOT_PASSWORD(role),
-        { email }
-      );
+      const response = await api.post(  API_ROUTES.AUTH.FORGOT_PASSWORD(role), { email } );
 
       if (!response.data.success) {
         return rejectWithValue("Invalid response");
@@ -331,11 +275,7 @@ export const forgotPassword = createAsyncThunk<
 );
 
 
-export const resetPassword = createAsyncThunk<
-  void,
-  ResetPasswordPayload,
-  { rejectValue: string }
->(
+export const resetPassword = createAsyncThunk<  void, ResetPasswordPayload, { rejectValue: string } >(
   "auth/reset-password",
   async (
     { role, email, token, newPassword, confirmPassword },
@@ -349,8 +289,7 @@ export const resetPassword = createAsyncThunk<
           token,   
           newPassword,
           confirmPassword,
-        }
-      );
+        } );
 
       if (!response.data.success) {
         return rejectWithValue("Invalid response");
@@ -361,6 +300,30 @@ export const resetPassword = createAsyncThunk<
       const err = error as AxiosError<{ message: string }>;
       return rejectWithValue(
         err.response?.data?.message || "Reset password failed"
+      );
+    }
+  }
+);
+
+export const updateProfile = createAsyncThunk< User, UpdateProfilePayload, { rejectValue: string }>(
+  "/parent/profile",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await api.put(
+        API_ROUTES.PARENT.PROFILE,
+        data
+      );
+
+      if (!response.data.success) {
+        return rejectWithValue("Profile update failed");
+      }
+
+      return response.data.data;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+
+      return rejectWithValue(
+        err.response?.data?.message || "Profile update failed"
       );
     }
   }
@@ -529,8 +492,23 @@ const authSlice = createSlice({
         state.error =
           action.payload || "Reset password failed";
       });
-  },
-});
+
+      // UPDATE PROFILE
+      builder
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Profile update failed";
+      });
+      },
+    });
 
 export const { clearError } = authSlice.actions;
 export default authSlice.reducer;

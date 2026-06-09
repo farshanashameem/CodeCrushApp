@@ -17,6 +17,7 @@ export const API_ROUTES = {
   PARENT: {
     LOGIN: "/parent/login",
     DASHBOARD: "/parent/dashboard",
+    PROFILE: "/auth/parent/profile",
     CHILDREN: {
       GET_ALL: "/auth/parent/children",
       BY_ID: (id: string ) =>`/auth/parent/children/${id}`,
