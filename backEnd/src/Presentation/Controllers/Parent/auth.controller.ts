@@ -9,12 +9,14 @@ import { IParentLoginUseCase } from '@/Application/Parent/Interfaces/IParentLogi
 import { IParentRegisterUseCase } from '@/Application/Parent/Interfaces/IParentRegisterUseCase';
 import { IResendOTPUseCase } from '@/Application/Parent/Interfaces/IResendOTPUseCase';
 import { IResetPasswordUseCase } from '@/Application/Parent/Interfaces/IResetPasswordUseCase';
+import { IUpdateProfileUseCase } from '@/Application/Parent/Interfaces/IUpdateProfile.usecase';
 import { IVerifyOTPUseCase } from '@/Application/Parent/Interfaces/IVerifyOTPUseCase';
 import OTPType from '@/Domain/enums/OTPType.enum';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { AppError } from '@/Domain/Errors/app.error';
 import { env } from '@/Infrastructure/Config/env';
 import { loginSchema } from '@/Presentation/Validators/LoginValidator';
-import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema } from '@/Presentation/Validators/RegisterValidator';
+import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema, UpdateProfileSchema } from '@/Presentation/Validators/RegisterValidator';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { NextFunction, Request, Response } from 'express';
 
@@ -26,7 +28,8 @@ export class ParentAuthController {
         private _resendOtp: IResendOTPUseCase,
         private _loginUseCase: IParentLoginUseCase,
         private _forgotPasswordUseCase: IForgotPasswordUseCase,
-        private _resetPasswordUseCase: IResetPasswordUseCase
+        private _resetPasswordUseCase: IResetPasswordUseCase,
+        private _updateProfile: IUpdateProfileUseCase
 
     ) {}
 
@@ -167,5 +170,27 @@ export class ParentAuthController {
 
         }
     };
+
+    updateProfile = async ( req: Request, res: Response, next: NextFunction ): Promise<Response | void > => {
+        try{
+
+            const updatedData = UpdateProfileSchema.parse(req.body);
+            const parentId = req.user?.id;
+            if(!parentId ) {
+                throw new AppError( authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED );
+            }
+
+            const { confirmPassword, ...data } = updatedData;
+            const payload = { id: parentId, ...data };
+            const parent = await this._updateProfile.execute( payload );
+            return res.status(StatusCodes.OK).json({
+                success: true,
+                data: parent
+            })
+
+        }catch(error) {
+            next(error)
+        }
+    }
 
 }

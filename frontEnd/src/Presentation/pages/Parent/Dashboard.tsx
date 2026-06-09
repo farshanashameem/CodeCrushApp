@@ -105,7 +105,7 @@ const ParentDashboard = () => {
               </button>
 
               <button
-                onClick={() => navigate("/parent/edit-profile")}
+                onClick={() => navigate("/parent/profile")}
                 className="bg-white hover:bg-gray-50 active:scale-95 text-[#1a3a6d] border border-gray-200 px-6 py-3 rounded-full font-mochiy text-sm shadow-sm transition-all"
               >
                 Edit Profile

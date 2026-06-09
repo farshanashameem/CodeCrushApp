@@ -5,7 +5,7 @@ import { loginSchema } from '@/Presentation/Validators/LoginValidator';
 import { validate } from '@/Presentation/Middlewares/Validate';
 import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
-import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema } from '@/Presentation/Validators/RegisterValidator';
+import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema, UpdateProfileSchema } from '@/Presentation/Validators/RegisterValidator';
 import { childManagementcontroller } from '@/Presentation/Factory/ParentFactory';
 const router = Express.Router();
 
@@ -16,7 +16,10 @@ router.post(ROUTES.PARENT.RESEND_OTP, validate(resendOtpSchema, 'body'), parentA
 router.post(ROUTES.PARENT.FORGOT_PASSWORD, validate( forgotPasswordSchema, 'body'), parentAuthController.forgotPassword);
 router.post(ROUTES.PARENT.RESET_PASSWORD, validate( resetPasswordSchema, 'body'), parentAuthController.resetPassword);
 
+
 router.use( authHandler(tokenService));
+router.put(ROUTES.PARENT.PROFILE, validate(UpdateProfileSchema, 'body'), parentAuthController.updateProfile);
+
 router.get( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BASE,childManagementcontroller.getAllChildren);
 router.get( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BY_ID, childManagementcontroller.getChildDetails);
 router.post( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BASE, childManagementcontroller.addChild );

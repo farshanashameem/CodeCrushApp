@@ -16,6 +16,7 @@ import { UpdateChildUseCase } from '@/Application/Parent/useCases/ChildManagemen
 import { ParentToggleUserStatus } from '@/Application/Parent/useCases/ChildManagement/ToggleUserStatus.usecase';
 import { GetAllChildrenUseCase } from '@/Application/Parent/useCases/ChildManagement/getAllChildren.usecase';
 import { ParentGetChildUseCase } from '@/Application/Parent/useCases/ChildManagement/getChild.usecase';
+import { UpdateProfileUseCase } from '@/Application/Parent/useCases/UpdateProfile.usecase.dto';
 
 //repositories
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
@@ -107,6 +108,12 @@ const toggleChildStatusUseCase = new ParentToggleUserStatus(
     childRepository
 );
 
+const updateProfileUseCase = new UpdateProfileUseCase(
+    parentRepository, 
+    hashService
+)
+
+
 
 //Controllers
 export const parentAuthController = new ParentAuthController(
@@ -115,7 +122,8 @@ export const parentAuthController = new ParentAuthController(
     resendOtpUseCase,
     loginParentUseCase,
     forgotPasswordUseCase,
-    resetPasswordUseCase
+    resetPasswordUseCase,
+    updateProfileUseCase
 );
 
 export const childManagementcontroller = new ChildManagementController(

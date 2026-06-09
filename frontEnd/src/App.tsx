@@ -21,7 +21,8 @@ import ResetPasswordPage from "./Presentation/pages/Auth/ResetPasswordPage";
 
 const ParentDashboard = lazy( () => import("./Presentation/pages/Parent/Dashboard"));
 const AddChildPage = lazy( () => import("./Presentation/pages/Parent/AddChildPage"));
-const ChildProgressPage = lazy( ()=> import( "./Presentation/pages/Parent/ChildProgressPage"))
+const ChildProgressPage = lazy( ()=> import( "./Presentation/pages/Parent/ChildProgressPage"));
+const ParentProfilePage = lazy( ()=> import('./Presentation/pages/Parent/UpdateProfile'));
 
 const AdminLogin = lazy( () => import("./Presentation/pages/Admin/AdminLogin"));
 const AdminDashBoard = lazy( () => import("./Presentation/pages/Admin/AdminDashBoard") );
@@ -126,6 +127,14 @@ function App() {
             element={
               <ProtectedRoute allowedRole="parent">
                 <AddChildPage />
+              </ProtectedRoute> }
+          />
+
+          <Route
+            path={ ROUTES.PARENT.PROFILE}
+            element={
+              <ProtectedRoute allowedRole="parent">
+                <ParentProfilePage />
               </ProtectedRoute> }
           />
 
