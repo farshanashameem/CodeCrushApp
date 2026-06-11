@@ -180,17 +180,17 @@ export class ParentAuthController {
                 throw new AppError( authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED );
             }
 
-            const { confirmPassword, ...data } = updatedData;
+            const { confirmPassword: _confirmPassword, ...data } = updatedData;
             const payload = { id: parentId, ...data };
             const parent = await this._updateProfile.execute( payload );
             return res.status(StatusCodes.OK).json({
                 success: true,
                 data: parent
-            })
+            });
 
         }catch(error) {
-            next(error)
+            next(error);
         }
-    }
+    };
 
 }

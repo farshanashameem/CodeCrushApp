@@ -14,6 +14,9 @@ export class AdminToggleChildStatus implements IToggleUserStatusUseCase {
 
     async execute ( input: ToggleUserStatusInputDTO) : Promise<ToggleUserStatusOutputDTO> {
         const { requesterId, targetId, action } = input;
+        if(!requesterId) {
+            throw new AppError(authMessages.error.ADMIN_NOT_FOUND, StatusCodes.NOT_FOUND);
+        }
 
         const child = await this._childRepo.findById( targetId );
         if( !child ) {

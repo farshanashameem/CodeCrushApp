@@ -74,7 +74,7 @@ export const authMessages = {
         //ACTION
         INVALID_ACTION :'Invalid Action',
 
-       PARENT_BLOCKED_OR_DELETED_BY_ADMIN: "parent is blocked or deleted by Admin",
+       PARENT_BLOCKED_OR_DELETED_BY_ADMIN: 'parent is blocked or deleted by Admin',
 
         //OTP RESEND 
         MAXIMUM_RESEND_LIMIT: 'Maximum Resend limit reached' 

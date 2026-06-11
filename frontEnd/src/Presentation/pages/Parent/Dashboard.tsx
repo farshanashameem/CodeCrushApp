@@ -7,15 +7,12 @@ import icon from "../../../assets/parentIcon.png";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../../redux/store";
 import { logoutUser } from "../../../redux/Slices/authSlice";
-import { getMe } from "../../../redux/Slices/authSlice";
 import { fetchChildren } from "../../../redux/Slices/ChildManagementSlice";
 import { avatarMap } from "../../../Constants/avatarMap";
 
 const ParentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
-  const [showChildren, setShowChildren] = useState(false);
   const [animate, setAnimate] = useState(false);
   const { children, loading } = useSelector(
     (state: RootState) => state.childManagement,
@@ -29,15 +26,7 @@ const ParentDashboard = () => {
     dispatch(fetchChildren());
   }, [dispatch]);
 
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated,
-  );
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      dispatch(getMe());
-    }
-  }, [dispatch, isAuthenticated]);
 
   // get logged in user from redux
   const parent = useSelector((state: RootState) => state.auth.user);
@@ -97,12 +86,7 @@ const ParentDashboard = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap justify-center md:justify-end gap-3 w-full md:w-auto border-t md:border-t-0 border-blue-200/40 pt-4 md:pt-0">
-              <button
-                onClick={() => setShowChildren(!showChildren)}
-                className="bg-green-600 hover:bg-green-700 active:scale-95 text-white px-6 py-3 rounded-full font-mochiy text-sm shadow-sm transition-all"
-              >
-                {showChildren ? "Hide Children" : "View Children"}
-              </button>
+              
 
               <button
                 onClick={() => navigate("/parent/profile")}
@@ -122,7 +106,7 @@ const ParentDashboard = () => {
         </div>
 
         {/* CHILD SECTION */}
-        {showChildren && (
+         (
           <div className="w-full transition-all duration-300">
             {children.length === 0 ? (
               <div className="text-center bg-gray-50 rounded-2xl p-10 border-2 border-dashed border-gray-200">
@@ -200,7 +184,7 @@ const ParentDashboard = () => {
               </div>
             )}
           </div>
-        )}
+        )
       </div>
     </AuthLayout>
   );

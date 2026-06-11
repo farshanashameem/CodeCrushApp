@@ -9,7 +9,7 @@ export const errorHandler: ErrorRequestHandler = (
     error: unknown,
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
 ): void => {
     req.log.error({error: error}, 'From error handler');    
 

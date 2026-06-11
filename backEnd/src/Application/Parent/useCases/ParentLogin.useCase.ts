@@ -36,20 +36,19 @@ export class ParentLoginUseCase implements IParentLoginUseCase {
 
         const status = parent.getStatus();
 
-    const messages = {
-        [UserStatus.BLOCKED]:
-            authMessages.error.PARENT_BLOCKED,
+        switch (status) {
+            case UserStatus.BLOCKED:
+                throw new AppError(
+                    authMessages.error.PARENT_BLOCKED,
+                    StatusCodes.FORBIDDEN
+                );
 
-        [UserStatus.DELETED]:
-            authMessages.error.PARENT_DELETED
-    };
-
-    if (messages[status]) {
-        throw new AppError(
-            messages[status],
-            StatusCodes.FORBIDDEN
-        );
-    }
+            case UserStatus.DELETED:
+                throw new AppError(
+                    authMessages.error.PARENT_DELETED,
+                    StatusCodes.FORBIDDEN
+                );
+        }
 
         const iValidPassword = await this._hashService.compare(Request.password,parent.getPassword());
         if(!iValidPassword) {

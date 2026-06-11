@@ -82,7 +82,8 @@ export class AuthController {
     logout = async ( req: Request, res: Response, next: NextFunction ) => {
         try {
 
-            const refreshToken = req.cookies.refreshToken;
+            
+            const refreshToken = String(req.cookies.refreshToken);
             await this._logoutuseCase.execute( refreshToken);
 
             res.clearCookie('refreshToken', {
@@ -91,6 +92,7 @@ export class AuthController {
                 secure: false,
                 path: '/'
             });
+            
 
             res.clearCookie('accessToken', {
                 httpOnly: true,
