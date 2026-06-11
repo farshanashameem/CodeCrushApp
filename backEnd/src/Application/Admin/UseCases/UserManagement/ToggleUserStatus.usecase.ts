@@ -4,9 +4,7 @@ import { UserAction } from '@/Application/enums/userAction.enum';
 import { IStatusEntity } from '@/Domain/Entities/IStatusEntity';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
-import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
 import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
-import { IUserStatusRepository } from '@/Domain/RepositoryInterface/IUserStatus.repository';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 
 

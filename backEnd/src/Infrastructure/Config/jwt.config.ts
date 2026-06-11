@@ -1,4 +1,3 @@
-import { access } from 'node:fs';
 import { env } from './env';
 
 export const jwtConfig = {

@@ -28,7 +28,7 @@ import { OTPService } from '@/Infrastructure/Services/OTPService';
 import { TokenService } from '@/Infrastructure/Services/TokenService';
 import { MailService } from '@/Infrastructure/Services/MailService';
 import { OTPRepository } from '@/Infrastructure/Repositories/OTP.repository';
-import { ToggleUserStatusUseCase } from '@/Application/Common/useCases/ToggleUserStatus.useCase';
+
 
 
 const parentRepository = new ParentRepository();
@@ -111,7 +111,7 @@ const toggleChildStatusUseCase = new ParentToggleUserStatus(
 const updateProfileUseCase = new UpdateProfileUseCase(
     parentRepository, 
     hashService
-)
+);
 
 
 

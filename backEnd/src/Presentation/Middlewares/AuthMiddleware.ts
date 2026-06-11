@@ -9,7 +9,7 @@ export function authHandler( tokenService: ITokenservice) {
     return( req: Request, res: Response, next: NextFunction) => {
 
 
-        const token = req.cookies.accessToken;
+        const token: string | undefined = req.cookies.accessToken;
 
         if( !token) {
             return next( new AppError( authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED));

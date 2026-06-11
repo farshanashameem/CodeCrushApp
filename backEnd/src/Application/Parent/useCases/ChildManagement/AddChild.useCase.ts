@@ -9,7 +9,7 @@ import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.reposito
 
 export class AddChildUseCase implements IAddChildUseCase {
 
-     constructor( 
+     constructor(  
       private _childRepository: IChildRepository,
       private _parentRepository : IParentRepository
    ) {}

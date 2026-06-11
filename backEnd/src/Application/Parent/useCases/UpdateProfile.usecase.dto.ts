@@ -1,11 +1,12 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IUpdateProfileUseCase } from "../Interfaces/IUpdateProfile.usecase";
-import ParentEntity from "@/Domain/Entities/Parent.entity";
-import { updateProfileDTO } from "../dto/update_profile.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { IHashService } from "@/Application/Interfaces/Services/IHashService";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IUpdateProfileUseCase } from '../Interfaces/IUpdateProfile.usecase';
+import ParentEntity from '@/Domain/Entities/Parent.entity';
+import { updateProfileDTO } from '../dto/update_profile.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { IHashService } from '@/Application/Interfaces/Services/IHashService';
+import UserStatus from '@/Domain/enums/UserStatus.enum';
 
 export class UpdateProfileUseCase implements IUpdateProfileUseCase {
     constructor (
@@ -20,7 +21,7 @@ export class UpdateProfileUseCase implements IUpdateProfileUseCase {
             throw new AppError( authMessages.error.PARENT_NOT_FOUND, StatusCodes.NOT_FOUND);
         }
 
-        if( parent.getStatus() === "BLOCKED" || parent.getStatus() === "DELETED") {
+        if( parent.getStatus() === UserStatus.BLOCKED || parent.getStatus() === UserStatus.DELETED) {
             throw new AppError( authMessages.error.PARENT_BLOCKED_OR_DELETED_BY_ADMIN, StatusCodes.UNAUTHORIZED);
         }
 
@@ -32,7 +33,7 @@ export class UpdateProfileUseCase implements IUpdateProfileUseCase {
         }
 
        if( data.password ){
-        data.password =await this._hashService.hash(data.password)
+        data.password =await this._hashService.hash(data.password);
        }
 
        parent.update( data );

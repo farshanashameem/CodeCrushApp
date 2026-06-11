@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { Model, Types, UpdateQuery } from 'mongoose';
 import { IBaseRepository } from '@/Domain/RepositoryInterface/IBase.repository';
 
 
@@ -9,7 +9,7 @@ export abstract class BaseRepository<T extends { getId(): string | undefined  },
 
     async create(entity: T): Promise<T> {
         
-        const data = this.mapToPersistence(entity) as any;
+        const data = this.mapToPersistence(entity);
         const savedDoc = await this._model.create(data);
         return this.mapToEntity(savedDoc);
     }
@@ -29,7 +29,7 @@ export abstract class BaseRepository<T extends { getId(): string | undefined  },
         const persisted = this.mapToPersistence(data);
         const updated = await this._model.findByIdAndUpdate(
             id,
-            { $set: persisted } as any,
+            { $set: persisted } as UpdateQuery<D>,
             { new: true }
         ).exec();
         
