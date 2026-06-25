@@ -23,6 +23,32 @@ export const ROUTES = {
                 STATUS: '/children/:id/status'
             }
         },
+        GAME_MANAGEMENT: {
+            BASE: '/games',
+            BY_ID: '/games/:gameId',
+            UPDATE: '/games/:id',
+            STATUS: '/games/:gameId/status',
+            CREATE: '/games',
+        },
+        LEVEL_MANAGEMENT : {
+            BASE: '/levels',
+            CREATE: '/levels',
+            BY_ID: '/levels/:levelId',
+            STATUS: '/levels/:id/status',
+            BY_GAME: '/games/:gameId/levels'
+        },
+        ICON_MANAGEMENT: {
+            BASE : '/icons',
+            CREATE : '/icons',
+            BY_ID : '/icons/:iconId',
+            STATUS: '/icons/:iconId/status'
+        },
+        IMAGE_MANAGEMENT: {
+            BASE : '/images',
+            CREATE : '/images',
+            BY_ID: '/images/:imageId',
+            STATUS : '/images/:imageId/status'
+        }
     },
 
     PARENT : {
@@ -42,5 +68,24 @@ export const ROUTES = {
                 STATUS: '/child/:childId/status'
             }
         }
+    },
+    CHILD : {
+        BASE: '/child',
+        SESSION: {
+            START: "/session/start",
+            END: "/session/end"
+        },
+        GAME : {
+            ALL: '/games',
+            BY_ID: '/games/:gameId',
+            LEVELS: '/games/:gameId/levels',
+            LEVELS_BY_ID: '/games/:gameId/levels/:levelId',
+            START_LEVEL: '/games/:gameId/levels/:levelId/start',
+            SUBMIT_LEVEL: '/games/:gameId/levels/:levelId/submit'
+        },
+        PROGRESS : {
+            BY_GAME: '/progress/:childId/:gameId'
+        }
+
     }
 };

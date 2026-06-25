@@ -14,10 +14,10 @@ export class ChildMapper {
             g.gameId.toString(),
             g.gameName,
             g.currentLevel,
-            g.currentLevelHighScore,
+            g.totalStars,
             g.playTime,
             g.totalScore,
-            g.averageScore,
+            g.totalAttempts,
             g.lastPlayedAt ?? new Date()
         )
     );
@@ -59,10 +59,10 @@ export class ChildMapper {
                 gameId: g.getGameId(),
                 gameName: g.getGameName(),
                 currentLevel: g.getCurrentLevel(),
-                currentLevelHighScore: g.getCurrentLevelHighScore(),
+                totalStars: g.getTotalStars(),
                 playTime: g.getPlayTime(),
                 totalScore: g.getTotalScore(),
-                averageScore: g.getAverageScore(),
+                totalAttempts: g.getTotalAttempts(),
                 lastPlayedAt: g.getLastPlayedAt()
             }))
         };

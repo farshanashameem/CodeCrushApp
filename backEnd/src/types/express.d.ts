@@ -6,12 +6,18 @@ declare module 'express-serve-static-core' {
     interface Request {
         user?: AccessTokenPayload;
         log: Logger;
+        childId?: string;
+        parentId?: string;
+        sessionId?: string;
         cookies: {
             accessToken?: string,
             refreshToken?: string
         };
         validatedQuery?: unknown,
-        validateParams?: unknown
+        validateParams?: unknown,
+
+        file?: Express.Multer.File;
+        files?: Express.Multer.File[];
     }
 }
 

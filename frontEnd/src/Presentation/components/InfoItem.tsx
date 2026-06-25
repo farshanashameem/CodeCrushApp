@@ -7,13 +7,14 @@ interface InfoItemProps {
 
 const InfoItem = ({ label, value }: InfoItemProps) => {
   return (
-    <div className="bg-white/40 border border-white/50 px-4 py-3 rounded-xl shadow-xs">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">
+    <div className="bg-white/40 border border-white/50 px-4 py-3 rounded-xl shadow-sm backdrop-blur-xs">
+     
+      <p className="text-[10px] font-sans font-bold uppercase tracking-wider text-slate-400 mb-0.5">
         {label}
       </p>
-      <p className="text-sm font-semibold text-slate-800">
+      <div className="text-sm font-semibold text-slate-800">
         {value ?? "N/A"}
-      </p>
+      </div>
     </div>
   );
 };

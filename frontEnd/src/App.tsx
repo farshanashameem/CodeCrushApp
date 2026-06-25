@@ -24,10 +24,21 @@ const AddChildPage = lazy( () => import("./Presentation/pages/Parent/AddChildPag
 const ChildProgressPage = lazy( ()=> import( "./Presentation/pages/Parent/ChildProgressPage"));
 const ParentProfilePage = lazy( ()=> import('./Presentation/pages/Parent/UpdateProfile'));
 
+
+const ChildHome = lazy( ()=> import('./Presentation/pages/Child/ChildHomePage'))
+const GamedetailsForChild = lazy( () => import('./Presentation/pages/Child/GameDetailsPage'))
+const LevelIntroPage = lazy( ()=> import('./Presentation/pages/Child/LevelIntroPage'))
+const GameStartPage = lazy( ()=> import('./Presentation/pages/Child/GameStartPage'))
+
 const AdminLogin = lazy( () => import("./Presentation/pages/Admin/AdminLogin"));
 const AdminDashBoard = lazy( () => import("./Presentation/pages/Admin/AdminDashBoard") );
 const Users = lazy ( ()=> import("./Presentation/pages/Admin/Users"));
 const UserDetails = lazy( ()=> import('./Presentation/pages/Admin/UserDetails'));
+const Games = lazy( ()=> import('./Presentation/pages/Admin/Games/Games'))
+const GameDetails = lazy( ()=> import('./Presentation/pages/Admin/Games/GameDetails'))
+const ManageLevels = lazy( ()=> import ('./Presentation/pages/Admin/Games/ManageLevels'))
+const CreateLevel = lazy( ()=> import('./Presentation/pages/Admin/Games/Levels/CreateLevel'))
+const Leveldetails = lazy( ()=> import ('./Presentation/pages/Admin/Games/Levels/LevelDetails'))
 
 function App() {
 
@@ -188,6 +199,83 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path={ROUTES.ADMIN.GAMES}
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+              >
+                <Games />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.ADMIN.GAME_DETAILS}
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+              >
+                <GameDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.ADMIN.LEVELS}
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+              >
+                <ManageLevels />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.ADMIN.CREATE_LEVEL}
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+              >
+                <CreateLevel />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.ADMIN.LEVEL_DETAILS}
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+              >
+                <Leveldetails />
+              </ProtectedRoute>
+            }
+          />
+
+
+          <Route
+            path="/play/:childId"
+            element={<ChildHome />}
+          />
+
+          <Route
+            path={ROUTES.CHILD.GAME_DETAILS}
+            element={<GamedetailsForChild />}
+          />
+
+          <Route
+            path={ROUTES.CHILD.LEVEL_DETAILS}
+            element={<LevelIntroPage />}
+          />
+
+          <Route
+            path={ROUTES.CHILD.START_LEVEL}
+            element={<GameStartPage />}
+          />
+    
 
         </Routes>
       </Suspense>

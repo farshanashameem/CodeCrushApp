@@ -4,6 +4,7 @@ import { AppError } from '@/Domain/Errors/app.error';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 export class TokenService implements ITokenservice {
     generateRefreshToken(payload: RefreshTokenPayload): string {
@@ -54,5 +55,9 @@ export class TokenService implements ITokenservice {
             throw new AppError( authMessages.error.RESET_TOKEN_SECRET_MISSING, StatusCodes.NOT_FOUND);
         }
         return jwt.verify(token, resetSecret) as ResetTokenPayload;
+    }
+
+    generateSessionToken(): string {
+        return crypto.randomBytes(32).toString("hex");
     }
 }

@@ -11,7 +11,18 @@ export const errorHandler: ErrorRequestHandler = (
     res: Response,
     _next: NextFunction
 ): void => {
-    req.log.error({error: error}, 'From error handler');    
+    if (error instanceof Error) {
+  req.log.error(
+    {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    },
+    "From error handler"
+  );
+} else {
+  req.log.error({ error }, "From error handler");
+}
 
     if( error instanceof AppError ) {
         req.log.error({error: error.message}, 'AppError');
