@@ -6,10 +6,10 @@ export interface IChildGame {
     gameId: Types.ObjectId;
     gameName: string;
     currentLevel: number;
-    currentLevelHighScore: number;
+    totalStars: number;
     playTime: number;
     totalScore: number;
-    averageScore: number;
+    totalAttempts: number;
     lastPlayedAt?: Date;
 }
 
@@ -46,10 +46,15 @@ const ChildGameSchema: Schema<IChildGame> = new Schema(
         type: Number,
         default: 1
     },
-    currentLevelHighScore: {
-        type: Number,
-        default: 0
-    },
+    totalStars: {
+  type: Number,
+  default: 0
+},
+
+totalAttempts: {
+  type: Number,
+  default: 0
+},
     playTime: {
         type: Number,
         default: 0
@@ -58,10 +63,7 @@ const ChildGameSchema: Schema<IChildGame> = new Schema(
         type: Number,
         default: 0
     },
-    averageScore: {
-        type: Number,
-        default: 0
-    },
+   
     lastPlayedAt: {
         type: Date
     }

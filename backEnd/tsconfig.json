@@ -55,6 +55,6 @@
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
 
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "seedGame.ts"],
   "exclude": ["node_modules", "dist", "logs"]
 }

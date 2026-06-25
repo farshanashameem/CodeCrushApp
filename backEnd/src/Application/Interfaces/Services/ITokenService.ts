@@ -25,4 +25,5 @@ export interface ITokenservice {
     verifyRefreshToken ( token: string) : RefreshTokenPayload;
     generateResetToken(payload: ResetTokenPayload ) :  string;
     verifyResetToken( token: string ) : ResetTokenPayload;
+    generateSessionToken(): string;
 }

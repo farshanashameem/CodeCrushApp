@@ -2,29 +2,29 @@ export default class ChildGameEntity {
     private gameId: string;
     private gameName: string;
     private currentLevel : number;
-    private currentLevelHighScore : number;
+    private totalStars: number;
     private playTime: number;
     private totalScore: number;
-    private averageScore: number;
+    private totalAttempts: number ;
     private lastPlayedAt?: Date;
 
     constructor (
         gameId: string,
         gameName: string,
         currentLevel: number =1,
-        currentLevelHighScore: number = 0,
+        totalStars: number = 0,
         playTime: number=0,
         totalScore: number=0,
-        averageScore: number = 0,
+        totalAttempts: number = 0,
         lastPlayedAt : Date
     ) {
         this.gameId = gameId;
         this.gameName = gameName;
         this.currentLevel = currentLevel;
-        this.currentLevelHighScore = currentLevelHighScore;
+        this.totalStars= totalStars;
         this.playTime = playTime;
         this.totalScore = totalScore;
-        this.averageScore = averageScore;
+        this.totalAttempts = totalAttempts;
         this.lastPlayedAt = lastPlayedAt;
     }
 
@@ -40,8 +40,8 @@ export default class ChildGameEntity {
     return this.currentLevel;
   }
 
-  public getCurrentLevelHighScore() : number {
-    return this.currentLevelHighScore;
+  public getTotalStars() : number {
+    return this.totalStars;
   }
 
   public getPlayTime(): number {
@@ -52,9 +52,7 @@ export default class ChildGameEntity {
     return this.totalScore;
   }
 
-  public getAverageScore(): number {
-    return this.averageScore;
-  }
+ getTotalAttempts() { return this.totalAttempts; }
 
   public getLastPlayedAt() : Date | undefined {
 

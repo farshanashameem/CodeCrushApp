@@ -124,7 +124,7 @@ const handleLogout = async () => {
             <h3 className="font-black text-sm uppercase tracking-wider text-slate-700 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3 h-full">
               <button onClick={() => navigate(ROUTES.ADMIN.USERS)} className="bg-blue-500 hover:bg-blue-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Manage Users</button>
-              <button className="bg-violet-500 hover:bg-violet-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Add Levels</button>
+              <button onClick={() => navigate(ROUTES.ADMIN.GAMES)} className="bg-violet-500 hover:bg-violet-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Games</button>
               <button className="bg-emerald-500 hover:bg-emerald-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Security</button>
               <button className="bg-orange-500 hover:bg-orange-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Reports</button>
             </div>

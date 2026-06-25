@@ -20,14 +20,14 @@ export const API_ROUTES = {
     PROFILE: "/auth/parent/profile",
     CHILDREN: {
       GET_ALL: "/auth/parent/children",
-      BY_ID: (id: string ) =>`/auth/parent/children/${id}`,
+      BY_ID: (id: string) => `/auth/parent/children/${id}`,
       ADD: "/auth/parent/children",
       UPDATE: (id: string) => `/auth/parent/children/${id}`,
       STATUS: (id: string) => `/auth/parent/child/${id}/status`,
-    }
+    },
   },
 
-  ADMIN: {
+   ADMIN: {
     LOGIN: "/admin/login",
     DASHBOARD: "/admin/dashboard",
     USERS: {
@@ -37,7 +37,60 @@ export const API_ROUTES = {
     },
     CHILDREN: {
       STATUS: (id: string) => `/auth/admin/children/${id}/status`,
-      BY_ID: (id: string ) => `/auth/admin/children/${id}`
-   }
+      BY_ID: (id: string) => `/auth/admin/children/${id}`,
+    },
+    GAMES: {
+      GET_ALL: "/auth/admin/games",
+      CREATE: "/auth/admin/games",
+      BY_ID: (id: string) => `/auth/admin/games/${id}`,
+      UPDATE: (id: string) => `/auth/admin/games/${id}`,
+      STATUS: (id: string) => `/auth/admin/games/${id}/status`,
+    },
+
+    LEVELS: {
+      GET_ALL: "/auth/admin/levels",
+      CREATE: "/auth/admin/levels",
+      BY_ID: (id: string) => `/auth/admin/levels/${id}`,
+      STATUS: (id: string) => `/auth/admin/levels/${id}/status`,
+      BY_GAME: (gameId: string) => `/auth/admin/games/${gameId}/levels`,
+      UPDATE: (id: string) => `/auth/admin/levels/${id}`,
+    },
+
+    ICONS: {
+      GET_ALL: "/auth/admin/icons",
+      CREATE: "/auth/admin/icons",
+      DELETE: (id: string) => `/auth/admin/icons/${id}`,
+    },
+
+    IMAGES: {
+      GET_ALL: "/auth/admin/images",
+      CREATE: "/auth/admin/images",
+      BY_ID: (id: string) => `/auth/admin/images/${id}`,
+      UPDATE: (id: string) => `/auth/admin/images/${id}`,
+      STATUS: (id: string) => `/auth/admin/images/${id}/status`,
+    },
+  },
+
+  CHILD: {
+    SESSION: {
+      START: "/auth/child/session/start",
+      END: "/auth/child/session/end",
+    },
+
+    GAMES: {
+      GET_ALL: "/auth/child/games",
+      BY_ID: (gameId: string) => `/auth/child/games/${gameId}`,
+      LEVELS: (gameId: string) => `/auth/child/games/${gameId}/levels`,
+      LEVEL_BY_ID: (gameId: string, levelId: string) =>
+        `/auth/child/games/${gameId}/levels/${levelId}`,
+      START_LEVEL: (gameId: string, levelId: string) =>
+        `/auth/child/games/${gameId}/levels/${levelId}/start`,
+      SUBMIT_LEVEL: (gameId: string, levelId: string) =>
+        `/auth/child/games/${gameId}/levels/${levelId}/submit`,
+    },
+    PROGRESS: {
+      BY_GAME: (childId: string, gameId: string) =>
+        `/auth/child/progress/${childId}/${gameId}`,
+    },
   },
 };

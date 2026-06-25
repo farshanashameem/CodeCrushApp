@@ -2,16 +2,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../../redux/store";
-import { getChildDetail, toggleChildStatus } from "../../../redux/Slices/ChildManagementSlice";
+import {
+  getChildDetail,
+  toggleChildStatus,
+} from "../../../redux/Slices/ChildManagementSlice";
 import AuthLayout from "../../layouts/AuthLayout";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { avatarMap } from "../../../Constants/avatarMap";
-
+import { startChildSession } from "../../../redux/Slices/childGameSlice";
 // Asset imports
-import mouseTracker from "../../../assets/games/mouseTrackers.png";
-import colorSorter from "../../../assets/games/Colour Sorter Safari.png";
-import typingTitans from "../../../assets/games/TYPING TITANS.png";
-import picturepuzzler from "../../../assets/games/PICTURE PUZZLERS.png";
+import mouseTracker from "../../../assets/games/MouseTrackers.png";
+import colorSorter from "../../../assets/games/ColourSorterSafari.png";
+import typingTitans from "../../../assets/games/TypingTitans.png";
+import picturepuzzler from "../../../assets/games/PicturePuzzlers.png";
 import toast from "react-hot-toast";
 
 const ALL_GAMES = [
@@ -28,7 +31,7 @@ const ChildProgressPage = () => {
 
   // 1. ALL HOOKS MUST BE DECLARED UNCONDITIONALLY AT THE TOP
   const { selectedChild, loading } = useSelector(
-    (state: RootState) => state.childManagement
+    (state: RootState) => state.childManagement,
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,8 +52,8 @@ const ChildProgressPage = () => {
     try {
       if (!child?.id || !modalAction) return;
 
-      await dispatch( 
-        toggleChildStatus({ id: child.id, action:modalAction })
+      await dispatch(
+        toggleChildStatus({ id: child.id, action: modalAction }),
       ).unwrap();
 
       await dispatch(getChildDetail({ id: child.id })).unwrap();
@@ -61,23 +64,45 @@ const ChildProgressPage = () => {
       setModalAction(null);
     } catch (error) {
       console.log("ERROR:", error);
-        setIsModalOpen(false);
-        toast.error(
-          typeof error === "string"
-            ? error
-            : "Failed to update child status"
-        );
-      }
+      setIsModalOpen(false);
+      toast.error(
+        typeof error === "string" ? error : "Failed to update child status",
+      );
+    }
   };
 
   const triggerBlockAction = () => {
-    setModalAction(child?.status=== "BLOCKED" ? "UNBLOCK" : "BLOCK");
+    setModalAction(child?.status === "BLOCKED" ? "UNBLOCK" : "BLOCK");
     setIsModalOpen(true);
   };
 
   const triggerDeleteAction = () => {
-    setModalAction(child?.status=== "DELETED" ? "RESTORE" : "DELETE");
+    setModalAction(child?.status === "DELETED" ? "RESTORE" : "DELETE");
     setIsModalOpen(true);
+  };
+
+  const handleStartGaming = async () => {
+    try {
+      if (!child?.id) return;
+
+      await dispatch(startChildSession(child.id)).unwrap();
+      localStorage.setItem(
+        "child",
+        JSON.stringify({
+          id: child.id,
+          name: child.name,
+          avatar: child.avatar,
+          age: child.age,
+          games: child.games
+        }),
+      );
+
+      window.open(`/play/${child.id}`, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      toast.error(
+        typeof error === "string" ? error : "Failed to start gaming session",
+      );
+    }
   };
 
   // 3. CONDITIONAL SAFETY RETURNS ARE SAFE TO RUN DOWN HERE
@@ -103,39 +128,38 @@ const ChildProgressPage = () => {
 
   // Map backend games safely now that child data availability is guaranteed
   const gamesMap: Record<string, any> = {};
-(child.games || []).forEach((g) => {
-  gamesMap[g.gameName] = g;
-});
+  (child.games || []).forEach((g) => {
+    gamesMap[g.gameName] = g;
+  });
 
-// Dummy data for testing
-if (!gamesMap["Mouse Tracker"]) {
-  gamesMap["Mouse Tracker"] = {
-    gameName: "Mouse Tracker",
-    level: 4,
-    stars: 5,
-    progress: 92,
-    bestScore: 850,
-    totalTime: "2h 15m",
-    lastPlayed: "Today",
-  };
-}
+  // Dummy data for testing
+  if (!gamesMap["Mouse Tracker"]) {
+    gamesMap["Mouse Tracker"] = {
+      gameName: "Mouse Tracker",
+      level: 4,
+      stars: 5,
+      progress: 92,
+      bestScore: 850,
+      totalTime: "2h 15m",
+      lastPlayed: "Today",
+    };
+  }
 
-if (!gamesMap["Typing Titans"]) {
-  gamesMap["Typing Titans"] = {
-    gameName: "Typing Titans",
-    level: 2,
-    stars: 3,
-    progress: 48,
-    bestScore: 420,
-    totalTime: "45m",
-    lastPlayed: "Yesterday",
-  };
-}
+  if (!gamesMap["Typing Titans"]) {
+    gamesMap["Typing Titans"] = {
+      gameName: "Typing Titans",
+      level: 2,
+      stars: 3,
+      progress: 48,
+      bestScore: 420,
+      totalTime: "45m",
+      lastPlayed: "Yesterday",
+    };
+  }
 
   return (
     <AuthLayout>
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col transition-all duration-500">
-        
         {/* TOP BREADCRUMB NAVIGATION */}
         <div className="mb-4 self-start">
           <button
@@ -149,7 +173,6 @@ if (!gamesMap["Typing Titans"]) {
         {/* CHILD METRICS HERO CARD */}
         <div className="w-full bg-gradient-to-br from-[#e1f5fe] to-[#b3e5fc]/40 rounded-3xl p-6 md:p-8 shadow-md border border-blue-100/50 mb-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            
             {/* Visual Portrait & Meta details */}
             <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left w-full md:w-auto">
               <div className="w-24 h-24 rounded-full bg-gradient-to-b from-blue-50 to-blue-100 p-1 border border-blue-200 shadow-inner overflow-hidden">
@@ -159,10 +182,11 @@ if (!gamesMap["Typing Titans"]) {
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              
+
               <div>
                 <h1 className="font-mochiy text-[#1a3a6d] text-2xl tracking-tight uppercase mb-1">
-                  {child.name}'s <span className="text-orange-500">Activity</span>
+                  {child.name}'s{" "}
+                  <span className="text-orange-500">Activity</span>
                 </h1>
                 <p className="text-gray-600 text-sm font-semibold bg-white/70 px-3 py-1 rounded-full inline-block border border-blue-100">
                   Age {child.age} Explorer
@@ -182,24 +206,33 @@ if (!gamesMap["Typing Titans"]) {
               <button
                 onClick={() => triggerBlockAction()}
                 className={`px-5 py-3 rounded-full font-mochiy text-xs active:scale-95 transition-all flex items-center gap-2 shadow-sm border
-                  ${child.status === "BLOCKED"
-                    ? "bg-green-600 hover:bg-green-700 text-white border-green-700"
-                    : "bg-amber-500 hover:bg-amber-600 text-white border-amber-600"}`}
+                  ${
+                    child.status === "BLOCKED"
+                      ? "bg-green-600 hover:bg-green-700 text-white border-green-700"
+                      : "bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
+                  }`}
               >
-                ⏸ {child.status === "BLOCKED" ? "Unblock Explorer" : "Block Explorer"}
+                ⏸{" "}
+                {child.status === "BLOCKED"
+                  ? "Unblock Explorer"
+                  : "Block Explorer"}
               </button>
 
               <button
                 onClick={() => triggerDeleteAction()}
                 className={`px-5 py-3 rounded-full font-mochiy text-xs active:scale-95 transition-all flex items-center gap-2 border shadow-sm
-                  ${child.status === "DELETED"
-                    ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-700"
-                    : "bg-red-50 hover:bg-red-100 text-red-600 border-red-200"}`}
+                  ${
+                    child.status === "DELETED"
+                      ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-700"
+                      : "bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
+                  }`}
               >
-                🗑️ {child.status === "DELETED" ? "Restore Account" : "Remove Account"}
+                🗑️{" "}
+                {child.status === "DELETED"
+                  ? "Restore Account"
+                  : "Remove Account"}
               </button>
             </div>
-
           </div>
         </div>
 
@@ -209,7 +242,8 @@ if (!gamesMap["Typing Titans"]) {
             Game Statistics
           </h3>
           <p className="text-sm text-blue-800 font-medium">
-            Review detailed execution progress, scores and engagement metrics below
+            Review detailed execution progress, scores and engagement metrics
+            below
           </p>
         </div>
 
@@ -276,13 +310,17 @@ if (!gamesMap["Typing Titans"]) {
                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">
                             Best Score
                           </span>
-                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">{played.bestScore || "-"}</span>
+                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">
+                            {played.bestScore || "-"}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center bg-gray-50/70 px-2.5 py-1.5 rounded-xl border border-gray-100">
                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">
                             Total Time
                           </span>
-                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">{played.totalTime || "-"}</span>
+                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">
+                            {played.totalTime || "-"}
+                          </span>
                         </div>
                       </div>
 
@@ -303,17 +341,39 @@ if (!gamesMap["Typing Titans"]) {
           })}
         </div>
 
+        {/* Start Gaming */}
+        <div className="flex justify-center mb-12">
+          <button
+            onClick={handleStartGaming}
+            disabled={child.status === "BLOCKED" || child.status === "DELETED"}
+            className="
+      px-10 py-4 rounded-full
+      bg-gradient-to-r from-blue-600 to-indigo-600
+      hover:from-blue-700 hover:to-indigo-700
+      disabled:opacity-50 disabled:cursor-not-allowed
+      text-white font-mochiy text-sm
+      shadow-lg hover:shadow-xl
+      transition-all duration-300
+      active:scale-95
+    "
+          >
+            🎮 Start Gaming
+          </button>
+        </div>
+
         {/* ACCOUNT CONFIRMATION DIALOG MODAL CONTROLLER */}
         <ConfirmationModal
-    isOpen={isModalOpen}
-    title="Confirm Action"
-    message={`Are you sure you want to ${modalAction?.toLowerCase()} ${child.name}'s account?`}
-    onConfirm={handleConfirm}
-    onCancel={() => {setIsModalOpen(false);
-                      setModalAction(null);}}
-    confirmText="Yes"
-    cancelText="No"
-  />
+          isOpen={isModalOpen}
+          title="Confirm Action"
+          message={`Are you sure you want to ${modalAction?.toLowerCase()} ${child.name}'s account?`}
+          onConfirm={handleConfirm}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setModalAction(null);
+          }}
+          confirmText="Yes"
+          cancelText="No"
+        />
       </div>
     </AuthLayout>
   );

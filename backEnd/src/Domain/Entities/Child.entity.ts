@@ -122,4 +122,28 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     }
   }
 
+  public replaceGame(updatedGame: ChildGameEntity): void {
+  this.games = this.games.map(game =>
+    game.getGameId() === updatedGame.getGameId()
+      ? updatedGame
+      : game
+  );
+}
+
+public setLastPlayed(date: Date): void {
+  this.lastPlayed = date;
+}
+
+public setTotalPlayedTime(time: number): void {
+  this.totalPlayTime = time;
+}
+
+public setTotalGamesPlayed(count: number): void {
+  this.totalGamesPlayed = count;
+}
+
+public addGame(game: ChildGameEntity): void {
+  this.games.push(game);
+}
+
 }

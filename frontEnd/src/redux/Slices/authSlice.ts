@@ -12,7 +12,7 @@ import api from "../../Lib/axios";
 import type { AxiosError } from "axios";
 import type { AdminLoginPayload } from "../../Types/admin";
 import { API_ROUTES } from "../../Constants/api.routes";
-import type { Parent, ParentPayload, UpdateProfilePayload } from "../../Types/parent";
+import type {  UpdateProfilePayload } from "../../Types/parent";
 
 const initialState: AuthState = {
   user: null,
