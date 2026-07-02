@@ -1,5 +1,5 @@
-import IconEntity from "../Entities/Icon.entity";
-import { IBaseRepository } from "./IBase.repository";
+import IconEntity from '../Entities/Icon.entity';
+import { IBaseRepository } from './IBase.repository';
 
 export interface IIconRepository extends IBaseRepository<IconEntity> {
    

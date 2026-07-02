@@ -72,8 +72,9 @@ export const ROUTES = {
     CHILD : {
         BASE: '/child',
         SESSION: {
-            START: "/session/start",
-            END: "/session/end"
+            START: '/session/start',
+            CURRENT: '/session/current',
+            END: '/session/end'
         },
         GAME : {
             ALL: '/games',
@@ -84,7 +85,8 @@ export const ROUTES = {
             SUBMIT_LEVEL: '/games/:gameId/levels/:levelId/submit'
         },
         PROGRESS : {
-            BY_GAME: '/progress/:childId/:gameId'
+            BY_GAME: '/progress/:childId/:gameId',
+            BY_LEVEL: '/games/:gameId/levels/:levelId/progress'
         }
 
     }

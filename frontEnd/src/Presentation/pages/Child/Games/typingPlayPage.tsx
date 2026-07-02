@@ -1,10 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-
+import ttplay from "../../../../assets/games/ttplay.png";
 import type { AppDispatch, RootState } from "../../../../redux/store";
-import { fetchLevelsByGame, getGameDetail, getLevelDetail, submitLevel, clearSelectedLevel } from "../../../../redux/Slices/childGameSlice";
-
+import {
+  fetchLevelsByGame,
+  getGameDetail,
+  getLevelDetail,
+  getCurrentChildSession,
+  submitLevel,
+  clearSelectedLevel,
+  getLevelProgress,
+} from "../../../../redux/Slices/childGameSlice";
+import click from "../../../../assets/audios/click.mp3";
 import ChildLayout from "../../../components/Child/ChildLayout";
 import GameHUD from "../../../components/Games/GamePlay/GameHUD";
 import GameTimer from "../../../components/Games/GamePlay/Gametimer";
@@ -18,100 +26,106 @@ const TypingPlayPage = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
-  const [child, setChild] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [input, setInput] = useState("");
-  const [mistakes, setMistakes] = useState(0);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
   const [score, setScore] = useState(0);
   const [stars, setStars] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showFailure, setShowFailure] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
   const [levels, setLevels] = useState<Level[]>([]);
+  const [isNewHighScore, setIsNewHighScore] = useState(false);
+  const [isNewBestTime, setIsNewBestTime] = useState(false);
+  const { currentChild, selectedGame, selectedLevel, selectedLevelProgress } =
+    useSelector((state: RootState) => state.childGame);
+  const keySound = useMemo(() => new Audio(click), []);
 
-  const { selectedGame, selectedLevel } = useSelector(
-    (state: RootState) => state.childGame,
-  );
-
-  // 1. Fetch child profile from localStorage safely
   useEffect(() => {
-    const stored = localStorage.getItem("child");
-    if (stored) {
-      setChild(JSON.parse(stored));
-    }
-  }, []);
+    dispatch(getCurrentChildSession());
+  }, [dispatch]);
 
-  // 2. Fetch levels list for the current game
-  useEffect(() => {
-    if (!gameId) return;
-
-    dispatch(fetchLevelsByGame(gameId))
-      .unwrap()
-      .then(data => setLevels(data));
-  }, [dispatch, gameId]);
-
-  // 3. Fetch specific details for the active game and level
   useEffect(() => {
     if (!gameId || !levelId) return;
 
     dispatch(getGameDetail(gameId));
+
     dispatch(
       getLevelDetail({
         gameId,
         levelId,
       }),
     );
+
+    dispatch(
+      getLevelProgress({
+        gameId,
+        levelId,
+      }),
+    );
   }, [dispatch, gameId, levelId]);
 
- 
   useEffect(() => {
-    if (selectedLevel) {
-      setTimeLeft(selectedLevel.timer);
-    }
+    if (!gameId) return;
+
+    dispatch(fetchLevelsByGame(gameId)).unwrap().then(setLevels);
+  }, [dispatch, gameId]);
+
+  useEffect(() => {
+    if (!selectedLevel) return;
+
+    setTimeLeft(selectedLevel.timer);
   }, [selectedLevel]);
 
-  
   useEffect(() => {
     setCurrentIndex(0);
     setInput("");
-    setMistakes(0);
+    setWrongAnswers(0);
     setScore(0);
     setStars(0);
     setShowSuccess(false);
     setShowFailure(false);
     setGameFinished(false);
+    setIsNewBestTime(false);
+    setIsNewHighScore(false);
   }, [levelId]);
 
-  
-  const nextLevel = useMemo(() => {
-    const sorted = [...levels].sort(
-      (a, b) => a.levelNumber - b.levelNumber
-    );
+  if (!currentChild || !selectedGame || !selectedLevel) return null;
 
-    const levelIndex = sorted.findIndex(
-      level => level.id === levelId
-    );
+  const words = (selectedLevel.config as { words: string[] }).words ?? [];
+
+  const currentWord = words[currentIndex];
+
+  const theme = gameTheme[selectedGame.name as keyof typeof gameTheme];
+
+  const nextLevel = useMemo(() => {
+    const sorted = [...levels].sort((a, b) => a.levelNumber - b.levelNumber);
+
+    const levelIndex = sorted.findIndex((level) => level.id === levelId);
 
     if (levelIndex === -1) return null;
 
     return sorted[levelIndex + 1] ?? null;
   }, [levels, levelId]);
 
- 
-  if (!selectedGame || !selectedLevel || !child) return null;
+  const finishLevel = async () => {
+    if (!selectedLevel || gameFinished) return;
 
-  const words = (selectedLevel.config as { words: string[] }).words || [];
-  const currentWord = words[currentIndex];
-  const theme = gameTheme[selectedGame.name as keyof typeof gameTheme];
-
-  const finishLevel = async (finalScore: number) => {
-   console.log("Submitting level", levelId);
-    if (gameFinished) return;
     setGameFinished(true);
 
+    const timeTaken = selectedLevel.timer - timeLeft;
+
+    const baseScore = 100;
+    const mistakePenalty = wrongAnswers * 2;
+
+    const finalScore = Math.max(0, baseScore - mistakePenalty);
+
+    setScore(finalScore);
+
+    // Star calculation
     const percentage = (finalScore / selectedLevel.maxScore) * 100;
+
     let earnedStars = 1;
 
     if (percentage >= 90) earnedStars = 3;
@@ -119,21 +133,36 @@ const TypingPlayPage = () => {
 
     setStars(earnedStars);
 
-    await dispatch(
-      submitLevel({
-        childId: child.id,
-        gameId: gameId!,
-        levelId: levelId!,
-        levelNumber: selectedLevel.levelNumber,
-        completed: true,
-        score: finalScore,
-        stars: earnedStars,
-        timeTaken: selectedLevel.timer - timeLeft,
-        mistakes,
-      }),
-    ).unwrap();
+    // Compare with previous attempt
+    const previousScore = selectedLevelProgress?.highScore ?? 0;
+    const previousBestTime =
+      selectedLevelProgress?.bestTime ?? Number.MAX_SAFE_INTEGER;
 
-    setShowSuccess(true);
+    const newHighScore = finalScore > previousScore;
+    const newBestTime = timeTaken < previousBestTime;
+
+    setIsNewHighScore(newHighScore);
+    setIsNewBestTime(newBestTime);
+
+    try {
+      await dispatch(
+        submitLevel({
+          childId: currentChild!.id,
+          gameId: gameId!,
+          levelId: levelId!,
+          levelNumber: selectedLevel.levelNumber,
+          completed: true,
+          score: finalScore,
+          stars: earnedStars,
+          timeTaken,
+          mistakes: wrongAnswers,
+        }),
+      ).unwrap();
+
+      setShowSuccess(true);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmitWord = () => {
@@ -141,47 +170,76 @@ const TypingPlayPage = () => {
 
     if (input.trim().toLowerCase() === currentWord.toLowerCase()) {
       const isLastWord = currentIndex === words.length - 1;
-      
-      // FIX: Fixed floating-point loss. The final word drops the exact remainder balance to reach maxScore.
-      const pointsToAdd = isLastWord
-        ? selectedLevel.maxScore - score 
-        : Math.floor(selectedLevel.maxScore / words.length);
-
-      const updatedScore = score + pointsToAdd;
-      setScore(updatedScore);
 
       if (isLastWord) {
-        finishLevel(updatedScore);
+        finishLevel();
       } else {
-        setCurrentIndex(prev => prev + 1);
+        setCurrentIndex((prev) => prev + 1);
       }
     } else {
-      setMistakes(prev => prev + 1);
+      setWrongAnswers((prev) => prev + 1);
     }
 
     setInput("");
   };
 
   const retryLevel = () => {
-    navigate(`/play/${child.id}/games/${gameId}/levels/${levelId}/start`);
+    setShowFailure(false);
+    setShowSuccess(false);
+
+    setCurrentIndex(0);
+    setInput("");
+    setWrongAnswers(0);
+    setScore(0);
+    setStars(0);
+    setGameFinished(false);
+
+    setTimeLeft(selectedLevel.timer);
   };
 
   const onNext = async () => {
-    dispatch(clearSelectedLevel());
-    await dispatch(getGameDetail(gameId!));
     if (!nextLevel) {
-      navigate(`/play/${child.id}/games/${gameId}`);
+      navigate(`/play/${currentChild?.id}/games/${gameId}/levels/${nextLevel}`);
       return;
     }
-    
-    navigate(`/play/${child.id}/games/${gameId}/levels/${nextLevel.id}/start`);
+
+    navigate(
+      `/play/${currentChild?.id}/games/${gameId}/levels/${nextLevel.id}`,
+      { replace: true },
+    );
+  };
+
+  const failLevel = async () => {
+    if (gameFinished || !selectedLevel) return;
+
+    setGameFinished(true);
+
+    const timeTaken = selectedLevel.timer;
+
+    await dispatch(
+      submitLevel({
+        childId: currentChild!.id,
+        gameId: gameId!,
+        levelId: levelId!,
+        levelNumber: selectedLevel.levelNumber,
+
+        completed: false,
+
+        score: 0,
+        stars: 0,
+        timeTaken,
+        mistakes: wrongAnswers,
+      }),
+    );
+
+    setShowFailure(true);
   };
 
   return (
     <ChildLayout
       background={theme.background}
-      child={child}
-      coins={child?.coins || 0}
+      child={currentChild}
+      coins={0}
       logo={theme.logo}
       title={selectedGame.name}
     >
@@ -192,47 +250,80 @@ const TypingPlayPage = () => {
               disabled={gameFinished || showFailure || showSuccess}
               timeLeft={timeLeft}
               onTick={setTimeLeft}
-              onTimeUp={() => {
-                if (!gameFinished) {
-                  setGameFinished(true);
-                  setShowFailure(true);
-                }
-              }}
+              onTimeUp={failLevel}
             />
           </GameHUD>
         )}
 
-        <div className="mt-12 bg-white/90 rounded-[40px] p-12 shadow-2xl text-center">
+        <div
+          className="mt-12 rounded-[40px] p-12 shadow-2xl text-center bg-cover bg-center bg-no-repeat"
+          
+        >
           <h2 className="text-slate-500 text-xl">Type This Word</h2>
 
-          <h1 className="font-mochiy text-5xl text-indigo-600 mt-8">
+          <h1 className="mt-8 inline-block rounded-3xl bg-white/90 px-10 py-6 text-6xl font-mochiy text-pink-600 shadow-2xl border-4 border-yellow-300">
             {currentWord}
           </h1>
 
           <input
             value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === "Enter") {
-                handleSubmitWord();
-              }
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              keySound.currentTime = 0;
+              keySound.play().catch(() => {});
+
+              if (e.key === "Enter") handleSubmitWord();
             }}
             autoFocus
-            className="w-full mt-10 text-center text-3xl border-4 border-indigo-300 rounded-3xl p-5 outline-none"
+            placeholder="✨ Type here..."
+            className="
+            w-full mt-10
+            rounded-3xl
+            border-4 border-yellow-300
+            bg-yellow-50
+            px-8 py-5
+            text-center
+            text-4xl
+            font-mochiy
+            text-fuchsia-600
+            placeholder:text-fuchsia-300
+            tracking-wide
+            outline-none
+            shadow-xl
+            transition-all
+            duration-300
+            focus:border-pink-500
+            focus:bg-white
+            focus:scale-105
+          "
           />
 
           <button
             onClick={handleSubmitWord}
-            className="mt-8 px-10 py-4 bg-indigo-500 text-white rounded-full font-mochiy"
+            className="
+              mt-8
+              px-12 py-4
+              rounded-full
+              bg-gradient-to-r
+              from-pink-500
+              to-orange-400
+              text-white
+              text-2xl
+              font-mochiy
+              shadow-lg
+              hover:scale-110
+              active:scale-95
+              transition-all
+            "
           >
-            Submit
+            🚀 Submit
           </button>
 
           <div className="mt-8">
             <p>
               Word {currentIndex + 1} / {words.length}
             </p>
-            <p className="text-red-500 mt-2">Mistakes: {mistakes}</p>
+            <p className="text-red-500 mt-2">Mistakes: {wrongAnswers}</p>
           </div>
         </div>
 
@@ -242,6 +333,8 @@ const TypingPlayPage = () => {
           score={score}
           stars={stars}
           timeTaken={selectedLevel.timer - timeLeft}
+          isNewHighScore={isNewHighScore}
+          isNewBestTime={isNewBestTime}
           onRetry={retryLevel}
           onNext={onNext}
         />
@@ -254,7 +347,11 @@ const TypingPlayPage = () => {
           stars={stars}
           timeTaken={selectedLevel.timer}
           onRetry={retryLevel}
-          onBack={() => navigate(`/play/${child.id}/games/${gameId}`)}
+          onBack={() =>
+            navigate(`/play/${currentChild?.id}/games/${gameId}`, {
+              replace: true,
+            })
+          }
         />
       </div>
     </ChildLayout>

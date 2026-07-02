@@ -1,12 +1,12 @@
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { IStartChildSessionUseCase } from "../Interfaces/IStartChildSession.usecase";
-import { IChildSessionRepository } from "@/Domain/RepositoryInterface/IChildSession.repository";
-import { StartChildSessionInputDTO, StartChildSessionOutputDTO } from "../dto/StartChildSession.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { ITokenservice } from "@/Application/Interfaces/Services/ITokenService";
-import ChildSessionEntity from "@/Domain/Entities/ChildSession.entity";
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { IStartChildSessionUseCase } from '../Interfaces/IStartChildSession.usecase';
+import { IChildSessionRepository } from '@/Domain/RepositoryInterface/IChildSession.repository';
+import { StartChildSessionInputDTO, StartChildSessionOutputDTO } from '../dto/StartChildSession.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { ITokenservice } from '@/Application/Interfaces/Services/ITokenService';
+import ChildSessionEntity from '@/Domain/Entities/ChildSession.entity';
 
 export class StartChildSessionUseCase implements IStartChildSessionUseCase {
     constructor( 
@@ -23,7 +23,7 @@ export class StartChildSessionUseCase implements IStartChildSessionUseCase {
         }
 
         if(child.getParentId() !== input.parentId) {
-            throw new AppError( authMessages.error.FORBIDDEN, StatusCodes.FORBIDDEN)
+            throw new AppError( authMessages.error.FORBIDDEN, StatusCodes.FORBIDDEN);
         }
 
         const existing = await this._childSessionRepo.findActiveSessionByChildId ( input.childId );
@@ -31,7 +31,7 @@ export class StartChildSessionUseCase implements IStartChildSessionUseCase {
             return {
                 sessionId: existing.getId()!,
                 sessionToken: existing.getSessionToken()
-            }
+            };
         }
 
         const token = this._tokenService.generateSessionToken();

@@ -1,21 +1,16 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { gameTheme } from "../../../../Constants/gameTheme";
+// Import your sad audio file here
+import failureMusic from "../../../../assets/sad.mp3"; 
 
 interface FailureModalProps {
   open: boolean;
-
   gameName: string;
-
   reason: string;
-
   score: number;
-
   stars: number;
-
   timeTaken: number;
-
   onRetry: () => void;
-
   onBack: () => void;
 }
 
@@ -31,193 +26,110 @@ const FailureModal = ({
 }: FailureModalProps) => {
   const theme = useMemo(
     () => gameTheme[gameName as keyof typeof gameTheme],
-    [gameName],
+    [gameName]
   );
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Audio lifecycle management
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (open) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    return () => {
+      audioRef.current?.pause();
+      if (audioRef.current) audioRef.current.currentTime = 0;
+    };
+  }, [open]);
 
   if (!open) return null;
 
   return (
-    <div
-      className="
-        fixed
-        inset-0
-        z-[999]
-        bg-black/70
-        backdrop-blur-sm
-        flex
-        items-center
-        justify-center
-        p-4
-      "
-    >
-      <div
-        className="
-          relative
-          w-full
-          max-w-4xl
-          h-[650px]
-          rounded-[40px]
-          overflow-hidden
-          shadow-2xl
-          border-8
-          border-white
-        "
-      >
-        {/* Background */}
-        <img
-          src={theme.failureBackground}
-          alt="failure"
-          className="
-            absolute
-            inset-0
-            w-full
-            h-full
-            object-cover
-          "
-        />
+    <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+      {/* Hidden audio element */}
+      <audio ref={audioRef} src={failureMusic} />
 
-        {/* Overlay */}
-        <div
-          className="
-            absolute
-            inset-0
-            bg-black/20
-          "
-        />
+      {/* Main Container */}
+      <div className="relative w-full max-w-2xl h-[600px] overflow-hidden rounded-[40px] border-8 border-rose-500 shadow-2xl flex flex-col">
+        
+        {/* Background Layer */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={theme?.failureBackground}
+            alt="failure"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        </div>
 
-        {/* Content */}
-        <div
-          className="
-            relative
-            h-full
-            flex
-            flex-col
-            items-center
-            justify-center
-            text-center
-            px-8
-          "
-        >
-          {/* Title */}
-          <h1
-            className="
-              font-mochiy
-              text-5xl
-              md:text-6xl
-              text-white
-              drop-shadow-lg
-            "
-          >
-            💥 Level Failed
+        {/* Header Title Section: Absolute Top Pin */}
+        <div className="absolute top-6 left-0 right-0 z-20 text-center px-4 md:top-8">
+          <h1 className="font-mochiy text-5xl text-orange-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.95)] md:text-6xl tracking-wide">
+            
           </h1>
-
-          <p
-            className="
-              mt-4
-              text-xl
-              font-semibold
-              text-white
-            "
-          >
+          <p className="mt-1 text-xl font-medium text-rose-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
             Don't give up. Try again!
           </p>
+        </div>
 
-          {/* Reason */}
-          <div
-            className="
-              mt-6
-              px-6
-              py-3
-              rounded-full
-              bg-red-500
-              text-white
-              font-mochiy
-              shadow-xl
-            "
-          >
-            {reason}
-          </div>
+        {/* Content Node */}
+        <div className="relative z-10 flex h-full w-full flex-col items-center justify-between px-6 pb-8 pt-28 text-center sm:px-8 md:px-12 md:pb-10 md:pt-32">
+          
+          {/* Center Content Section */}
+          <div className="flex flex-col items-center w-full flex-1 justify-center my-auto">
+            {/* Failure Alert Reason Badge */}
+            <div className="px-6 py-2 rounded-2xl bg-rose-600 border border-rose-400 text-white font-mochiy text-sm shadow-2xl tracking-wide">
+              ❌ {reason}
+            </div>
 
-          {/* Stats */}
-          <div
-            className="
-              mt-8
-              bg-white/90
-              rounded-3xl
-              p-8
-              shadow-xl
-              min-w-[340px]
-            "
-          >
-            <div className="grid grid-cols-3 gap-6">
-              <div>
-                <p className="text-slate-500 text-sm">
-                  Score
-                </p>
+            {/* Transparent Stats Section */}
+            <div className="mt-6 w-full max-w-sm">
+              <div className="grid grid-cols-2 gap-8">
+                <div className="flex flex-col items-center justify-center">
+                  <p className="text-orange-400 text-sm font-bold uppercase tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">Score</p>
+                  <h3 className="font-mochiy text-rose-400 text-4xl mt-1 drop-shadow-[0_3px_6px_rgba(0,0,0,0.95)]">
+                    {score.toLocaleString()}
+                  </h3>
+                </div>
 
-                <h3 className="font-mochiy text-red-500 text-2xl mt-2">
-                  {score}
-                </h3>
+                <div className="flex flex-col items-center justify-center">
+                  <p className="text-orange-400 text-sm font-bold uppercase tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">Time Spent</p>
+                  <h3 className="font-mochiy text-rose-400 text-4xl mt-1 drop-shadow-[0_3px_6px_rgba(0,0,0,0.95)]">
+                    {timeTaken}s
+                  </h3>
+                </div>
               </div>
-
-              <div>
-                <p className="text-slate-500 text-sm">
-                  Time
-                </p>
-
-                <h3 className="font-mochiy text-red-500 text-2xl mt-2">
-                  {timeTaken}s
-                </h3>
-              </div>
-
-              <div>
-                <p className="text-slate-500 text-sm">
-                  Stars
-                </p>
-
-                <h3 className="text-3xl mt-2">
-                  {stars > 0 ? "⭐".repeat(stars) : "—"}
-                </h3>
-              </div>
+              
+              {stars > 0 && (
+                <div className="mt-5 text-center text-base text-orange-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] font-medium">
+                  Stars Saved: <span className="tracking-wide ml-1">{ "⭐".repeat(stars) }</span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-4 mt-10">
+          {/* Action Buttons Footer */}
+          <div className="w-full flex flex-col sm:flex-row gap-4 max-w-sm mt-auto">
             <button
               onClick={onRetry}
-              className="
-                px-10
-                py-4
-                rounded-full
-                bg-yellow-400
-                hover:bg-yellow-500
-                text-white
-                font-mochiy
-                shadow-xl
-                transition
-              "
+              className="flex-1 px-6 py-3.5 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-500 border-b-4 border-amber-700 text-white font-mochiy text-base shadow-xl transition hover:brightness-110 active:translate-y-0.5 active:border-b-0"
             >
               🔄 Retry
             </button>
-
             <button
               onClick={onBack}
-              className="
-                px-10
-                py-4
-                rounded-full
-                bg-indigo-500
-                hover:bg-indigo-600
-                text-white
-                font-mochiy
-                shadow-xl
-                transition
-              "
+              className="flex-1 px-6 py-3.5 rounded-2xl bg-gradient-to-b from-indigo-500 to-indigo-600 border-b-4 border-indigo-800 text-white font-mochiy text-base shadow-xl transition hover:brightness-110 active:translate-y-0.5 active:border-b-0"
             >
-              📚 Back To Levels
+              📚 Back
             </button>
           </div>
+          
         </div>
       </div>
     </div>

@@ -141,19 +141,19 @@ const updateLevelUseCase = new UpdateLevelUseCase(
 
 const changeLevelStatusUseCase = new ChangeStatusUseCase(
     levelRepository
-)
+);
 
 const getAllGamesUseCase = new GetGamesUseCase(
     gameRepository
-)
+);
 
 const getGameUseCase = new GetGameUseCase(
     gameRepository
-)
+);
 
 const changeGameStatusUseCase = new ChangeGameStatusUseCase(
     gameRepository
-)
+);
 
 
 
@@ -179,7 +179,7 @@ export const gameLevelController = new GameLevelController(
     getAllLevelsByGameIduseCase,
     changeLevelStatusUseCase,
     getLevelUseCase
-)
+);
 
 export const imageManagementcontroller = new ImageManagementController(
     createImageUseCase,
@@ -188,17 +188,17 @@ export const imageManagementcontroller = new ImageManagementController(
     getImageUseCase,
     deleteImageUseCase,
     cloudinarService
-)
+);
 
 export const iconManagementController = new IconManagementController(
     createIconUseCase,
     getIconsUseCase,
     getIconUseCase,
     deleteIconUseCase
-)
+);
 
 export const gameController = new GameManagementController(
     getAllGamesUseCase,
     getGameUseCase,
     changeGameStatusUseCase
-)
+);

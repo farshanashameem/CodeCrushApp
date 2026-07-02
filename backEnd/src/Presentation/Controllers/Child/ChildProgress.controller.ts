@@ -1,8 +1,8 @@
-import { GetGameProgressUseCase } from "@/Application/Child/UseCases/GetGameProgress.usecase";
-import { SubmitLevelUseCase } from "@/Application/Child/UseCases/SubmitLevel.usecase";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { getGameProgressSchema, submitLevelSchema } from "@/Presentation/Validators/progressValidator";
-import { NextFunction, Request, Response } from "express";
+import { GetGameProgressUseCase } from '@/Application/Child/UseCases/GetGameProgress.usecase';
+import { SubmitLevelUseCase } from '@/Application/Child/UseCases/SubmitLevel.usecase';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { getGameProgressSchema, submitLevelSchema } from '@/Presentation/Validators/progressValidator';
+import { NextFunction, Request, Response } from 'express';
 
 export class ChildProgressController {
     constructor (
@@ -17,11 +17,11 @@ export class ChildProgressController {
 
             return res.status( StatusCodes.OK).json({
              result
-            })
+            });
         }catch(error){
-            next( error)
+            next( error);
         }
-    }
+    };
 
     submitProgress = async( req: Request, res: Response, next: NextFunction): Promise< Response | void > => {
 
@@ -31,9 +31,9 @@ export class ChildProgressController {
 
             return res.status( StatusCodes.CREATED).json({
                 result
-            })
+            });
         } catch( error) {
-            next( error)
+            next( error);
         }
-    }
+    };
 }

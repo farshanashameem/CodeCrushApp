@@ -11,7 +11,7 @@ export default class ChildSessionEntity {
     private lastActivity: Date = new Date(),
 
     private expiresAt: Date = new Date(
-      Date.now() + 30 * 24 * 60 * 60 * 1000
+      Date.now() +  12 * 60 * 60 * 1000
     ),
 
     private id?: string
@@ -51,10 +51,11 @@ export default class ChildSessionEntity {
 
   public updateActivity() {
     this.lastActivity = new Date();
-    this.expiresAt = new Date( new Date().getTime() + 30 * 24 * 60 * 60 * 1000 );
+    this.expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
   }
 
   public deactivate() {
-    this.isActive = false;
+    this.isActive = false; 
+    this.expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);  
   }
 }

@@ -18,18 +18,16 @@ import picturepuzzler from "../../../assets/games/PicturePuzzlers.png";
 import toast from "react-hot-toast";
 
 const ALL_GAMES = [
-  { name: "Mouse Tracker", color: "bg-orange-400", image: mouseTracker },
+  { name: "Mouse Trackers", color: "bg-orange-400", image: mouseTracker },
   { name: "Typing Titans", color: "bg-blue-400", image: typingTitans },
-  { name: "Color Sorter", color: "bg-purple-400", image: colorSorter },
-  { name: "Picture Puzzle", color: "bg-pink-400", image: picturepuzzler },
+  { name: "Colour Sorter Safari", color: "bg-purple-400", image: colorSorter },
+  { name: "Picture Puzzlers", color: "bg-pink-400", image: picturepuzzler },
 ];
 
 const ChildProgressPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams<{ id: string }>();
-
-  // 1. ALL HOOKS MUST BE DECLARED UNCONDITIONALLY AT THE TOP
   const { selectedChild, loading } = useSelector(
     (state: RootState) => state.childManagement,
   );
@@ -47,6 +45,17 @@ const ChildProgressPage = () => {
 
   const child = selectedChild;
 
+  const formatDate = (date?: string) => {
+  if (!date) return "-";
+
+  return new Date(date).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
   // 2. ALL HANDLERS AND COMPONENT METHOD LOGIC
   const handleConfirm = async () => {
     try {
@@ -86,24 +95,23 @@ const ChildProgressPage = () => {
       if (!child?.id) return;
 
       await dispatch(startChildSession(child.id)).unwrap();
-      localStorage.setItem(
-        "child",
-        JSON.stringify({
-          id: child.id,
-          name: child.name,
-          avatar: child.avatar,
-          age: child.age,
-          games: child.games
-        }),
-      );
 
-      window.open(`/play/${child.id}`, "_blank", "noopener,noreferrer");
+      window.open(`/play`, "_blank", "noopener,noreferrer");
     } catch (error) {
       toast.error(
         typeof error === "string" ? error : "Failed to start gaming session",
       );
     }
   };
+  const formatTime = (seconds: number) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+};
 
   // 3. CONDITIONAL SAFETY RETURNS ARE SAFE TO RUN DOWN HERE
   if (loading) {
@@ -131,31 +139,6 @@ const ChildProgressPage = () => {
   (child.games || []).forEach((g) => {
     gamesMap[g.gameName] = g;
   });
-
-  // Dummy data for testing
-  if (!gamesMap["Mouse Tracker"]) {
-    gamesMap["Mouse Tracker"] = {
-      gameName: "Mouse Tracker",
-      level: 4,
-      stars: 5,
-      progress: 92,
-      bestScore: 850,
-      totalTime: "2h 15m",
-      lastPlayed: "Today",
-    };
-  }
-
-  if (!gamesMap["Typing Titans"]) {
-    gamesMap["Typing Titans"] = {
-      gameName: "Typing Titans",
-      level: 2,
-      stars: 3,
-      progress: 48,
-      bestScore: 420,
-      totalTime: "45m",
-      lastPlayed: "Yesterday",
-    };
-  }
 
   return (
     <AuthLayout>
@@ -251,6 +234,13 @@ const ChildProgressPage = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
           {ALL_GAMES.map((game, index) => {
             const played = gamesMap[game.name];
+            const averageScore = played?.totalAttempts
+              ? Math.round(played.totalScore / played.totalAttempts)
+              : 0;
+
+            const averageStars = played?.totalAttempts
+              ? played.totalStars / played.totalAttempts
+              : 0;
             return (
               <div
                 key={index}
@@ -265,7 +255,7 @@ const ChildProgressPage = () => {
                   />
                   {played && (
                     <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full text-[9px] text-white font-mochiy tracking-wider">
-                      LVL {played.level}
+                      LVL {played.currentLevel}
                     </div>
                   )}
                 </div>
@@ -279,53 +269,53 @@ const ChildProgressPage = () => {
                   {played ? (
                     <>
                       {/* Interactive Milestone Stars */}
+
                       <div className="flex justify-center gap-0.5 mb-3">
-                        {[...Array(5)].map((_, i) => (
+                        {[...Array(3)].map((_, i) => (
                           <span
                             key={i}
-                            className={`text-base leading-none ${i < (played.stars || 0) ? "text-amber-400" : "text-gray-200"}`}
+                            className={`text-base leading-none ${
+                              i < Math.round(averageStars)
+                                ? "text-amber-400"
+                                : "text-gray-200"
+                            }`}
                           >
                             ★
                           </span>
                         ))}
                       </div>
 
-                      {/* Percentage Tracking Node */}
-                      <div className="mb-3">
-                        <div className="flex justify-between text-[9px] font-bold text-gray-400 mb-1 tracking-wider">
-                          <span>COMPLETION</span>
-                          <span>{played.progress || 0}%</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className={`${game.color} h-full rounded-full transition-all duration-1000`}
-                            style={{ width: `${played.progress || 0}%` }}
-                          />
-                        </div>
-                      </div>
-
                       {/* Explicit Highscore/Time Data Rows */}
                       <div className="space-y-1.5 mt-auto">
                         <div className="flex justify-between items-center bg-gray-50/70 px-2.5 py-1.5 rounded-xl border border-gray-100">
                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">
-                            Best Score
+                            Average Score
                           </span>
                           <span className="text-[10px] font-mochiy text-[#1a3a6d]">
-                            {played.bestScore || "-"}
+                            {averageScore || "-"}
                           </span>
                         </div>
                         <div className="flex justify-between items-center bg-gray-50/70 px-2.5 py-1.5 rounded-xl border border-gray-100">
                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">
-                            Total Time
+                            Play Time
                           </span>
                           <span className="text-[10px] font-mochiy text-[#1a3a6d]">
-                            {played.totalTime || "-"}
+                            {formatTime(played.playTime)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center bg-gray-50/70 px-2.5 py-1.5 rounded-xl border border-gray-100">
+                          <span className="text-[9px] font-bold text-gray-400 uppercase">
+                            Attempts
+                          </span>
+
+                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">
+                            {played.totalAttempts}
                           </span>
                         </div>
                       </div>
 
                       <p className="text-center text-[9px] font-semibold text-gray-400 mt-2.5 pt-2 border-t border-gray-50 uppercase tracking-tight">
-                        Played: {played.lastPlayed || "-"}
+                        Last Played: {formatDate(played.lastPlayed)}
                       </p>
                     </>
                   ) : (

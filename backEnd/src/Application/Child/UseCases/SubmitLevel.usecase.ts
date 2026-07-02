@@ -1,13 +1,13 @@
-import { IProgressRepository } from "@/Domain/RepositoryInterface/IProgress.repository";
-import { ISubmitLevelUseCase } from "../Interfaces/ISubmitLevel.usecase";
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { SubmitLevelDTO, SubmitLevelOutputDTO } from "../dto/SubmitLevel.dto";
-import ProgressEntity from "@/Domain/Entities/Progress.entity";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import ChildGameEntity from "@/Domain/Entities/ChildGame.entity";
-import { IGameRepository } from "@/Domain/RepositoryInterface/IGame.repository";
+import { IProgressRepository } from '@/Domain/RepositoryInterface/IProgress.repository';
+import { ISubmitLevelUseCase } from '../Interfaces/ISubmitLevel.usecase';
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { SubmitLevelDTO, SubmitLevelOutputDTO } from '../dto/SubmitLevel.dto';
+import ProgressEntity from '@/Domain/Entities/Progress.entity';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import ChildGameEntity from '@/Domain/Entities/ChildGame.entity';
+import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
 
 export class SubmitLevelUseCase implements ISubmitLevelUseCase {
   constructor(
@@ -115,18 +115,17 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
         ? game.getCurrentLevel() + 1
         : game.getCurrentLevel();
 
-    const updatedGame = new ChildGameEntity(
-      game.getGameId(),
-      game.getGameName(),
-      nextLevel,
+        const updatedGame = new ChildGameEntity(
+        game.getGameId(),
+        game.getGameName(),
+        nextLevel,
 
-      game.getTotalStars() + input.stars,
-      game.getTotalScore() + input.score,
-      game.getTotalAttempts() + 1,
-
-      game.getPlayTime() + input.timeTaken,
-      now,
-    );
+        game.getTotalStars() + input.stars,
+        game.getPlayTime() + input.timeTaken,
+        game.getTotalScore() + input.score,
+        game.getTotalAttempts() + 1,
+        now,
+      );
 
     child.replaceGame(updatedGame);
 

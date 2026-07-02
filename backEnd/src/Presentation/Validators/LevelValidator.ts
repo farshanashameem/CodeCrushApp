@@ -1,9 +1,9 @@
-import z from "zod";
+import z from 'zod';
 
 const difficultyEnum = z.enum([
-  "easy",
-  "medium",
-  "hard",
+  'easy',
+  'medium',
+  'hard',
 ]);
 
  export const levelIdSchema = z.object({
@@ -73,7 +73,7 @@ export const addLevelSchema = z.object({
   gameId: z
     .string()
     .trim()
-    .min(1, "Game ID is required"),
+    .min(1, 'Game ID is required'),
 
   levelNumber: z
     .coerce.number()
@@ -129,6 +129,6 @@ export const updateLevelSchema = z .object({
       data.config !== undefined ||
       data.isActive !== undefined,
     {
-      message: "At least one field must be provided",
+      message: 'At least one field must be provided',
     }
   );

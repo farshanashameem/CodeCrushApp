@@ -1,11 +1,11 @@
-import { IGetGameUseCase } from "@/Application/Games/Interfaces/IGetGame.usecase";
-import { IGetGamesUseCase } from "@/Application/Games/Interfaces/IGetGames.usecase";
-import { IGetAllLevelsByGameIdUseCase } from "@/Application/Games/Interfaces/Level/IGetAllLevelsByGameId.usecase";
-import { IGetLevelUseCase } from "@/Application/Games/Interfaces/Level/IGetLevel.usecase";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { gameIdSchema } from "@/Presentation/Validators/Game.validator";
-import { levelIdSchema } from "@/Presentation/Validators/LevelValidator";
-import { NextFunction, Request, Response } from "express";
+import { IGetGameUseCase } from '@/Application/Games/Interfaces/IGetGame.usecase';
+import { IGetGamesUseCase } from '@/Application/Games/Interfaces/IGetGames.usecase';
+import { IGetAllLevelsByGameIdUseCase } from '@/Application/Games/Interfaces/Level/IGetAllLevelsByGameId.usecase';
+import { IGetLevelUseCase } from '@/Application/Games/Interfaces/Level/IGetLevel.usecase';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { gameIdSchema } from '@/Presentation/Validators/Game.validator';
+import { levelIdSchema } from '@/Presentation/Validators/LevelValidator';
+import { NextFunction, Request, Response } from 'express';
 
 export class ChildGameController {
     constructor(
@@ -59,11 +59,11 @@ export class ChildGameController {
             return res.status( StatusCodes.OK).json({
                 success: true,
                 data: levels
-            })
+            });
         }catch( error) {
             next( error );
         }
-    }
+    };
 
      getLevel = async( req: Request, res: Response, next: NextFunction) : Promise< Response| void> => {
         try{
@@ -74,11 +74,11 @@ export class ChildGameController {
             return res.status( StatusCodes.OK).json({
                 success: true,
                 data: level
-            })
+            });
 
 
         }catch(error) {
-            next( error)
+            next( error);
         } 
-    }
+    };
 }

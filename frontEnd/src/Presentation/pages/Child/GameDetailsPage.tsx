@@ -6,6 +6,7 @@ import type { AppDispatch, RootState } from "../../../redux/store";
 
 import {
   fetchLevelsByGame,
+  getCurrentChildSession,
   getGameDetail, getGameProgress
 } from "../../../redux/Slices/childGameSlice";
 
@@ -19,26 +20,21 @@ const GameDetailsPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [child, setChild] = useState<any>(null);
-
-  const { selectedGame, levels, progress } = useSelector(
+  const { currentChild, selectedGame, levels, progress } = useSelector(
     (state: RootState) => state.childGame
   );
 
   useEffect(() => {
-    const stored = localStorage.getItem("child");
-    if (stored) {
-      setChild(JSON.parse(stored));
-    }
-  }, []);
+    dispatch( getCurrentChildSession())
+  }, [dispatch]);
 
   useEffect(() => {
-    if (!gameId || !child?.id) return;
+    if (!gameId || !currentChild) return;
 
     dispatch(getGameDetail(gameId));
     dispatch(fetchLevelsByGame(gameId));
-    dispatch(getGameProgress({ childId: child?.id, gameId }));
-  }, [dispatch, child?.id, gameId]);
+    dispatch(getGameProgress({ childId: currentChild.id, gameId }));
+  }, [dispatch, gameId, currentChild]);
 
   if (!selectedGame) return null;
 
@@ -47,13 +43,15 @@ const GameDetailsPage = () => {
     logo: "🎮"
   };
 
-  const currentLevel = child?.games?.find((game: any) => game.gameId === gameId)?.currentLevel || 1;
+ const currentGame = currentChild?.games.find(game => game.gameId === gameId);
 
+const currentLevel = currentGame?.currentLevel ?? 1;
+const totalStars = currentGame?.totalStars ?? 0;
   return (
     <ChildLayout
       background={theme.background}
-      child={child}
-      coins={child?.coins || 0}
+      child={currentChild}
+      coins={0}
       logo={theme.logo}
       title={selectedGame.name}
     >
@@ -83,8 +81,8 @@ const GameDetailsPage = () => {
             ↩️ Go Back
           </button>
 
-          <div className="bg-white/20 border-2 border-white/20 rounded-full px-4 py-1.5 text-white font-mochiy text-xs tracking-wider backdrop-blur-sm">
-            ✨ Mission Map
+          <div className="bg-white/20 border-2 border-white/20 rounded-full px-4 py-1.5 text-white font-mochiy text-xs backdrop-blur-sm">
+            ⭐ {totalStars} Stars
           </div>
         </div>
 
@@ -125,7 +123,7 @@ const GameDetailsPage = () => {
                       {/* Active Level Node */}
                       <button
                         onClick={() =>
-                          navigate(`/play/${child?.id}/games/${gameId}/levels/${level.id}`)
+                          navigate(`/play/${currentChild?.id}/games/${gameId}/levels/${level.id}`)
                         }
                         className="
                           w-24 h-24

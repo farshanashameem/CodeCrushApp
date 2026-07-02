@@ -1,5 +1,5 @@
-import ImageEntity from "@/Domain/Entities/Image.entity";
-import { IImage } from "@/Infrastructure/Database/Model/ImageModel";
+import ImageEntity from '@/Domain/Entities/Image.entity';
+import { IImage } from '@/Infrastructure/Database/Model/ImageModel';
 
 export class ImageMapper {
 

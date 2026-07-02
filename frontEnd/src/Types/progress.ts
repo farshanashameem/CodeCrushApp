@@ -30,3 +30,20 @@ export interface SubmitLevelPayload {
   levelNumber: number;
   completed: boolean;
 }
+
+export interface LevelProgress {
+  levelId: string;
+  stars: number;
+  completed: boolean;
+}
+
+export interface LevelProgressDetails {
+  levelId: string;
+  completed: boolean;
+  stars: number;
+  highScore: number;
+  totalAttempts: number;
+  bestTime: number;
+  totalMistakes: number;
+  lastPlayedAt?: Date;
+}

@@ -1,4 +1,3 @@
-import ProgressEntity from "@/Domain/Entities/Progress.entity";
 
 export interface GetGameProgressInputDTO {
     childId: string;
@@ -6,5 +5,10 @@ export interface GetGameProgressInputDTO {
 }
 
 export interface GetGameProgressOutputDTO {
-    progress: ProgressEntity[]
+   
+    levels: {
+        levelId: string;
+        stars: number;
+        completed: boolean;
+    }[];
 }

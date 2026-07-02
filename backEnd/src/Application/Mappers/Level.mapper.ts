@@ -1,5 +1,5 @@
-import LevelEntity from "@/Domain/Entities/Level.entity";
-import { ILevel } from "@/Infrastructure/Database/Model/LevelModel";
+import LevelEntity from '@/Domain/Entities/Level.entity';
+import { ILevel } from '@/Infrastructure/Database/Model/LevelModel';
 
 export class LevelMapper {
 

@@ -1,4 +1,4 @@
-import mongoose, { Types, Document, Schema, Model } from "mongoose";
+import mongoose, { Types, Document, Schema, Model } from 'mongoose';
 
 export interface IImage extends Document {
     _id: Types.ObjectId;
@@ -47,4 +47,4 @@ const ImageSchema: Schema<IImage> = new Schema(
 );
 
 export const ImageModel: Model<IImage> =
-    mongoose.model<IImage>("Image", ImageSchema);
+    mongoose.model<IImage>('Image', ImageSchema);

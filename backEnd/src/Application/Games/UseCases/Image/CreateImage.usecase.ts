@@ -1,10 +1,10 @@
-import { IImageRepository } from "@/Domain/RepositoryInterface/IImage.repository";
-import { ICreateImageUseCase } from "../../Interfaces/Image/ICreateImage.usecase";
-import { CreateImageInputDTO, CreateImageOutputDTO } from "../../dto/Image/CreateImage.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import ImageEntity from "@/Domain/Entities/Image.entity";
+import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
+import { ICreateImageUseCase } from '../../Interfaces/Image/ICreateImage.usecase';
+import { CreateImageInputDTO, CreateImageOutputDTO } from '../../dto/Image/CreateImage.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import ImageEntity from '@/Domain/Entities/Image.entity';
 
 
 
@@ -27,7 +27,7 @@ export class CreateImageUseCase implements ICreateImageUseCase {
             input.imageUrl,
             input.publicId,
             input.category
-        )
+        );
 
         const result = await this._imageRepo.create( item );
         return {

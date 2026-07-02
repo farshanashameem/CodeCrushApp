@@ -1,10 +1,11 @@
-import Express from "express";
-import { ROUTES } from "@/Shared/Routes";
-import { startChildSessionController, endChildSessionController,  verifyChildSessionMiddleware } from "@/Presentation/Factory/ChildFactory";
-import { childGameController } from "@/Presentation/Factory/ChildFactory";
-import { authHandler } from "@/Presentation/Middlewares/AuthMiddleware";
-import { tokenService } from "@/Presentation/Factory/ParentFactory";
-import { childProgressController } from "@/Presentation/Factory/ChildFactory";
+import Express from 'express';
+import { ROUTES } from '@/Shared/Routes';
+import { startChildSessionController, endChildSessionController,  verifyChildSessionMiddleware, getLevelProgressController } from '@/Presentation/Factory/ChildFactory';
+import { childGameController } from '@/Presentation/Factory/ChildFactory';
+import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
+import { tokenService } from '@/Presentation/Factory/ParentFactory';
+import { childProgressController } from '@/Presentation/Factory/ChildFactory';
+import { getCurrentChildSessionController } from '@/Presentation/Factory/ChildFactory';
 
 const router = Express.Router();
 
@@ -28,4 +29,7 @@ router.get ( ROUTES.CHILD.GAME.LEVELS_BY_ID,childGameController.getLevel );
 
 router.post( ROUTES.CHILD.GAME.SUBMIT_LEVEL, childProgressController.submitProgress );
 router.get( ROUTES.CHILD.PROGRESS.BY_GAME, childProgressController.getProgressData );
+router.get( ROUTES.CHILD.SESSION.CURRENT, getCurrentChildSessionController.getCurrentChildSession);
+router.get( ROUTES.CHILD.PROGRESS.BY_LEVEL, getLevelProgressController.getLevelProgress);
+
 export default router;

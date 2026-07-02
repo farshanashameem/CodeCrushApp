@@ -30,6 +30,7 @@ export default function AdminDashboardLayout({
     { name: "Dashboard 🏠", path: ROUTES.ADMIN.DASHBOARD || "/admin/dashboard" },
     { name: "Users Management 👥", path: "/admin/users" }, 
     { name: "Reports 📊", path: "/admin/reports" },
+    { name: "Games 🎲", path: "/admin/games" },
   ];
 
   const handleLogout = async () => {

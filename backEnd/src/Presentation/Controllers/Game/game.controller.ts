@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
-import { IGetGamesUseCase } from "@/Application/Games/Interfaces/IGetGames.usecase";
-import { IGetGameUseCase } from "@/Application/Games/Interfaces/IGetGame.usecase";
-import { gameIdSchema } from "@/Presentation/Validators/Game.validator";
-import { IChangeGameStatusUseCase } from "@/Application/Games/Interfaces/IChangeGameStatus.usecase";
+import { IGetGamesUseCase } from '@/Application/Games/Interfaces/IGetGames.usecase';
+import { IGetGameUseCase } from '@/Application/Games/Interfaces/IGetGame.usecase';
+import { gameIdSchema } from '@/Presentation/Validators/Game.validator';
+import { IChangeGameStatusUseCase } from '@/Application/Games/Interfaces/IChangeGameStatus.usecase';
 
 export class GameManagementController {
 

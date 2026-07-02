@@ -1,4 +1,4 @@
-import mongoose, { Types, Document, Schema, Model } from "mongoose";
+import mongoose, { Types, Document, Schema, Model } from 'mongoose';
 
 export interface IIcon extends Document {
     _id: Types.ObjectId;
@@ -60,4 +60,4 @@ IconSchema.index(
 );
 
 export const IconModel: Model<IIcon> =
-    mongoose.model<IIcon>("Icon", IconSchema);
+    mongoose.model<IIcon>('Icon', IconSchema);

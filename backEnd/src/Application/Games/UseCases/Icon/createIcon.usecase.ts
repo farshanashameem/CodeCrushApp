@@ -1,10 +1,10 @@
-import { IIconRepository } from "@/Domain/RepositoryInterface/IIcon.repository";
-import { ICreateIconUseCase } from "../../Interfaces/Icon/ICreateIcon.usecase";
-import { CreateIconInputDTO, CreateIconOutputDTO } from "../../dto/Icon/createIcon.dto";
-import IconEntity from "@/Domain/Entities/Icon.entity";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IIconRepository } from '@/Domain/RepositoryInterface/IIcon.repository';
+import { ICreateIconUseCase } from '../../Interfaces/Icon/ICreateIcon.usecase';
+import { CreateIconInputDTO, CreateIconOutputDTO } from '../../dto/Icon/createIcon.dto';
+import IconEntity from '@/Domain/Entities/Icon.entity';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class CreateIconUseCase implements ICreateIconUseCase {
     constructor( 
@@ -23,12 +23,12 @@ export class CreateIconUseCase implements ICreateIconUseCase {
             input.iconKey,
             input.color,
             input.category
-        )
+        );
         const result = await this._iconRepository.create(icon);
 
         return {
             icon: result
             
-        }
+        };
     }
 }

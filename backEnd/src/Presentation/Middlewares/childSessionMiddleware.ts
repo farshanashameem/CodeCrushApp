@@ -1,8 +1,8 @@
-import { IValidateChildSessionUseCase } from "@/Application/Child/Interfaces/IValidateChildSession.usecase";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import { NextFunction, Request, Response } from "express";
+import { IValidateChildSessionUseCase } from '@/Application/Child/Interfaces/IValidateChildSession.usecase';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { NextFunction, Request, Response } from 'express';
 
 export class VerifyChildSessionMiddleware {
   constructor(

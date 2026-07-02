@@ -18,10 +18,10 @@ export const errorHandler: ErrorRequestHandler = (
       stack: error.stack,
       name: error.name,
     },
-    "From error handler"
+    'From error handler'
   );
 } else {
-  req.log.error({ error }, "From error handler");
+  req.log.error({ error }, 'From error handler');
 }
 
     if( error instanceof AppError ) {

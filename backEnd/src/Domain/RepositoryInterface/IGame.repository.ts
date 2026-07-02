@@ -1,4 +1,4 @@
-import GameEntity from "../Entities/game.entity";
+import GameEntity from '../Entities/game.entity';
 
 export interface IGameRepository {
     getAllGames(): Promise<GameEntity[] >

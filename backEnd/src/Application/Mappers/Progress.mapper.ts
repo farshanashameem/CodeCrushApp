@@ -1,5 +1,5 @@
-import ProgressEntity from "@/Domain/Entities/Progress.entity";
-import { IProgress } from "@/Infrastructure/Database/Model/ProgressModal";
+import ProgressEntity from '@/Domain/Entities/Progress.entity';
+import { IProgress } from '@/Infrastructure/Database/Model/ProgressModal';
 
 export class ProgressMapper {
 

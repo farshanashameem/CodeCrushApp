@@ -1,8 +1,8 @@
-import { ILevelRepository } from "@/Domain/RepositoryInterface/ILevel.repository";
-import { IAddLevelUseCase } from "../../Interfaces/Level/IAddLevel.usecase";
-import { AddLevelInputDTO, AddLevelOutputDTO } from "../../dto/Level/AddLevel.dto";
-import LevelEntity from "@/Domain/Entities/Level.entity";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
+import { ILevelRepository } from '@/Domain/RepositoryInterface/ILevel.repository';
+import { IAddLevelUseCase } from '../../Interfaces/Level/IAddLevel.usecase';
+import { AddLevelInputDTO, AddLevelOutputDTO } from '../../dto/Level/AddLevel.dto';
+import LevelEntity from '@/Domain/Entities/Level.entity';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
 
 
 export class AddLevelUseCase implements IAddLevelUseCase {

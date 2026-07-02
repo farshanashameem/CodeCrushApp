@@ -1,5 +1,5 @@
-import IconEntity from "@/Domain/Entities/Icon.entity";
-import { IIcon } from "@/Infrastructure/Database/Model/IconModel";
+import IconEntity from '@/Domain/Entities/Icon.entity';
+import { IIcon } from '@/Infrastructure/Database/Model/IconModel';
 
 export class IconMapper {
 

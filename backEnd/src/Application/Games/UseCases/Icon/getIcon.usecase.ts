@@ -1,6 +1,6 @@
-import { IIconRepository } from "@/Domain/RepositoryInterface/IIcon.repository";
-import { IGetAllIconsUseCase } from "../../Interfaces/Icon/IGetAllIcons.usecase";
-import { GetAllIconsOutputDTO } from "../../dto/Icon/getAllIcons.dto";
+import { IIconRepository } from '@/Domain/RepositoryInterface/IIcon.repository';
+import { IGetAllIconsUseCase } from '../../Interfaces/Icon/IGetAllIcons.usecase';
+import { GetAllIconsOutputDTO } from '../../dto/Icon/getAllIcons.dto';
 
 export class GetIconsUseCase implements IGetAllIconsUseCase {
     constructor (
@@ -20,6 +20,6 @@ export class GetIconsUseCase implements IGetAllIconsUseCase {
         }) );
         return {
             icons: list
-        }
+        };
     }
 }

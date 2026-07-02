@@ -11,7 +11,7 @@ export default class ProgressEntity {
 
     private totalAttempts: number = 0,
     private bestTime: number = 0,
-    private totalMistakes: number = 0,
+    private totalMistakes: number = 0, 
 
     private lastPlayedAt?: Date,
 

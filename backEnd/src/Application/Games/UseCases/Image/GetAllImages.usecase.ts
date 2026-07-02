@@ -1,6 +1,6 @@
-import { IImageRepository } from "@/Domain/RepositoryInterface/IImage.repository";
-import { IGetAllImagesUseCase } from "../../Interfaces/Image/IGetAllImages.usecase";
-import { GetAllImagesOutputDTO } from "../../dto/Image/getAllImages.dto";
+import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
+import { IGetAllImagesUseCase } from '../../Interfaces/Image/IGetAllImages.usecase';
+import { GetAllImagesOutputDTO } from '../../dto/Image/getAllImages.dto';
 
 export class GetAllImagesUseCase implements IGetAllImagesUseCase {
 

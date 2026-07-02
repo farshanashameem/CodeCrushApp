@@ -1,11 +1,11 @@
-import { IAddLevelUseCase } from "@/Application/Games/Interfaces/Level/IAddLevel.usecase";
-import { IChangeStatusUseCase } from "@/Application/Games/Interfaces/Level/IChangeStatus.usecase";
-import { IGetAllLevelsByGameIdUseCase } from "@/Application/Games/Interfaces/Level/IGetAllLevelsByGameId.usecase";
-import { IGetLevelUseCase } from "@/Application/Games/Interfaces/Level/IGetLevel.usecase";
-import { IUpdateLevelUseCase } from "@/Application/Games/Interfaces/Level/IUpdateLevel.usecase";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { addLevelSchema, gameIdSchema, levelIdSchema, updateLevelSchema } from "@/Presentation/Validators/LevelValidator";
-import { NextFunction, Request, Response } from "express";
+import { IAddLevelUseCase } from '@/Application/Games/Interfaces/Level/IAddLevel.usecase';
+import { IChangeStatusUseCase } from '@/Application/Games/Interfaces/Level/IChangeStatus.usecase';
+import { IGetAllLevelsByGameIdUseCase } from '@/Application/Games/Interfaces/Level/IGetAllLevelsByGameId.usecase';
+import { IGetLevelUseCase } from '@/Application/Games/Interfaces/Level/IGetLevel.usecase';
+import { IUpdateLevelUseCase } from '@/Application/Games/Interfaces/Level/IUpdateLevel.usecase';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { addLevelSchema, gameIdSchema, levelIdSchema, updateLevelSchema } from '@/Presentation/Validators/LevelValidator';
+import { NextFunction, Request, Response } from 'express';
 
 
 export class GameLevelController {
@@ -25,12 +25,12 @@ export class GameLevelController {
              return res.status( StatusCodes.CREATED).json({
                 success: true,
                 data: result
-             })
+             });
 
         } catch( error) {
             next( error );
         }
-    }
+    };
 
     updateLevel = async( req: Request, res: Response, next: NextFunction ) : Promise< Response | void> => {
         try{
@@ -47,11 +47,11 @@ export class GameLevelController {
             return res.status( StatusCodes.OK).json({
                 success: true,
                 data: result
-            })
+            });
         }catch(error) {
             next( error);
         }
-    }
+    };
 
     getLevelsByGame = async ( req: Request, res: Response, next: NextFunction) : Promise< Response | void > => {
         try{
@@ -62,11 +62,11 @@ export class GameLevelController {
             return res.status( StatusCodes.OK).json({
                 success: true,
                 data: levels
-            })
+            });
         }catch( error) {
             next( error );
         }
-    }
+    };
 
     changestatus = async (req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
 
@@ -76,12 +76,12 @@ export class GameLevelController {
             await this._changeStatus.execute( levelId );
             return res.status( StatusCodes.OK).json({
                 success: true
-            })
+            });
 
         }catch( error) {
             next( error);
         }
-    }
+    };
 
     getLevel = async( req: Request, res: Response, next: NextFunction) : Promise< Response| void> => {
         try{
@@ -92,12 +92,12 @@ export class GameLevelController {
             return res.status( StatusCodes.OK).json({
                 success: true,
                 data: level
-            })
+            });
 
 
         }catch(error) {
-            next( error)
+            next( error);
         } 
-    }
+    };
 
 }

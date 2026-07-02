@@ -1,10 +1,10 @@
-import { LevelConfig } from "@/Domain/Types/Config";
+import { LevelConfig } from '@/Domain/Types/Config';
 
 export default class LevelEntity {
     constructor(
         private gameId: string,
         private levelNumber: number,
-        private difficulty: "easy" | "medium" | "hard",
+        private difficulty: 'easy' | 'medium' | 'hard',
         private timer: number,
         private maxScore: number,
         private config: LevelConfig,
@@ -26,7 +26,7 @@ export default class LevelEntity {
         return this.levelNumber;
     }
 
-    public getDifficulty(): "easy" | "medium" | "hard" {
+    public getDifficulty(): 'easy' | 'medium' | 'hard' {
         return this.difficulty;
     }
 

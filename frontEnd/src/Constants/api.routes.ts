@@ -74,6 +74,7 @@ export const API_ROUTES = {
   CHILD: {
     SESSION: {
       START: "/auth/child/session/start",
+      CURRENT: "/auth/child/session/current",
       END: "/auth/child/session/end",
     },
 
@@ -91,6 +92,7 @@ export const API_ROUTES = {
     PROGRESS: {
       BY_GAME: (childId: string, gameId: string) =>
         `/auth/child/progress/${childId}/${gameId}`,
+      BY_LEVEL: (gameId: string, levelId: string )=> `/auth/child/games/${gameId}/levels/${levelId}/progress`,
     },
   },
 };

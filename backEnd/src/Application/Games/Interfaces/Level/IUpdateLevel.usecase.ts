@@ -1,4 +1,4 @@
-import { UpdateLevelInputDTO, UpdateLevelOutputDTO } from "../../dto/Level/UpdateLevel.dto";
+import { UpdateLevelInputDTO, UpdateLevelOutputDTO } from '../../dto/Level/UpdateLevel.dto';
 
 
 export interface IUpdateLevelUseCase {
