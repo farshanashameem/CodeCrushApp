@@ -1,11 +1,11 @@
-import { IProgressRepository } from "@/Domain/RepositoryInterface/IProgress.repository";
-import { IGetGameProgressUseCase } from "../Interfaces/IGetGameProgress.usecase";
-import { GetGameProgressInputDTO, GetGameProgressOutputDTO } from "../dto/GetGameProgress.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { IGameRepository } from "@/Domain/RepositoryInterface/IGame.repository";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IProgressRepository } from '@/Domain/RepositoryInterface/IProgress.repository';
+import { IGetGameProgressUseCase } from '../Interfaces/IGetGameProgress.usecase';
+import { GetGameProgressInputDTO, GetGameProgressOutputDTO } from '../dto/GetGameProgress.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class GetGameProgressUseCase implements IGetGameProgressUseCase {
     constructor(
@@ -26,8 +26,16 @@ export class GetGameProgressUseCase implements IGetGameProgressUseCase {
             throw new AppError( authMessages.error.GAME_NOT_FOUND, StatusCodes.NOT_FOUND );
         }
 
-
         const progress = await this._progressRepo.findByChildAndGame(input.childId, input.gameId);
-        return {progress};
+        
+        return {
+            
+            
+            levels: progress.map(level => ({
+                levelId: level.getLevelId(),
+                stars: level.getStars(),
+                completed: level.isCompleted(),
+            })),
+        };
     }
 }

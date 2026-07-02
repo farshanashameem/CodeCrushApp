@@ -1,13 +1,13 @@
-import { IProgressRepository } from "@/Domain/RepositoryInterface/IProgress.repository";
-import { BaseRepository } from "./Base.repository";
-import { IProgress, ProgressModel } from "../Database/Model/ProgressModal";
-import ProgressEntity from "@/Domain/Entities/Progress.entity";
-import { ProgressMapper } from "@/Application/Mappers/Progress.mapper";
-import { Types } from "mongoose";
+import { IProgressRepository } from '@/Domain/RepositoryInterface/IProgress.repository';
+import { BaseRepository } from './Base.repository';
+import { IProgress, ProgressModel } from '../Database/Model/ProgressModal';
+import ProgressEntity from '@/Domain/Entities/Progress.entity';
+import { ProgressMapper } from '@/Application/Mappers/Progress.mapper';
+import { Types } from 'mongoose';
 
 export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress> implements IProgressRepository {
     constructor() {
-        super(ProgressModel)
+        super(ProgressModel);
     }
 
     async findByChildGameLevel(childId: string, gameId: string, levelId: string): Promise<ProgressEntity | null> {
@@ -23,7 +23,7 @@ export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress
     async updateByChildGameLevel(progress: ProgressEntity): Promise<ProgressEntity | null> {
         const updated = await this._model.findOneAndUpdate( { childId: progress.getChildId(), gameId: progress.getGameId(), levelId: progress.getLevelId()}, { $set: ProgressMapper.toDocument(progress)}, {new: true});
 
-        return updated? ProgressMapper.toEntity(updated) : null
+        return updated? ProgressMapper.toEntity(updated) : null;
     }
 
    protected mapToEntity(doc: IProgress): ProgressEntity {

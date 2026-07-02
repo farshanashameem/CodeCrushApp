@@ -1,4 +1,4 @@
-import { GetAllImagesOutputDTO } from "../../dto/Image/getAllImages.dto";
+import { GetAllImagesOutputDTO } from '../../dto/Image/getAllImages.dto';
 
 export interface IGetAllImagesUseCase {
     execute(): Promise<GetAllImagesOutputDTO>

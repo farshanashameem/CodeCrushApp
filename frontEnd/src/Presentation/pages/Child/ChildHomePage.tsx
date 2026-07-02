@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect,  useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -6,13 +6,12 @@ import type { AppDispatch, RootState } from "../../../redux/store";
 
 import {
   fetchGames,
-  endChildSession,
+  endChildSession,getCurrentChildSession
 } from "../../../redux/Slices/childGameSlice";
 
 import { avatarMap } from "../../../Constants/avatarMap";
 import { gameImages } from "../../../Constants/gameImages";
 
-import bgMusic from "../../../assets/kids-bg.mp3";
 import background from "../../../assets/kids-bg.png";
 
 const gameSkills: Record<string, { label: string; bg: string; text: string }[]> = {
@@ -38,30 +37,16 @@ const ChildHomePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { games } = useSelector((state: RootState) => state.childGame);
+  const { games, currentChild } = useSelector((state: RootState) => state.childGame);
 
-  const [child, setChild] = useState<{
-    id: string;
-    name: string;
-    avatar: string;
-    age: number;
-  } | null>(null);
+  
 
-  useEffect(() => {
-    const storedChild = localStorage.getItem("child");
-    if (storedChild) {
-      setChild(JSON.parse(storedChild));
-    }
-  }, []);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [muted, setMuted] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchGames());
-    audioRef.current?.play().catch(() => {});
-  }, [dispatch]);
+ useEffect(() => {
+  dispatch(getCurrentChildSession());
+  dispatch(fetchGames());
+}, [dispatch]);
 
   const handleExit = async () => {
     try {
@@ -79,7 +64,7 @@ const ChildHomePage = () => {
         backgroundImage: `url(${background})`,
       }}
     >
-      <audio ref={audioRef} src={bgMusic} loop />
+      
 
       {/* HEADER */}
       <header className="flex justify-between items-center px-6 md:px-12 py-6 bg-white/40 backdrop-blur-md border-b-4 border-dashed border-indigo-200 sticky top-0 z-40">
@@ -100,15 +85,15 @@ const ChildHomePage = () => {
           >
             <div className="w-12 h-12 rounded-full border-2 border-amber-400 overflow-hidden bg-purple-100 shadow-inner group-hover:rotate-12 transition-transform">
               <img
-                src={avatarMap[child?.avatar as keyof typeof avatarMap]}
+                src={avatarMap[currentChild?.avatar as keyof typeof avatarMap]}
                 className="w-full h-full object-cover"
                 alt="Avatar"
               />
             </div>
 
             <div className="text-left font-mochiy hidden sm:block">
-              <p className="text-slate-700 text-sm leading-tight">{child?.name || "Explorer"}</p>
-              <p className="text-[10px] text-slate-400 font-sans">Age {child?.age || "?"}</p>
+              <p className="text-slate-700 text-sm leading-tight">{currentChild?.name || "Explorer"}</p>
+              <p className="text-[10px] text-slate-400 font-sans">Age {currentChild?.age || "?"}</p>
             </div>
             <span className="text-indigo-400 group-hover:text-indigo-600 transition-colors text-xs">
               {showMenu ? "▲" : "▼"}
@@ -136,7 +121,7 @@ const ChildHomePage = () => {
         <div className="absolute left-12 bottom-0 text-3xl hidden lg:block select-none">🌈</div>
 
         <h2 className="font-mochiy text-2xl md:text-3xl text-indigo-600 mb-2 drop-shadow-sm">
-          Hi {child?.name || "Explorer"}! 👋
+          Hi {currentChild?.name || "Explorer"}! 👋
         </h2>
 
         <p className="text-slate-600 font-bold tracking-wide text-sm md:text-base mb-6">
@@ -178,7 +163,7 @@ const ChildHomePage = () => {
           return (
             <div
               key={game.id} 
-              onClick={() => navigate(`/play/${child?.id}/games/${game.id}`)}
+              onClick={() => navigate(`/play/${currentChild?.id}/games/${game.id}`)}
               className={`
                 bg-white
                 border-4
@@ -253,37 +238,8 @@ const ChildHomePage = () => {
         })}
       </main>
 
-      {/* FLOATING MUSIC CONTROLLER */}
-      <button
-        onClick={() => {
-          if (!audioRef.current) return;
-          audioRef.current.muted = !muted;
-          setMuted(!muted);
-        }}
-        className="
-          fixed
-          bottom-6
-          right-6
-          w-16
-          h-16
-          rounded-full
-          bg-white
-          border-4
-          border-amber-400
-          shadow-[0_6px_0_#f59e0b]
-          active:translate-y-1
-          active:shadow-[0_2px_0_#f59e0b]
-          text-3xl
-          flex
-          items-center
-          justify-center
-          hover:scale-110
-          transition-all
-          z-50
-        "
-      >
-        {muted ? "🔇" : "🔊"}
-      </button>
+       
+    
 
       {/* Global CSS Inject for custom Animations */}
       <style>{`

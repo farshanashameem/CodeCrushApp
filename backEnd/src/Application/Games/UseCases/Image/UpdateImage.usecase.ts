@@ -1,11 +1,11 @@
-import { IImageRepository } from "@/Domain/RepositoryInterface/IImage.repository";
-import { IUpdateImageUseCase } from "../../Interfaces/Image/IUpdateImage.usecase";
-import { UpdateImageInputDTO, UpdateImageOutputDTO } from "../../dto/Image/updateImage.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import ImageEntity from "@/Domain/Entities/Image.entity";
-import { ICloudinaryService } from "@/Application/Interfaces/Services/ICloudinaryService";
+import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
+import { IUpdateImageUseCase } from '../../Interfaces/Image/IUpdateImage.usecase';
+import { UpdateImageInputDTO, UpdateImageOutputDTO } from '../../dto/Image/updateImage.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import ImageEntity from '@/Domain/Entities/Image.entity';
+import { ICloudinaryService } from '@/Application/Interfaces/Services/ICloudinaryService';
 
 export class UpdateImageUseCase implements IUpdateImageUseCase {
 
@@ -42,6 +42,6 @@ export class UpdateImageUseCase implements IUpdateImageUseCase {
         return {
             success: true,
             message: authMessages.success.IMAGE_UPDATED
-        }
+        };
     }
 }

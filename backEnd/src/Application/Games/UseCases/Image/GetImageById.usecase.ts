@@ -1,9 +1,9 @@
-import { IImageRepository } from "@/Domain/RepositoryInterface/IImage.repository";
-import { IGetImageById } from "../../Interfaces/Image/IGetImageById.usecase";
-import { GetImageInputDTO, GetImageOutputDTO } from "../../dto/Image/getImageById.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
+import { IGetImageById } from '../../Interfaces/Image/IGetImageById.usecase';
+import { GetImageInputDTO, GetImageOutputDTO } from '../../dto/Image/getImageById.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class GetImageByIdUsecase implements IGetImageById  {
    
@@ -26,6 +26,6 @@ export class GetImageByIdUsecase implements IGetImageById  {
             publicId: image.getPublicId(),
             category: image.getCategory(),
             isActive: image.isImageActive()
-        }
+        };
     }
 }

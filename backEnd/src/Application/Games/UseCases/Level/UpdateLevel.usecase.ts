@@ -1,10 +1,10 @@
-import { ILevelRepository } from "@/Domain/RepositoryInterface/ILevel.repository";
-import { IUpdateLevelUseCase } from "../../Interfaces/Level/IUpdateLevel.usecase";
-import { UpdateLevelInputDTO, UpdateLevelOutputDTO } from "../../dto/Level/UpdateLevel.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import LevelEntity from "@/Domain/Entities/Level.entity";
+import { ILevelRepository } from '@/Domain/RepositoryInterface/ILevel.repository';
+import { IUpdateLevelUseCase } from '../../Interfaces/Level/IUpdateLevel.usecase';
+import { UpdateLevelInputDTO, UpdateLevelOutputDTO } from '../../dto/Level/UpdateLevel.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import LevelEntity from '@/Domain/Entities/Level.entity';
 
 export class UpdateLevelUseCase implements IUpdateLevelUseCase {
     constructor (

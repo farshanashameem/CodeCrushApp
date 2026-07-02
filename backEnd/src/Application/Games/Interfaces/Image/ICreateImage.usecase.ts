@@ -1,4 +1,4 @@
-import { CreateImageInputDTO, CreateImageOutputDTO } from "../../dto/Image/CreateImage.dto";
+import { CreateImageInputDTO, CreateImageOutputDTO } from '../../dto/Image/CreateImage.dto';
 
 
 export interface ICreateImageUseCase {

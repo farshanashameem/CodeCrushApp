@@ -3,7 +3,7 @@ import { parentAuthController } from '@/Presentation/Factory/ParentFactory';
 import { ROUTES } from '@/Shared/Routes';
 import { loginSchema } from '@/Presentation/Validators/LoginValidator';
 import { validate } from '@/Presentation/Middlewares/Validate';
-import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
+import { authParentHandler } from '@/Presentation/Middlewares/parentAuthMiddleware';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
 import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema, UpdateProfileSchema } from '@/Presentation/Validators/RegisterValidator';
 import { childManagementcontroller } from '@/Presentation/Factory/ParentFactory';
@@ -17,7 +17,7 @@ router.post(ROUTES.PARENT.FORGOT_PASSWORD, validate( forgotPasswordSchema, 'body
 router.post(ROUTES.PARENT.RESET_PASSWORD, validate( resetPasswordSchema, 'body'), parentAuthController.resetPassword);
 
 
-router.use( authHandler(tokenService));
+router.use( authParentHandler(tokenService));
 router.put(ROUTES.PARENT.PROFILE, validate(UpdateProfileSchema, 'body'), parentAuthController.updateProfile);
 
 router.get( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BASE,childManagementcontroller.getAllChildren);

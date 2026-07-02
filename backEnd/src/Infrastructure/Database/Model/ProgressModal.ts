@@ -1,4 +1,4 @@
-import mongoose, { Types, Document, Schema, Model } from "mongoose";
+import mongoose, { Types, Document, Schema, Model } from 'mongoose';
 
 export interface IProgress extends Document {
   _id: Types.ObjectId;
@@ -20,19 +20,19 @@ const ProgressSchema: Schema<IProgress> = new Schema(
   {
     childId: {
       type: Schema.Types.ObjectId,
-      ref: "Child",
+      ref: 'Child',
       required: true,
     },
 
     gameId: {
       type: Schema.Types.ObjectId,
-      ref: "Game",
+      ref: 'Game',
       required: true,
     },
 
     levelId: {
       type: Schema.Types.ObjectId,
-      ref: "Level",
+      ref: 'Level',
       required: true,
     },
 
@@ -85,4 +85,4 @@ ProgressSchema.index(
 );
 
 export const ProgressModel: Model<IProgress> =
-  mongoose.model<IProgress>("Progress", ProgressSchema);
+  mongoose.model<IProgress>('Progress', ProgressSchema);

@@ -1,4 +1,4 @@
-import IconEntity from "@/Domain/Entities/Icon.entity";
+import IconEntity from '@/Domain/Entities/Icon.entity';
 
 export interface CreateIconInputDTO {
     name: string;

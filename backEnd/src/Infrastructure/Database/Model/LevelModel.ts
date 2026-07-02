@@ -1,4 +1,4 @@
-import mongoose, { Types, Document, Schema, Model } from "mongoose";
+import mongoose, { Types, Document, Schema, Model } from 'mongoose';
 
 export interface ILevel extends Document {
     _id: Types.ObjectId;
@@ -7,7 +7,7 @@ export interface ILevel extends Document {
 
     levelNumber: number;
 
-    difficulty: "easy" | "medium" | "hard";
+    difficulty: 'easy' | 'medium' | 'hard';
 
     timer: number;
 
@@ -25,7 +25,7 @@ const LevelSchema: Schema<ILevel> = new Schema(
     {
         gameId: {
             type: Schema.Types.ObjectId,
-            ref: "Game",
+            ref: 'Game',
             required: true,
         },
 
@@ -37,8 +37,8 @@ const LevelSchema: Schema<ILevel> = new Schema(
 
         difficulty: {
             type: String,
-            enum: ["easy", "medium", "hard"],
-            default: "easy",
+            enum: ['easy', 'medium', 'hard'],
+            default: 'easy',
         },
 
         timer: {
@@ -67,6 +67,6 @@ const LevelSchema: Schema<ILevel> = new Schema(
 );
 
 export const LevelModel: Model<ILevel> = mongoose.model<ILevel>(
-    "Level",
+    'Level',
     LevelSchema
 );

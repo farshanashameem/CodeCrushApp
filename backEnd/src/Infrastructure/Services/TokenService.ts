@@ -58,6 +58,6 @@ export class TokenService implements ITokenservice {
     }
 
     generateSessionToken(): string {
-        return crypto.randomBytes(32).toString("hex");
+        return crypto.randomBytes(32).toString('hex');
     }
 }

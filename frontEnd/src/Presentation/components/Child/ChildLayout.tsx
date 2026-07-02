@@ -1,4 +1,4 @@
-import BackgroundMusic from "./BackgroundMusic";
+
 import ChildHeader from "./ChildHeader";
 
 interface Child {
@@ -35,7 +35,7 @@ const ChildLayout = ({
     >
       <ChildHeader child={child} coins={coins} logo={logo} title={title} />
 
-      <BackgroundMusic />
+    
 
       {children}
     </div>

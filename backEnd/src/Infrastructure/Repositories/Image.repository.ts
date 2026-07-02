@@ -1,13 +1,13 @@
-import ImageEntity from "@/Domain/Entities/Image.entity";
-import { IImageRepository } from "@/Domain/RepositoryInterface/IImage.repository";
-import { IImage, ImageModel } from "../Database/Model/ImageModel";
-import { ImageMapper } from "@/Application/Mappers/Image.mapper";
-import { BaseRepository } from "./Base.repository";
+import ImageEntity from '@/Domain/Entities/Image.entity';
+import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
+import { IImage, ImageModel } from '../Database/Model/ImageModel';
+import { ImageMapper } from '@/Application/Mappers/Image.mapper';
+import { BaseRepository } from './Base.repository';
 
 export class ImageRepository extends BaseRepository<ImageEntity, IImage> implements IImageRepository {
 
     constructor(){
-        super(ImageModel)
+        super(ImageModel);
     }
    
 
@@ -23,7 +23,7 @@ export class ImageRepository extends BaseRepository<ImageEntity, IImage> impleme
 
     async changeStatus(id: string, isActive: boolean): Promise<void> {
         const iamge = await this._model.findById(id);
-        await this._model.findByIdAndUpdate( id, {isActive} )
+        await this._model.findByIdAndUpdate( id, {isActive} );
     }
     
     protected mapToEntity(doc: IImage): ImageEntity {

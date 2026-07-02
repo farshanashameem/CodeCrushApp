@@ -1,5 +1,5 @@
-import ProgressEntity from "../Entities/Progress.entity";
-import { IBaseRepository } from "./IBase.repository";
+import ProgressEntity from '../Entities/Progress.entity';
+import { IBaseRepository } from './IBase.repository';
 
 export interface IProgressRepository extends IBaseRepository<ProgressEntity> {
     findByChildGameLevel ( childId : string, gameId: string, levelId: string ) : Promise<ProgressEntity | null>;

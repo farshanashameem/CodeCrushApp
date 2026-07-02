@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema, Types } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 export interface IChildSession extends Document {
   _id: Types.ObjectId;
@@ -22,13 +22,13 @@ const ChildSessionSchema: Schema<IChildSession> = new Schema(
   {
     childId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Child",
+      ref: 'Child',
       required: true,
     },
 
     parentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Parent",
+      ref: 'Parent',
       required: true,
       index: true,
     },
@@ -84,4 +84,4 @@ ChildSessionSchema.index(
   },
 );
 export const ChildSessionModel: Model<IChildSession> =
-  mongoose.model<IChildSession>("ChildSession", ChildSessionSchema);
+  mongoose.model<IChildSession>('ChildSession', ChildSessionSchema);

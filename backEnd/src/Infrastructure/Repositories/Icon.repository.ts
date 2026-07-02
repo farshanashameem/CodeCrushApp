@@ -1,13 +1,13 @@
-import IconEntity from "@/Domain/Entities/Icon.entity";
-import { IIconRepository } from "@/Domain/RepositoryInterface/IIcon.repository";
-import { IconModel, IIcon } from "../Database/Model/IconModel";
-import { IconMapper } from "@/Application/Mappers/Icon.mapper";
-import { BaseRepository } from "./Base.repository";
+import IconEntity from '@/Domain/Entities/Icon.entity';
+import { IIconRepository } from '@/Domain/RepositoryInterface/IIcon.repository';
+import { IconModel, IIcon } from '../Database/Model/IconModel';
+import { IconMapper } from '@/Application/Mappers/Icon.mapper';
+import { BaseRepository } from './Base.repository';
 
 export class IconRepository extends BaseRepository< IconEntity, IIcon> implements IIconRepository{
 
     constructor() {
-        super(IconModel)
+        super(IconModel);
     }
     
 

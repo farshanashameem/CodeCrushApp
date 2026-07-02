@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-
+import { AuthInitializer } from "./AuthInitializer";
 import GlobalAudio from "./Presentation/components/GlobalAudio";
 import ProtectedRoute from "./Presentation/components/ProtectedRoute";
 
@@ -24,7 +24,7 @@ const AddChildPage = lazy( () => import("./Presentation/pages/Parent/AddChildPag
 const ChildProgressPage = lazy( ()=> import( "./Presentation/pages/Parent/ChildProgressPage"));
 const ParentProfilePage = lazy( ()=> import('./Presentation/pages/Parent/UpdateProfile'));
 
-
+const GameAudio = lazy(() => import('./Presentation/components/Games/BackgroundMusic'))
 const ChildHome = lazy( ()=> import('./Presentation/pages/Child/ChildHomePage'))
 const GamedetailsForChild = lazy( () => import('./Presentation/pages/Child/GameDetailsPage'))
 const LevelIntroPage = lazy( ()=> import('./Presentation/pages/Child/LevelIntroPage'))
@@ -42,11 +42,9 @@ const Leveldetails = lazy( ()=> import ('./Presentation/pages/Admin/Games/Levels
 
 function App() {
 
-  const { checkAuth } = useAuth();
+ 
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+ 
 
   return (
     <>
@@ -117,36 +115,52 @@ function App() {
           {/* Parent protected */}
           <Route
             path={ROUTES.PARENT.DASHBOARD}
-            element={  <ProtectedRoute  allowedRole="parent"  >
-                       <ParentDashboard />  </ProtectedRoute>  }
+            element={ <AuthInitializer>
+                      <ProtectedRoute  allowedRole="parent"  >
+                       <ParentDashboard />  </ProtectedRoute>
+
+                       </AuthInitializer>
+                 }
           />
 
           <Route
             path="/parent/add-child"
-            element={  <ProtectedRoute  allowedRole="parent"  >
-                       <AddChildPage />  </ProtectedRoute>  }
+            element={  <AuthInitializer>
+                           <ProtectedRoute  allowedRole="parent"  >
+                           <AddChildPage />  </ProtectedRoute> 
+                      </AuthInitializer>
+            
+            }
           />
 
           <Route
             path={ ROUTES.PARENT.CHILD_DETAILS}
-            element={  <ProtectedRoute  allowedRole="parent"  >
-                       <ChildProgressPage />  </ProtectedRoute>  }
+            element={ <AuthInitializer>
+                          <ProtectedRoute  allowedRole="parent"  >
+                       <ChildProgressPage />  </ProtectedRoute>
+                      </AuthInitializer> 
+              
+                     }
           />
 
           <Route
             path="/parent/child/edit/:id"
-            element={
-              <ProtectedRoute allowedRole="parent">
-                <AddChildPage />
-              </ProtectedRoute> }
+            element={   <AuthInitializer>
+                          <ProtectedRoute allowedRole="parent">
+                            <AddChildPage />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+                    }
           />
 
           <Route
             path={ ROUTES.PARENT.PROFILE}
-            element={
-              <ProtectedRoute allowedRole="parent">
-                <ParentProfilePage />
-              </ProtectedRoute> }
+            element={  <AuthInitializer>
+                            <ProtectedRoute allowedRole="parent">
+                            <ParentProfilePage />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+                    }
           />
 
           {/* redirect /admin */}
@@ -168,107 +182,108 @@ function App() {
           {/* Admin protected */}
           <Route
             path={ROUTES.ADMIN.DASHBOARD}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <AdminDashBoard />
-              </ProtectedRoute>
-            }
+            element={    <AuthInitializer>
+                              <ProtectedRoute allowedRole="admin" >
+                              <AdminDashBoard />
+                            </ProtectedRoute>
+                          </AuthInitializer>
+              
+                    }
           />
 
 
           <Route
             path={ROUTES.ADMIN.USERS}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <Users />
-              </ProtectedRoute>
-            }
+            element={     <AuthInitializer>
+                              <ProtectedRoute allowedRole="admin" >
+                                <Users />
+                              </ProtectedRoute>
+                          </AuthInitializer>
+              
+                    }
           />
 
           <Route
             path={ROUTES.ADMIN.USER_DETAILS}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <UserDetails />
-              </ProtectedRoute>
-            }
+            element={     <AuthInitializer>
+                            <ProtectedRoute allowedRole="admin" >
+                              <UserDetails />
+                            </ProtectedRoute>
+                          </AuthInitializer> 
+              
+                    }
           />
 
           <Route
             path={ROUTES.ADMIN.GAMES}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <Games />
-              </ProtectedRoute>
+            element={    <AuthInitializer>
+                          <ProtectedRoute allowedRole="admin" >
+                            <Games />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+              
             }
           />
 
           <Route
             path={ROUTES.ADMIN.GAME_DETAILS}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <GameDetails />
-              </ProtectedRoute>
-            }
+            element={  <AuthInitializer>
+                            <ProtectedRoute allowedRole="admin" >
+                               <GameDetails />
+                            </ProtectedRoute>
+                        </AuthInitializer>
+              
+                    }
           />
 
           <Route
             path={ROUTES.ADMIN.LEVELS}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <ManageLevels />
-              </ProtectedRoute>
-            }
+            element={   <AuthInitializer>
+                          <ProtectedRoute allowedRole="admin" >
+                            <ManageLevels />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+              
+                    }
           />
 
           <Route
             path={ROUTES.ADMIN.CREATE_LEVEL}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <CreateLevel />
-              </ProtectedRoute>
-            }
+            element={   <AuthInitializer>
+                          <ProtectedRoute allowedRole="admin" >
+                            <CreateLevel />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+              
+                    }
           />
 
           <Route
             path={ROUTES.ADMIN.LEVEL_DETAILS}
-            element={
-              <ProtectedRoute
-                allowedRole="admin"
-              >
-                <Leveldetails />
-              </ProtectedRoute>
-            }
+            element={   <AuthInitializer>
+                          <ProtectedRoute allowedRole="admin" >
+                            <Leveldetails />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+              
+                    }
           />
 
 
           <Route
-            path="/play/:childId"
-            element={<ChildHome />}
+          
+            path="/play"
+            element={<> <ChildHome /> <GameAudio/></>}
           />
 
           <Route
             path={ROUTES.CHILD.GAME_DETAILS}
-            element={<GamedetailsForChild />}
+            element={ <><GamedetailsForChild /> <GameAudio/>  </>}
           />
 
           <Route
             path={ROUTES.CHILD.LEVEL_DETAILS}
-            element={<LevelIntroPage />}
+            element={<><LevelIntroPage />  < GameAudio/></>}
           />
 
           <Route
@@ -283,4 +298,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 

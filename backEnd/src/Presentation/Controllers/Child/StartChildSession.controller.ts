@@ -1,11 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { IStartChildSessionUseCase } from "@/Application/Child/Interfaces/IStartChildSession.usecase";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import { env } from "@/Infrastructure/Config/env";
-import { StartChildSessionUseCase } from "@/Application/Child/UseCases/StartChildSession.usecase";
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { env } from '@/Infrastructure/Config/env';
+import { StartChildSessionUseCase } from '@/Application/Child/UseCases/StartChildSession.usecase';
 
 export class StartChildSessionController {
   constructor(
@@ -19,10 +18,10 @@ export class StartChildSessionController {
     }
     const result = await this._startChildSession.execute({ childId: req.body.childId, parentId: req.user.id});
 
-    res.cookie("childSession", result.sessionToken, {
+    res.cookie('childSession', result.sessionToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: env.CHILD_SESSION_TOKEN_MAX_AGE,
     });
 
@@ -30,5 +29,5 @@ export class StartChildSessionController {
       success: true,
       data: result,
     });
-  }
+  };
 }

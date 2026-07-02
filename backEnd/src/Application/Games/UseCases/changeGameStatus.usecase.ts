@@ -1,10 +1,10 @@
-import { IGameRepository } from "@/Domain/RepositoryInterface/IGame.repository";
-import { IChangeGameStatusUseCase } from "../Interfaces/IChangeGameStatus.usecase";
-import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from "../dto/changegameStatus.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import GameEntity from "@/Domain/Entities/game.entity";
+import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
+import { IChangeGameStatusUseCase } from '../Interfaces/IChangeGameStatus.usecase';
+import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from '../dto/changegameStatus.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import GameEntity from '@/Domain/Entities/game.entity';
 
 export class ChangeGameStatusUseCase implements IChangeGameStatusUseCase {
 
@@ -20,16 +20,7 @@ export class ChangeGameStatusUseCase implements IChangeGameStatusUseCase {
             throw new AppError( authMessages.error.GAME_NOT_FOUND, StatusCodes.NOT_FOUND );
         }
 
-        const updatedGame = new GameEntity(
-            game.getName(),
-            game.getImage(),
-            game.getDescription(),
-            game.getSkillType(),
-            game.getId(),
-            !game.isGameActive(),
-            game.getCreatedAt(),
-            new Date()
-        );
+       
 
         await this._gameRepo.toggleStatus( game.getId()!,  !game.isGameActive() );
 
@@ -38,6 +29,6 @@ export class ChangeGameStatusUseCase implements IChangeGameStatusUseCase {
             isActive: !game.isGameActive(),
             message: authMessages.success.GAME_STATUS_UPDATED
     
-        }
+        };
     }
 }

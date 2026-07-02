@@ -1,10 +1,10 @@
-import { ColorSorterConfig, MouseTrackerConfig, PicturePuzzleConfig, TypingConfig } from "../../../../Domain/Types/Config";
+import { ColorSorterConfig, MouseTrackerConfig, PicturePuzzleConfig, TypingConfig } from '../../../../Domain/Types/Config';
 
 export interface AddLevelInputDTO {
 
     gameId: string;
     levelNumber: number;
-    difficulty: "easy" | "medium" | "hard";
+    difficulty: 'easy' | 'medium' | 'hard';
     timer: number;
     maxScore: number;
     config: ColorSorterConfig | MouseTrackerConfig | PicturePuzzleConfig | TypingConfig;

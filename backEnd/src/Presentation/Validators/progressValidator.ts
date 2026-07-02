@@ -1,15 +1,15 @@
-import z from "zod";
+import z from 'zod';
 
 export const getGameProgressSchema = z.object({
   childId: z
     .string()
     .trim()
-    .min(1, "Child id is required"),
+    .min(1, 'Child id is required'),
 
   gameId: z
     .string()
     .trim()
-    .min(1, "Game id is required"),
+    .min(1, 'Game id is required'),
 });
 
 export type GetGameProgressSchema =
@@ -20,17 +20,17 @@ export type GetGameProgressSchema =
   childId: z
     .string()
     .trim()
-    .min(1, "Child id is required"),
+    .min(1, 'Child id is required'),
 
   gameId: z
     .string()
     .trim()
-    .min(1, "Game id is required"),
+    .min(1, 'Game id is required'),
 
   levelId: z
     .string()
     .trim()
-    .min(1, "Level id is required"),
+    .min(1, 'Level id is required'),
 
   levelNumber: z.number(),
   completed: z.boolean(),

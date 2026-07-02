@@ -1,28 +1,28 @@
-import multer from "multer";
-import path from "path";
+import multer from 'multer';
+import path from 'path';
 
-import { AppError } from "@/Domain/Errors/app.error";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
+import { AppError } from '@/Domain/Errors/app.error';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
 
 const storage = multer.memoryStorage();
 
    
 
-const fileFilter: multer.Options["fileFilter"] = ( req, file, cb ) => {
+const fileFilter: multer.Options['fileFilter'] = ( req, file, cb ) => {
 
     const allowedMimeTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/webp"
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp'
     ];
 
     const allowedExtensions = [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp"
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.webp'
     ];
 
     const extension = path

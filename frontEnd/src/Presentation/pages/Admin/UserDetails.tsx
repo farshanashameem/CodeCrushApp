@@ -61,6 +61,16 @@ const UserDetails = () => {
     }
   };
 
+  const formatTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+
   useEffect(() => {
     if (id) dispatch(getUserDetail({ id }));
   }, [dispatch, id]);
@@ -78,9 +88,7 @@ const UserDetails = () => {
           }),
         ).unwrap();
 
-        toast.success(
-          `Parent account successfully updated`,
-        );
+        toast.success(`Parent account successfully updated`);
         if (id) dispatch(getUserDetail({ id }));
       } else if (entityType === "CHILD") {
         await dispatch(
@@ -369,55 +377,63 @@ const UserDetails = () => {
                 Engine Metrics Array (Games History)
               </h4>
 
-              {selectedChild.games && selectedChild.games.length > 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-xs">
-                          <th className="py-3.5 px-5">Target Engine</th>
-                          <th className="py-3.5 px-5 text-center">
-                            Tier Level
-                          </th>
-                          <th className="py-3.5 px-5 text-center">
-                            High Score
-                          </th>
-                          <th className="py-3.5 px-5 text-center">
-                            Session Duration
-                          </th>
-                        </tr>
-                      </thead>
+              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50 border-b">
+                        <th className="py-3 px-4">Game</th>
+                        <th className="py-3 px-4 text-center">Level</th>
+                        <th className="py-3 px-4 text-center">Avg Score</th>
+                        <th className="py-3 px-4 text-center">Avg Stars</th>
+                        <th className="py-3 px-4 text-center">Attempts</th>
+                        <th className="py-3 px-4 text-center">Play Time</th>
+                        <th className="py-3 px-4 text-center">Last Played</th>
+                      </tr>
+                    </thead>
 
-                      <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                        {selectedChild.games.map((game: ChildGame) => (
-                          <tr
-                            key={game.gameId}
-                            className="hover:bg-slate-50/50 transition-colors"
-                          >
-                            <td className="py-3.5 px-5 font-semibold text-slate-900">
-                              🎮 {game.gameName}
+                    <tbody>
+                      {selectedChild.games.map((game: ChildGame) => {
+                        const averageScore = game.totalAttempts
+                          ? Math.round(game.totalScore / game.totalAttempts)
+                          : 0;
+
+                        const averageStars = game.totalAttempts
+                          ? (game.totalStars / game.totalAttempts).toFixed(1)
+                          : "0";
+
+                        return (
+                          <tr key={game.gameId}>
+                            <td>🎮 {game.gameName}</td>
+
+                            <td className="text-center">{game.currentLevel}</td>
+
+                            <td className="text-center">{averageScore}</td>
+
+                            <td className="text-center">⭐ {averageStars}/3</td>
+
+                            <td className="text-center">
+                              {game.totalAttempts}
                             </td>
-                            <td className="py-3.5 px-5 text-center font-mono text-xs text-violet-600 font-bold">
-                              Lvl {game.currentLevel}
+
+                            <td className="text-center">
+                              {formatTime(game.playTime)}
                             </td>
-                            <td className="py-3.5 px-5 text-center font-mono text-xs text-emerald-600 font-bold">
-                              {game.totalScore} pts
-                            </td>
-                            <td className="py-3.5 px-5 text-center text-xs text-slate-500">
-                              {game.playTime} mins
+
+                            <td className="text-center">
+                              {game.lastPlayedAt
+                                ? new Date(
+                                    game.lastPlayedAt,
+                                  ).toLocaleDateString("en-IN")
+                                : "-"}
                             </td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
-              ) : (
-                <div className="bg-white/50 border border-dashed border-slate-200 rounded-2xl text-center py-8 text-xs text-slate-400 font-medium">
-                  No active gameplay metric rows generated on this workspace
-                  node yet.
-                </div>
-              )}
+              </div>
             </div>
           </div>
         )}

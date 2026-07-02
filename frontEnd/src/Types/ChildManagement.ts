@@ -1,17 +1,13 @@
-export type ChildStatus =
-  | "ACTIVE"
-  | "BLOCKED"
-  | "DELETED";
+export type ChildStatus = "ACTIVE" | "BLOCKED" | "DELETED";
 
-
-  export interface ChildGame {
+export interface ChildGame {
   gameId: string;
   gameName: string;
   currentLevel: number;
-  currentLevelHighScore: number;
+  totalStars: number;
   playTime: number;
   totalScore: number;
-  averageScore: number;
+  totalAttempts: number;
   lastPlayedAt?: string;
 }
 
@@ -52,7 +48,6 @@ export interface GetChildDetailPayload {
   games: ChildGame[];
 }
 
-
 export interface AddChildPayload {
   name: string;
   age: number;
@@ -72,11 +67,7 @@ export interface UpdateChildPayload {
 export interface ToggleChildStatusArgs {
   id: string;
 
-  action:
-    | "BLOCK"
-    | "UNBLOCK"
-    | "DELETE"
-    | "RESTORE";
+  action: "BLOCK" | "UNBLOCK" | "DELETE" | "RESTORE";
 }
 
 export interface ToggleChildStatusPayload {

@@ -1,6 +1,6 @@
-import { ILevelRepository } from "@/Domain/RepositoryInterface/ILevel.repository";
-import { IGetAllLevelsByGameIdUseCase } from "../../Interfaces/Level/IGetAllLevelsByGameId.usecase";
-import LevelEntity from "@/Domain/Entities/Level.entity";
+import { ILevelRepository } from '@/Domain/RepositoryInterface/ILevel.repository';
+import { IGetAllLevelsByGameIdUseCase } from '../../Interfaces/Level/IGetAllLevelsByGameId.usecase';
+import LevelEntity from '@/Domain/Entities/Level.entity';
 
 
 export class GetAllLevelsByGameUseCase implements IGetAllLevelsByGameIdUseCase{

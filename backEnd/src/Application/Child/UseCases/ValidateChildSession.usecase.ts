@@ -1,9 +1,9 @@
-import { IChildSessionRepository } from "@/Domain/RepositoryInterface/IChildSession.repository";
-import { IValidateChildSessionUseCase } from "../Interfaces/IValidateChildSession.usecase";
-import { ValidateChildSessionInputDTO, ValidateChildSessionOutputDTO, } from "../dto/ValidateChildSession.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IChildSessionRepository } from '@/Domain/RepositoryInterface/IChildSession.repository';
+import { IValidateChildSessionUseCase } from '../Interfaces/IValidateChildSession.usecase';
+import { ValidateChildSessionInputDTO, ValidateChildSessionOutputDTO, } from '../dto/ValidateChildSession.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class ValidateChildSessionUseCase implements IValidateChildSessionUseCase {
   constructor(private _childSessionRepo: IChildSessionRepository) {}
@@ -28,19 +28,9 @@ export class ValidateChildSessionUseCase implements IValidateChildSessionUseCase
         StatusCodes.UNAUTHORIZED,
       );
     }
-
-    const inactiveTime = Date.now() - session.getLastActivity().getTime();
-
-    if (inactiveTime > 12 * 60 * 60 * 1000) {
-      await this._childSessionRepo.deactivate(session.getId()!);
-
-      throw new AppError(
-        authMessages.error.SESSION_EXPIRED,
-        StatusCodes.UNAUTHORIZED,
-      );
-    }
-
+   
     session.updateActivity();
+ 
 
     await this._childSessionRepo.update(session.getId()!,session);
 

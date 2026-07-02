@@ -6,8 +6,8 @@ import { API_ROUTES } from "../../Constants/api.routes";
 
 import type { FetchGamesResponse, Game } from "../../Types/game";
 import type { Level } from "../../Types/level";
-import type { Progress, SubmitLevelPayload } from "../../Types/progress";
-import { ROUTES } from "../../Constants/Routes";
+import type { LevelProgress, LevelProgressDetails, Progress, SubmitLevelPayload } from "../../Types/progress";
+import type { CurrentChild } from "../../Types/child";
 
 interface ChildGameState {
   loading: boolean;
@@ -19,10 +19,17 @@ interface ChildGameState {
   levels: Level[];
   selectedLevel: Level | null;
 
-  progress: Progress[];
+  progress: LevelProgress[];
+  selectedLevelProgress: LevelProgressDetails | null;
 
   sessionId: string | null;
   sessionActive: boolean;
+
+  currentChild: CurrentChild | null;
+}
+
+interface CurrentChildSessionResponse {
+  child: CurrentChild;
 }
 
 interface StartChildSessionResponse {
@@ -52,6 +59,48 @@ export const startChildSession = createAsyncThunk<
       );
     }
   },
+);
+
+export const getCurrentChildSession = createAsyncThunk< CurrentChildSessionResponse, void, { rejectValue: string } >(
+  "child/getCurrentSession",
+
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get( API_ROUTES.CHILD.SESSION.CURRENT );
+
+      return response.data.data;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+
+      return rejectWithValue(
+        err.response?.data?.message || "Failed getting current session"
+      );
+    }
+  }
+);
+
+export const getLevelProgress = createAsyncThunk<
+  LevelProgressDetails,
+  { gameId: string; levelId: string },
+  { rejectValue: string }
+>(
+  "child/getLevelProgress",
+
+  async ({ gameId, levelId }, { rejectWithValue }) => {
+    try {
+      const response = await api.get(
+        API_ROUTES.CHILD.PROGRESS.BY_LEVEL(gameId, levelId)
+      );
+
+      return response.data.data;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+
+      return rejectWithValue(
+        err.response?.data?.message || "Failed fetching level progress"
+      );
+    }
+  }
 );
 
 export const endChildSession = createAsyncThunk<
@@ -165,7 +214,7 @@ export const getLevelDetail = createAsyncThunk<
 );
 
 export const getGameProgress = createAsyncThunk<
-  Progress[],
+  LevelProgress[],
   {
     childId: string;
     gameId: string;
@@ -180,7 +229,7 @@ export const getGameProgress = createAsyncThunk<
         API_ROUTES.CHILD.PROGRESS.BY_GAME(childId, gameId),
       );
 
-      return response.data.data.progress;
+      return response.data.result.levels;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
 
@@ -226,9 +275,12 @@ const initialState: ChildGameState = {
   levels: [],
   selectedLevel: null,
   progress: [],
+  selectedLevelProgress: null,
 
   sessionId: null,
   sessionActive: false,
+
+  currentChild:  null
 };
 
 const childGameSlice = createSlice({
@@ -270,6 +322,31 @@ const childGameSlice = createSlice({
       .addCase(startChildSession.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed starting session";
+      })
+
+      .addCase(getCurrentChildSession.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getCurrentChildSession.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentChild = action.payload.child;
+        state.sessionActive = true;
+      })
+
+      .addCase(getCurrentChildSession.rejected, (state, action) => {
+        state.loading = false;
+        state.sessionActive = false;
+        state.error = action.payload || "Failed getting current session";
+      })
+
+      .addCase(getLevelProgress.fulfilled, (state, action) => {
+        state.selectedLevelProgress = action.payload;
+      })
+
+      .addCase(getLevelProgress.rejected, (state, action) => {
+        state.error = action.payload || "Failed fetching level progress";
       })
 
       .addCase(endChildSession.fulfilled, (state) => {

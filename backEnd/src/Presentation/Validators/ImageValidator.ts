@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
  export const imageIdSchema = z.object({
     imageId: z.string().min(1)
@@ -8,8 +8,8 @@ export const addImageSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Image name must be at least 2 characters")
-    .max(50, "Image name cannot exceed 50 characters"),
+    .min(2, 'Image name must be at least 2 characters')
+    .max(50, 'Image name cannot exceed 50 characters'),
 
   category: z
     .string()
@@ -29,7 +29,7 @@ export const updateImageSchema = z.object({
     imageUrl: z
       .string()
       .trim()
-      .url("Invalid image URL")
+      .url('Invalid image URL')
       .optional(),
     
     publicId: z
@@ -54,6 +54,6 @@ export const updateImageSchema = z.object({
       data.category !== undefined ||
       data.isActive !== undefined,
     {
-      message: "At least one field must be provided",
+      message: 'At least one field must be provided',
     }
   );

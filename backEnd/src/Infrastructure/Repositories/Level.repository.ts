@@ -1,14 +1,14 @@
-import { ILevelRepository } from "@/Domain/RepositoryInterface/ILevel.repository";
-import { ILevel, LevelModel } from "../Database/Model/LevelModel";
-import LevelEntity from "@/Domain/Entities/Level.entity";
-import { LevelMapper } from "@/Application/Mappers/Level.mapper";
-import { Types } from "mongoose";
-import { BaseRepository } from "./Base.repository";
+import { ILevelRepository } from '@/Domain/RepositoryInterface/ILevel.repository';
+import { ILevel, LevelModel } from '../Database/Model/LevelModel';
+import LevelEntity from '@/Domain/Entities/Level.entity';
+import { LevelMapper } from '@/Application/Mappers/Level.mapper';
+import { Types } from 'mongoose';
+import { BaseRepository } from './Base.repository';
 
 export class LevelRepository extends BaseRepository<LevelEntity, ILevel> implements ILevelRepository {
 
     constructor() {
-        super(LevelModel)
+        super(LevelModel);
     }
           async getLevelsByGameId(gameId: string): Promise<LevelEntity[]> {
              const levels = await this._model.find({gameId});
@@ -17,7 +17,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
 
 
          async changeStatus(id: string, isActive: boolean): Promise<void> {
-             await this._model.findByIdAndUpdate(id, {isActive})
+             await this._model.findByIdAndUpdate(id, {isActive});
          }
 
     protected mapToEntity(doc: ILevel): LevelEntity {

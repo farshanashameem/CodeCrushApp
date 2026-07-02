@@ -1,9 +1,9 @@
-import { IImageRepository } from "@/Domain/RepositoryInterface/IImage.repository";
-import { ChangeImageStatusInputDTO, ChangeImageStatusOutputDTO } from "../../dto/Image/changeStatus.dto";
-import { IChangeStatusUseCase } from "../../Interfaces/Image/IChangeImageStatus.usecase";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
+import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
+import { ChangeImageStatusInputDTO, ChangeImageStatusOutputDTO } from '../../dto/Image/changeStatus.dto';
+import { IChangeStatusUseCase } from '../../Interfaces/Image/IChangeImageStatus.usecase';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 
 export class ChangeImageStatusUseCase implements IChangeStatusUseCase {
     constructor(
@@ -22,6 +22,6 @@ export class ChangeImageStatusUseCase implements IChangeStatusUseCase {
         return {
             success: true,
             message: authMessages.success.IMAGE_STATUS_UPDATED
-        }
+        };
     }
 }

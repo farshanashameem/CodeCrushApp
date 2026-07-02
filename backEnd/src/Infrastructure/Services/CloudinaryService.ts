@@ -1,7 +1,7 @@
-import { v2 as cloudinary } from "cloudinary";
-import { ICloudinaryService, UploadImageResponse } from "@/Application/Interfaces/Services/ICloudinaryService";
-import { env } from "../Config/env";
-import streamifier from "streamifier";
+import { v2 as cloudinary } from 'cloudinary';
+import { ICloudinaryService, UploadImageResponse } from '@/Application/Interfaces/Services/ICloudinaryService';
+import { env } from '../Config/env';
+import streamifier from 'streamifier';
 
 export class CloudinaryService implements ICloudinaryService {
 
@@ -16,7 +16,7 @@ export class CloudinaryService implements ICloudinaryService {
   
     async uploadImage(
     fileBuffer: Buffer,
-    folder = "picture-puzzlers"
+    folder = 'picture-puzzlers'
   ): Promise<UploadImageResponse> {
 
     return new Promise((resolve, reject) => {

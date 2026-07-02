@@ -17,7 +17,7 @@ export function authHandler( tokenService: ITokenservice) {
 
         try {
             const user: AccessTokenPayload = tokenService.verifyAccessToken( token);
-            req.user = user;
+            req.user = user;           
             next();
         } catch ( error) {
             if(error instanceof TokenExpiredError ) {

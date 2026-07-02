@@ -1,5 +1,5 @@
-import ChildSessionEntity from "@/Domain/Entities/ChildSession.entity";
-import { IChildSession } from "@/Infrastructure/Database/Model/ChildSessionModel";
+import ChildSessionEntity from '@/Domain/Entities/ChildSession.entity';
+import { IChildSession } from '@/Infrastructure/Database/Model/ChildSessionModel';
 
 export class ChildSessionMapper {
 

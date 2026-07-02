@@ -1,13 +1,13 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
-import ChildSessionEntity from "@/Domain/Entities/ChildSession.entity";
-import { IChildSessionRepository } from "@/Domain/RepositoryInterface/IChildSession.repository";
+import ChildSessionEntity from '@/Domain/Entities/ChildSession.entity';
+import { IChildSessionRepository } from '@/Domain/RepositoryInterface/IChildSession.repository';
 
-import { BaseRepository } from "./Base.repository";
+import { BaseRepository } from './Base.repository';
 
-import {  ChildSessionModel,  IChildSession, } from "../Database/Model/ChildSessionModel";
+import {  ChildSessionModel,  IChildSession, } from '../Database/Model/ChildSessionModel';
 
-import { ChildSessionMapper } from "@/Application/Mappers/ChildSession.mapper";
+import { ChildSessionMapper } from '@/Application/Mappers/ChildSession.mapper';
         
 export class ChildSessionRepository  extends BaseRepository<ChildSessionEntity, IChildSession> implements IChildSessionRepository {
        
@@ -18,6 +18,7 @@ export class ChildSessionRepository  extends BaseRepository<ChildSessionEntity, 
         async findByToken(token: string): Promise<ChildSessionEntity | null> {
             const session = await this._model.findOne({
             sessionToken: token,
+            expiresAt: { $gt: new Date() },
             });
 
             return session ? this.mapToEntity(session) : null;
@@ -29,6 +30,7 @@ export class ChildSessionRepository  extends BaseRepository<ChildSessionEntity, 
             const session = await this._model.findOne({
             childId,
             isActive: true,
+            expiresAt: { $gt: new Date() },
             });
 
             return session ? this.mapToEntity(session) : null;
@@ -42,22 +44,16 @@ export class ChildSessionRepository  extends BaseRepository<ChildSessionEntity, 
             {
                 $set: {
                 isActive: false,
+                expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
                 },
             },
             );
         }
 
-        async deleteExpiredSessions(): Promise<void> {
-            await this._model.deleteMany({
-            expiresAt: {
-                $lte: new Date(),
-            },
-            });
-        }
-
+        
         async updateLastActivity(sessionId: string, lastActivity: Date): Promise<void> {
             if (!Types.ObjectId.isValid(sessionId)) return;
-            await this._model.updateOne( {_id: sessionId}, { $set: { lastActivity}})
+            await this._model.updateOne( {_id: sessionId}, { $set: { lastActivity}});
         }
 
         protected mapToEntity(doc: IChildSession): ChildSessionEntity {

@@ -18,5 +18,6 @@ export const envSchema = z.object({
     CLOUDINARY_CLOUD_NAME: z.string().min(1),
     CLOUDINARY_API_KEY: z.string().min(1),
     CLOUDINARY_API_SECRET: z.string().min(1),
-    CHILD_SESSION_TOKEN_MAX_AGE:z.coerce.number()
+    CHILD_SESSION_TOKEN_MAX_AGE:z.coerce.number(),
+    CHILD_SESSION_TTL:z.coerce.number(),
 });
