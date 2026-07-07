@@ -2,8 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { AuthInitializer } from "./AuthInitializer";
-import GlobalAudio from "./Presentation/components/GlobalAudio";
-import ProtectedRoute from "./Presentation/components/ProtectedRoute";
+import GlobalAudio from "./Presentation/SharedComponents/GlobalAudio";
+import ProtectedRoute from "./Presentation/SharedComponents/ProtectedRoute";
 
 
 import { ROUTES } from "./Constants/Routes";
@@ -16,6 +16,7 @@ import AuthPage from "./Presentation/pages/Auth/Auth";
 import OTPPage from "./Presentation/pages/Auth/OTPPage";
 import ForgotPasswordPage from "./Presentation/pages/Auth/ForgotPasswordPage";
 import ResetPasswordPage from "./Presentation/pages/Auth/ResetPasswordPage";
+import ReportsPage from "./Presentation/pages/Admin/Reports/ReportPage";
 
 
 
@@ -24,7 +25,7 @@ const AddChildPage = lazy( () => import("./Presentation/pages/Parent/AddChildPag
 const ChildProgressPage = lazy( ()=> import( "./Presentation/pages/Parent/ChildProgressPage"));
 const ParentProfilePage = lazy( ()=> import('./Presentation/pages/Parent/UpdateProfile'));
 
-const GameAudio = lazy(() => import('./Presentation/components/Games/BackgroundMusic'))
+const GameAudio = lazy(() => import('./Presentation/SharedComponents/Games/BackgroundMusic'))
 const ChildHome = lazy( ()=> import('./Presentation/pages/Child/ChildHomePage'))
 const GamedetailsForChild = lazy( () => import('./Presentation/pages/Child/GameDetailsPage'))
 const LevelIntroPage = lazy( ()=> import('./Presentation/pages/Child/LevelIntroPage'))
@@ -269,11 +270,23 @@ function App() {
                     }
           />
 
+          <Route
+            path='admin/reports'
+            element={   <AuthInitializer>
+                          <ProtectedRoute allowedRole="admin" >
+                            <ReportsPage />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+              
+                    }
+          />
+
+
 
           <Route
           
             path="/play"
-            element={<> <ChildHome /> <GameAudio/></>}
+            element={<> <ChildHome /> </>}
           />
 
           <Route
@@ -291,8 +304,10 @@ function App() {
             element={<GameStartPage />}
           />
     
+    
 
         </Routes>
+      
       </Suspense>
     </>
   );

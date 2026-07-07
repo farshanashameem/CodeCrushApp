@@ -5,12 +5,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../../../redux/store";
 
 import AdminDashboardLayout from "../../../layouts/AdminDashboardLayout";
-import ConfirmationModal from "../../../components/ConfirmationModal";
+import ConfirmationModal from "../../../SharedComponents/ConfirmationModal";
 
 import { fetchLevelsByGame, toggleLevelStatus } from "../../../../redux/Slices/LevelSlice";
 import { getGameDetail } from "../../../../redux/Slices/gameSlice";
 import { gameImages } from "../../../../Constants/gameImages";
-import GameHeader from "../../../components/GameHeader"; 
+import GameHeader from "../../../SharedComponents/GameHeader"; 
 
 const ManageLevels = () => {
   const { gameId } = useParams();

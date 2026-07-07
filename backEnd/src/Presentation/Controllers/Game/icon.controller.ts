@@ -3,7 +3,9 @@ import { IDeleteIconUseCase } from '@/Application/Games/Interfaces/Icon/IDeletIc
 import { IGetAllIconsUseCase } from '@/Application/Games/Interfaces/Icon/IGetAllIcons.usecase';
 import { IGetIconUseCase } from '@/Application/Games/Interfaces/Icon/IGetIcon.usecase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { addIconSchema, iconIdSchema } from '@/Presentation/Validators/IconValidator';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { NextFunction, Request, Response } from 'express';
 
 
@@ -21,10 +23,12 @@ export class  IconManagementController {
 
             const data = addIconSchema.parse( req.body );
             const icon = await this._addIcon.execute( data);
-            return res.status( StatusCodes.CREATED).json({
-                success: true,
-                data: icon
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.CREATED,
+                authMessages.success.ICON_ADDED,
+                icon
+            );
 
         }catch( error) {
             next( error );
@@ -37,10 +41,12 @@ export class  IconManagementController {
 
             const icons = await this._getIcons.execute();
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data : icons
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.ICON_FETCHED,
+                icons
+            );
 
         }catch ( error ) {
             next( error );
@@ -53,10 +59,12 @@ export class  IconManagementController {
             const { iconId } = iconIdSchema.parse( req.params );
              const icon = await this._getIcon.execute( iconId );
 
-             return res.status(StatusCodes.OK ).json({
-                success: true,
-                data: icon
-             });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.ICON_FETCHED,
+                icon
+            );
 
         }catch( error ) {
             next ( error);
@@ -69,9 +77,11 @@ export class  IconManagementController {
              const { iconId } = iconIdSchema.parse( req.params);
              await this._deleteIcon.execute( { iconId});
 
-             return res.status( StatusCodes.OK).json({
-                success: true
-             });
+             return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.ICON_DELETED
+            );
         }catch( error ) {
             next( error );
         }

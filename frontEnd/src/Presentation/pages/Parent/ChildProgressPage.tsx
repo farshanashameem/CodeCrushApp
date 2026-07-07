@@ -7,7 +7,7 @@ import {
   toggleChildStatus,
 } from "../../../redux/Slices/ChildManagementSlice";
 import AuthLayout from "../../layouts/AuthLayout";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import ConfirmationModal from "../../SharedComponents/ConfirmationModal";
 import { avatarMap } from "../../../Constants/avatarMap";
 import { startChildSession } from "../../../redux/Slices/childGameSlice";
 // Asset imports

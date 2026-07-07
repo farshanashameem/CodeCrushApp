@@ -11,15 +11,14 @@ import {
   getLevelProgress,
 } from "../../../../redux/Slices/childGameSlice";
 import click from "../../../../assets/audios/click.mp3";
-import ChildLayout from "../../../components/Child/ChildLayout";
-import GameHUD from "../../../components/Games/GamePlay/GameHUD";
-import GameTimer from "../../../components/Games/GamePlay/Gametimer";
-import FailureModal from "../../../components/Games/GamePlay/FailureModal";
-import SuccessModal from "../../../components/Games/GamePlay/SuccessModal";
+import ChildLayout from "../../../SharedComponents/Child/ChildLayout";
+import GameTimer from "../../../SharedComponents/Games/GamePlay/Gametimer";
+import FailureModal from "../../../SharedComponents/Games/GamePlay/FailureModal";
+import SuccessModal from "../../../SharedComponents/Games/GamePlay/SuccessModal";
 import { gameTheme } from "../../../../Constants/gameTheme";
-import type { Level,  } from "../../../../Types/level";
+import type { Level } from "../../../../Types/level";
 import type { ColorSorterItemForm } from "../../../../Types/colourSorter";
-import basket from "../../../../assets/basket.png"
+import basket from "../../../../assets/basket.png";
 import hoverSound from "../../../../assets/audios/hover.mp3";
 import correctSound from "../../../../assets/audios/correct.mp3";
 import wrongSound from "../../../../assets/audios/wrong.mp3";
@@ -337,25 +336,24 @@ const ColorSorterPlayPage = () => {
     <ChildLayout
       background={theme.background}
       child={currentChild}
-      coins={0}
       logo={theme.logo}
       title={selectedGame.name}
     >
-      <div className="max-w-6xl mx-auto px-6 pt-32 pb-10">
+      <div className="relative max-w-6xl mx-auto h-[calc(100vh-90px)] px-6 py-4 flex flex-col">
         {!showSuccess && !showFailure && (
-          <GameHUD score={score} timer={timeLeft} stars={stars}>
+          <div className="fixed top-28 left-8 z-50">
             <GameTimer
               disabled={gameFinished || showFailure || showSuccess}
               timeLeft={timeLeft}
               onTick={setTimeLeft}
               onTimeUp={failLevel}
             />
-          </GameHUD>
+          </div>
         )}
 
-        <div className="mt-12 rounded-[40px] p-10 shadow-2xl bg-white/80">
+        <div className="flex-1 flex flex-col overflow-hidden rounded-[40px] p-6 bg-orange-500/40">
           {/* Target Color */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">
               Drag all
               <span className="mx-2 capitalize" style={{ color: targetColor }}>
@@ -365,7 +363,7 @@ const ColorSorterPlayPage = () => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-12 items-center">
+          <div className="flex-1 grid grid-cols-2 gap-6 items-center overflow-hidden">
             {/* LEFT DROP BOX */}
             <div
               onDragOver={(e) => {
@@ -385,11 +383,7 @@ const ColorSorterPlayPage = () => {
                 src={basket}
                 alt="Basket"
                 draggable={false}
-                className={`
-      w-72
-      transition-all
-      duration-200
-      select-none
+                className={`w-[28vw] min-w-40 max-w-72 transition-all duration-200 select-none
       ${
         isOverDropZone
           ? "scale-110 drop-shadow-[0_0_35px_rgba(255,210,0,.8)]"
@@ -400,22 +394,24 @@ const ColorSorterPlayPage = () => {
             </div>
 
             {/* RIGHT ICONS */}
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid flex-1 grid-cols-4 gap-4 place-items-center">
               {items.map((item) => (
                 <div
                   key={item.id}
                   draggable
                   onDragStart={(e) => onDragStart(e, item)}
                   onDragEnd={onDragEnd}
-                  className="h-20 w-20 rounded-2xl   flex flex-col items-center justify-center cursor-grab hover:scale-110 transition"
+                  className="h-[8vw] w-[8vw] min-h-14 min-w-14 max-h-20 max-w-20 rounded-2xl   flex flex-col items-center justify-center cursor-grab hover:scale-110 transition"
                 >
-                  <span className="text-5xl  ms-4">{item.iconKey}</span>
+                  <span className="text-4xl md:text-5xl ms-2">
+                    {item.iconKey}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-4 text-center">
             <p className="text-red-500">Mistakes : {wrongAnswers}</p>
           </div>
         </div>

@@ -14,8 +14,8 @@ import {
   adminToggleChildStatus,
 } from "../../../redux/Slices/ChildManagementSlice";
 
-import InfoItem from "../../components/InfoItem";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import InfoItem from "../../SharedComponents/InfoItem";
+import ConfirmationModal from "../../SharedComponents/ConfirmationModal";
 import toast from "react-hot-toast";
 import type { ChildGame } from "../../../Types/ChildManagement";
 

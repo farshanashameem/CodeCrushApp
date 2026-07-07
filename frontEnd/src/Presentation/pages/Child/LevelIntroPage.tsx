@@ -11,7 +11,7 @@ import {
   getLevelProgress
 } from "../../../redux/Slices/childGameSlice";
 
-import ChildLayout from "../../components/Child/ChildLayout";
+import ChildLayout from "../../SharedComponents/Child/ChildLayout";
 
 import { gameTheme } from "../../../Constants/gameTheme";
 

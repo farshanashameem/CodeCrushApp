@@ -10,13 +10,13 @@ import type {
 import AdminDashboardLayout from "../../../../layouts/AdminDashboardLayout";
 import { fetchLevelsByGame } from "../../../../../redux/Slices/LevelSlice";
 import {  getGameDetail, } from "../../../../../redux/Slices/gameSlice";
-import GameHeader from "../../../../components/GameHeader";
+import GameHeader from "../../../../SharedComponents/GameHeader";
 
 // Game Forms
-import PicturePuzzleLevelForm from "../../../../components/Levels/PicturePuzzlers/PicturePuzzleLevelForm";
- import ColorSorterLevelForm from "../../../../components/Levels/ColourSorter/ColorSorterLevelForm";
-import TypingTitansLevelForm from "../../../../components/Levels/TypingTitans/TypingTitansLevelForm";
-import MouseTrackerLevelForm from "../../../../components/Levels/MouseTrackers/MouseTrackerLevelForm";
+import PicturePuzzleLevelForm from "../../../../SharedComponents/Levels/PicturePuzzlers/PicturePuzzleLevelForm";
+ import ColorSorterLevelForm from "../../../../SharedComponents/Levels/ColourSorter/ColorSorterLevelForm";
+import TypingTitansLevelForm from "../../../../SharedComponents/Levels/TypingTitans/TypingTitansLevelForm";
+import MouseTrackerLevelForm from "../../../../SharedComponents/Levels/MouseTrackers/MouseTrackerLevelForm";
 
 const CreateLevel = () => {
   const { gameId } = useParams();

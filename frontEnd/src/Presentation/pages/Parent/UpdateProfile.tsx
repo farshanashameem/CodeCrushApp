@@ -8,7 +8,7 @@ import { updateProfileSchema } from "../../../Lib/validation";
 import AuthLayout from "../../layouts/AuthLayout";
 import icon from "../../../assets/parentIcon.png";
 import toast from "react-hot-toast";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import ConfirmationModal from "../../SharedComponents/ConfirmationModal";
 
 const UpdateProfile = () => {
   const navigate = useNavigate();

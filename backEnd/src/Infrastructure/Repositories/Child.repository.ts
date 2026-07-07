@@ -9,6 +9,8 @@ export class ChildRepository extends BaseRepository < ChildEntity, IChild > impl
     constructor() {
         super( ChildModel );
     }
+
+     
        
         async findByParentId(parentId: string): Promise<ChildEntity[] > {
           

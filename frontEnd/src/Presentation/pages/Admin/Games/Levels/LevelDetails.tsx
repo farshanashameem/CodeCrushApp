@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../../../../redux/store";
 
 import AdminDashboardLayout from "../../../../layouts/AdminDashboardLayout";
-import GameHeader from "../../../../components/GameHeader";
+import GameHeader from "../../../../SharedComponents/GameHeader";
 
 import { getGameDetail } from "../../../../../redux/Slices/gameSlice";
 import {
@@ -13,10 +13,10 @@ import {
   getLevelDetail,
 } from "../../../../../redux/Slices/LevelSlice";
 
-import PicturePuzzleLevelForm from "../../../../components/Levels/PicturePuzzlers/PicturePuzzleLevelForm";
-import ColorSorterLevelForm from "../../../../components/Levels/ColourSorter/ColorSorterLevelForm";
-import TypingTitansLevelForm from "../../../../components/Levels/TypingTitans/TypingTitansLevelForm";
-import MouseTrackerLevelForm from "../../../../components/Levels/MouseTrackers/MouseTrackerLevelForm";
+import PicturePuzzleLevelForm from "../../../../SharedComponents/Levels/PicturePuzzlers/PicturePuzzleLevelForm";
+import ColorSorterLevelForm from "../../../../SharedComponents/Levels/ColourSorter/ColorSorterLevelForm";
+import TypingTitansLevelForm from "../../../../SharedComponents/Levels/TypingTitans/TypingTitansLevelForm";
+import MouseTrackerLevelForm from "../../../../SharedComponents/Levels/MouseTrackers/MouseTrackerLevelForm";
 
 const LevelDetails = () => {
   const { levelId } = useParams();

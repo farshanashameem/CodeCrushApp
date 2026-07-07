@@ -87,40 +87,40 @@ const ImageSelectorModal = ({
               No Images Found
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-3">
               {filteredImages.map((image) => (
-                <div
-                  key={image.id}
-                  onClick={() => {
-                    onSelect(
-                      {
-                        imageId: image.id,
-                        imageName: image.name,
-                        imageUrl: image.imageUrl,
-                        answer: image.name,
-                      },
-                      editIndex,
-                    );
+                  <div
+                    key={image.id}
+                    onClick={() => {
+                      onSelect(
+                        {
+                          imageId: image.id,
+                          imageName: image.name,
+                          imageUrl: image.imageUrl,
+                          answer: image.name,
+                        },
+                        editIndex,
+                      );
 
-                    onClose();
-                  }}
-                  className="cursor-pointer overflow-hidden rounded-3xl border border-white/30 bg-white/40 backdrop-blur-md transition hover:-translate-y-1 hover:border-indigo-400 hover:shadow-xl"
-                >
-                  <div className="aspect-square bg-slate-100">
-                    <img
-                      src={image.imageUrl}
-                      alt={image.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
+                      onClose();
+                    }}
+                    className="cursor-pointer overflow-hidden rounded-xl border border-white/30 bg-white/40 transition hover:scale-105 hover:shadow-lg"
+                  >
+                    <div className="aspect-square bg-slate-100">
+                      <img
+                        src={image.imageUrl}
+                        alt={image.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
 
-                  <div className="p-4">
-                    <p className="truncate text-center font-semibold text-slate-700">
-                      {image.name}
-                    </p>
+                    <div className="p-2">
+                      <p className="truncate text-center text-xs font-medium">
+                        {image.name}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>

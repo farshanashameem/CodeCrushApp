@@ -6,6 +6,7 @@ import { IUpdateImageUseCase } from '@/Application/Games/Interfaces/Image/IUpdat
 import { ICloudinaryService } from '@/Application/Interfaces/Services/ICloudinaryService';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { addImageSchema, imageIdSchema, updateImageSchema } from '@/Presentation/Validators/ImageValidator';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { NextFunction, Request, Response } from 'express';
@@ -32,10 +33,12 @@ export class ImageManagementController {
             
             const uploadResult = await this._cloudinaryService.uploadImage( req.file.buffer );
             const result = await this._addImage.execute( {name, category, imageUrl: uploadResult.secureUrl, publicId: uploadResult.publicId});
-           return  res.status( StatusCodes.CREATED).json({
-                success: true,
-                data: result
-            });
+           return sendSuccess(
+            res,
+            StatusCodes.CREATED,
+            authMessages.success.IMAGE_ADDED,
+            result
+        );
 
         } catch ( error ) {
             next( error);
@@ -58,10 +61,12 @@ export class ImageManagementController {
             }
            
             const result = await this._updateImage.execute({ imageId, ...updateData});
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data: result
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.IMAGE_UPDATED,
+                result
+            );
         } catch ( error ) {
             next( error);
         }
@@ -71,10 +76,12 @@ export class ImageManagementController {
         try {
 
             const images = await this._getAllImages.execute() ;
-            return res.status( StatusCodes.OK ). json({
-                success:true,
-                data: images
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                "",
+                images
+            );
 
         } catch ( error ) {
             next( error);
@@ -86,10 +93,12 @@ export class ImageManagementController {
 
             const { imageId } = imageIdSchema.parse( req.params );
             const image = await this._getImage.execute( {imageId});
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: image
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                "",
+                image
+            );
 
         } catch ( error ) {
             next( error);
@@ -101,9 +110,11 @@ export class ImageManagementController {
 
             const { imageId } = imageIdSchema.parse( req.params );
             await this._deleteImage.execute( {imageId});
-            return res.status(StatusCodes.OK).json({
-                success: true,
-            });
+           return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.IMAGE_DELETED
+            );
         } catch ( error ) {
             next( error);
         }

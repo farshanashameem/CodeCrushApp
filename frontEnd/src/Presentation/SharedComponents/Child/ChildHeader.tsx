@@ -6,13 +6,13 @@ interface ChildHeaderProps {
     avatar: string;
     age?: number;
   } | null;
-  coins?: number;
+  
   logo?: string;
 
   title?: string;
 }
 
-const ChildHeader = ({ child, coins = 0, logo, title }: ChildHeaderProps) => {
+const ChildHeader = ({ child,  logo, title }: ChildHeaderProps) => {
   return (
     <header className="flex justify-between items-center px-6 md:px-10 py-5 bg-white/30 backdrop-blur-md border-b border-white/30">
       {/* Left Logo */}
@@ -38,12 +38,7 @@ const ChildHeader = ({ child, coins = 0, logo, title }: ChildHeaderProps) => {
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
-        {/* Coins */}
-        <div className="flex items-center gap-2 bg-yellow-400 px-4 py-2 rounded-full shadow-lg">
-          <span className="text-xl">🪙</span>
-
-          <span className="font-mochiy text-white text-sm">{coins}</span>
-        </div>
+       
 
         {/* Avatar */}
         <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-full shadow-lg border-2 border-indigo-200">

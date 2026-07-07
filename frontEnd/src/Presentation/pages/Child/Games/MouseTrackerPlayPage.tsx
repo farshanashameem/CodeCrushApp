@@ -10,11 +10,10 @@ import {
   submitLevel,
   getLevelProgress,
 } from "../../../../redux/Slices/childGameSlice";
-import ChildLayout from "../../../components/Child/ChildLayout";
-import GameHUD from "../../../components/Games/GamePlay/GameHUD";
-import GameTimer from "../../../components/Games/GamePlay/Gametimer";
-import FailureModal from "../../../components/Games/GamePlay/FailureModal";
-import SuccessModal from "../../../components/Games/GamePlay/SuccessModal";
+import ChildLayout from "../../../SharedComponents/Child/ChildLayout";
+import GameTimer from "../../../SharedComponents/Games/GamePlay/Gametimer";
+import FailureModal from "../../../SharedComponents/Games/GamePlay/FailureModal";
+import SuccessModal from "../../../SharedComponents/Games/GamePlay/SuccessModal";
 import { gameTheme } from "../../../../Constants/gameTheme";
 import type { Level } from "../../../../Types/level";
 import drag from "../../../../assets/audios/drag.mp3";
@@ -44,12 +43,15 @@ const MouseTrackerPlayPage = () => {
   // Reference for the tracking audio sound effect
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Constants representing internal coordinates (Coordinate Space)
+  const SVG_WIDTH = 800;
+  const SVG_HEIGHT = 500;
+
   // Initialize drag sound effect
   useEffect(() => {
-    // Replace with your actual sound file path (e.g., a soft pencil slide, whimsical sparkle, or hum)
     const audio = new Audio(drag);
     audio.loop = true;
-    audio.volume = 0.4; // Keep it comfortable for kids
+    audio.volume = 0.4;
     audioRef.current = audio;
 
     return () => {
@@ -57,40 +59,39 @@ const MouseTrackerPlayPage = () => {
     };
   }, []);
 
-const playDragSound = () => {
-  const audio = audioRef.current;
-
-  if (!audio || gameFinished) return;
-
-  if (audio.paused) {
-    audio.play().catch(console.error);
-  }
-};
-
-const stopDragSound = () => {
-  const audio = audioRef.current;
-
-  if (!audio) return;
-
-  audio.pause();
-};
-
-useEffect(() => {
-  return () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
+  const playDragSound = () => {
+    const audio = audioRef.current;
+    if (!audio || gameFinished) return;
+    if (audio.paused) {
+      audio.play().catch(console.error);
     }
   };
-}, []);
 
+  const stopDragSound = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  // Safely calculates mouse ratios based on current bounding container
   const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
-    const rect = svgRef.current!.getBoundingClientRect();
+    if (!svgRef.current) return { x: 0, y: 0 };
+    const rect = svgRef.current.getBoundingClientRect();
     return {
       x: (e.clientX - rect.left) / rect.width,
       y: (e.clientY - rect.top) / rect.height,
     };
   };
 
+  // Uses SVG_WIDTH dynamically to map tolerances perfectly
   const isOnRoad = (x: number, y: number) => {
     const tolerance = pathWidth / SVG_WIDTH / 2;
     return pathCoordinates.some((point) => {
@@ -304,10 +305,6 @@ useEffect(() => {
     setShowFailure(true);
   };
 
-  const SVG_WIDTH = 900;
-  const SVG_HEIGHT = 550;
-
-  // Grabbing Start and End positions for structural UI markers
   const startPoint = pathCoordinates[0];
   const endPoint = pathCoordinates[pathCoordinates.length - 1];
 
@@ -315,35 +312,32 @@ useEffect(() => {
     <ChildLayout
       background={theme.background}
       child={currentChild}
-      coins={0}
       logo={theme.logo}
       title={selectedGame.name}
     >
-      <div className="max-w-6xl mx-auto px-6 pt-32 pb-10 font-sans select-none">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 pt-3 pb-10 font-sans select-none">
         {!showSuccess && !showFailure && (
-          <div className="transform transition-all hover:scale-[1.01]">
-            <GameHUD score={score} timer={timeLeft} stars={stars}>
-              <GameTimer
-                disabled={gameFinished || showFailure || showSuccess}
-                timeLeft={timeLeft}
-                onTick={setTimeLeft}
-                onTimeUp={failLevel}
-              />
-            </GameHUD>
+          <div className="md:fixed top-28 left-8 z-50 mb-4 md:mb-0 flex justify-center">
+            <GameTimer
+              disabled={gameFinished || showFailure || showSuccess}
+              timeLeft={timeLeft}
+              onTick={setTimeLeft}
+              onTimeUp={failLevel}
+            />
           </div>
         )}
 
-        <div className="mt-8 rounded-[40px] bg-emerald-50 border-8 border-emerald-200 p-8 shadow-xl text-center">
-          <h2 className="text-4xl font-extrabold text-emerald-800 mb-6 tracking-wide drop-shadow-sm">
+        <div className="rounded-3xl md:rounded-[40px] bg-emerald-50 border-4 md:border-8 border-emerald-200 p-2 md:p-4 shadow-xl text-center">
+          <h2 className="text-2xl md:text-4xl font-extrabold text-emerald-800 mb-4 md:mb-6 tracking-wide drop-shadow-sm">
             ✨ Follow the Magic Road! ✨
           </h2>
 
-          <div className="relative inline-block rounded-3xl overflow-hidden bg-emerald-100 p-3 shadow-inner">
+          {/* Wrapper container handles fluid constraint sizing */}
+          <div className="relative w-full max-w-3xl mx-auto rounded-2xl overflow-hidden bg-emerald-100 p-1 shadow-inner aspect-[8/5]">
             <svg
               ref={svgRef}
-              width={SVG_WIDTH}
-              height={SVG_HEIGHT}
-              className="rounded-2xl bg-gradient-to-br from-emerald-300 to-green-400 cursor-pointer shadow-md transition-all duration-150"
+              viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+              className="w-full h-full rounded-xl bg-gradient-to-br from-emerald-300 to-green-400 cursor-pointer shadow-md transition-all duration-150 touch-none"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={stopDrawing}
@@ -432,8 +426,8 @@ useEffect(() => {
           </div>
 
           {/* Child-Friendly Mistake Counter */}
-          <div className="mt-6 flex justify-center items-center gap-2">
-            <span className="px-6 py-2.5 rounded-full bg-orange-100 border-2 border-orange-300 text-orange-700 font-bold text-lg shadow-sm">
+          <div className="mt-4 md:mt-6 flex justify-center items-center gap-2">
+            <span className="px-4 py-2 md:px-6 md:py-2.5 rounded-full bg-orange-100 border-2 border-orange-300 text-orange-700 font-bold text-sm md:text-lg shadow-sm">
               Oups Count 🧸 : {wrongAnswers}
             </span>
           </div>

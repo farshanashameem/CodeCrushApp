@@ -7,7 +7,7 @@ child: {
     name: string;
     age: number;
     avatar: string;
-
+    dob?: Date;
     totalPlayTime: number;
     totalGamesPlayed: number;
     lastPlayed?: Date;

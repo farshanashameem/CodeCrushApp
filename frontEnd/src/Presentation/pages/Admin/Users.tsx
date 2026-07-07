@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout";
-import ConfirmationModal from "../../components/ConfirmationModal";
+import ConfirmationModal from "../../SharedComponents/ConfirmationModal";
 
 import type { AppDispatch, RootState } from "../../../redux/store";
 import {

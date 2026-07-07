@@ -13,11 +13,10 @@ import {
   getLevelProgress,
 } from "../../../../redux/Slices/childGameSlice";
 import click from "../../../../assets/audios/click.mp3";
-import ChildLayout from "../../../components/Child/ChildLayout";
-import GameHUD from "../../../components/Games/GamePlay/GameHUD";
-import GameTimer from "../../../components/Games/GamePlay/Gametimer";
-import FailureModal from "../../../components/Games/GamePlay/FailureModal";
-import SuccessModal from "../../../components/Games/GamePlay/SuccessModal";
+import ChildLayout from "../../../SharedComponents/Child/ChildLayout";
+import GameTimer from "../../../SharedComponents/Games/GamePlay/Gametimer";
+import FailureModal from "../../../SharedComponents/Games/GamePlay/FailureModal";
+import SuccessModal from "../../../SharedComponents/Games/GamePlay/SuccessModal";
 import { gameTheme } from "../../../../Constants/gameTheme";
 import type { Level } from "../../../../Types/level";
 
@@ -239,32 +238,35 @@ const TypingPlayPage = () => {
     <ChildLayout
       background={theme.background}
       child={currentChild}
-      coins={0}
       logo={theme.logo}
       title={selectedGame.name}
     >
-      <div className="max-w-6xl mx-auto px-6 pt-32 pb-10">
+      <div className="max-w-6xl mx-auto px-6 pt-2 pb-10">
         {!showSuccess && !showFailure && (
-          <GameHUD score={score} timer={timeLeft} stars={stars}>
+          <div className="fixed top-28 left-8 z-50">
             <GameTimer
               disabled={gameFinished || showFailure || showSuccess}
               timeLeft={timeLeft}
               onTick={setTimeLeft}
               onTimeUp={failLevel}
             />
-          </GameHUD>
+          </div>
         )}
 
-        <div
-          className="mt-12 rounded-[40px] p-12 shadow-2xl text-center bg-cover bg-center bg-no-repeat"
-          
-        >
-          <h2 className="text-slate-500 text-xl">Type This Word</h2>
+        <div className="flex-1 flex flex-col justify-center items-center rounded-[40px] bg-white/20 backdrop-blur-md shadow-2xl p-6 lg:p-10">
+          {/* Title */}
+          <h2 className="text-2xl lg:text-3xl font-mochiy text-blue-700 drop-shadow animate-bounce">
+            ⌨️ Type This Word
+          </h2>
 
-          <h1 className="mt-8 inline-block rounded-3xl bg-white/90 px-10 py-6 text-6xl font-mochiy text-pink-600 shadow-2xl border-4 border-yellow-300">
-            {currentWord}
-          </h1>
+          {/* Word Card */}
+          <div className="mt-6 rounded-3xl bg-white border-4 border-yellow-300 px-8 lg:px-12 py-6 shadow-2xl animate-pulse">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-mochiy text-pink-600 tracking-wide text-center break-words">
+              {currentWord}
+            </h1>
+          </div>
 
+          {/* Input */}
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -277,53 +279,61 @@ const TypingPlayPage = () => {
             autoFocus
             placeholder="✨ Type here..."
             className="
-            w-full mt-10
-            rounded-3xl
-            border-4 border-yellow-300
-            bg-yellow-50
-            px-8 py-5
-            text-center
-            text-4xl
-            font-mochiy
-            text-fuchsia-600
-            placeholder:text-fuchsia-300
-            tracking-wide
-            outline-none
-            shadow-xl
-            transition-all
-            duration-300
-            focus:border-pink-500
-            focus:bg-white
-            focus:scale-105
-          "
+      mt-8
+      w-[95%] sm:w-[85%] lg:w-[70%]
+      rounded-3xl
+      border-4 border-yellow-300
+      bg-yellow-50
+      px-6 py-4
+      text-center
+      text-2xl lg:text-3xl
+      font-mochiy
+      text-fuchsia-600
+      placeholder:text-fuchsia-300
+      tracking-wide
+      outline-none
+      shadow-xl
+      transition-all
+      duration-300
+      focus:border-pink-500
+      focus:bg-white
+      focus:scale-105
+    "
           />
 
+          {/* Submit */}
           <button
             onClick={handleSubmitWord}
             className="
-              mt-8
-              px-12 py-4
-              rounded-full
-              bg-gradient-to-r
-              from-pink-500
-              to-orange-400
-              text-white
-              text-2xl
-              font-mochiy
-              shadow-lg
-              hover:scale-110
-              active:scale-95
-              transition-all
-            "
+      mt-6
+      rounded-full
+      bg-gradient-to-r
+      from-pink-500
+      via-orange-400
+      to-yellow-400
+      px-10 py-4
+      text-xl lg:text-2xl
+      font-mochiy
+      text-white
+      shadow-xl
+      hover:scale-110
+      hover:shadow-2xl
+      active:scale-95
+      transition-all
+    "
           >
             🚀 Submit
           </button>
 
-          <div className="mt-8">
-            <p>
-              Word {currentIndex + 1} / {words.length}
-            </p>
-            <p className="text-red-500 mt-2">Mistakes: {wrongAnswers}</p>
+          {/* Bottom Stats */}
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <div className="rounded-full bg-blue-500 px-6 py-3 text-white font-bold shadow-lg">
+              📖 {currentIndex + 1} / {words.length}
+            </div>
+
+            <div className="rounded-full bg-red-500 px-6 py-3 text-white font-bold shadow-lg">
+              ❌ {wrongAnswers}
+            </div>
           </div>
         </div>
 

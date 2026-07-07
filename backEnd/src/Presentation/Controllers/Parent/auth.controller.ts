@@ -15,6 +15,7 @@ import OTPType from '@/Domain/enums/OTPType.enum';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
 import { env } from '@/Infrastructure/Config/env';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { loginSchema } from '@/Presentation/Validators/LoginValidator';
 import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema, UpdateProfileSchema } from '@/Presentation/Validators/RegisterValidator';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
@@ -44,10 +45,11 @@ export class ParentAuthController {
 
             await this._registerUseCase.execute( payload );
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                message: authMessages.success.OTP_SENT
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.OTP_SENT
+            );
         } catch ( error) {
             next(error);
         }
@@ -68,11 +70,12 @@ export class ParentAuthController {
             ? authMessages.success.PARENT_REGISTER_SUCCESS
             : authMessages.success.OTP_VERIFIED;
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
                 message,
-                data: result
-            });
+                result
+            );
         } catch( error){
             next(error);
         }
@@ -88,10 +91,11 @@ export class ParentAuthController {
 
             await this._resendOtp.execute(payload);
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                message: authMessages.success.OTP_SENT
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.OTP_SENT
+            );
         } catch (error) {
             next( error );
         }
@@ -119,11 +123,12 @@ export class ParentAuthController {
                 path: '/'
             });
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                parent: parent,
-                message: authMessages.success.PARENT_LOGIN_SUCCESS
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.PARENT_LOGIN_SUCCESS,
+                parent
+            );
         } catch( error) {
             next( error );
         }
@@ -140,10 +145,11 @@ export class ParentAuthController {
 
             await this._forgotPasswordUseCase.execute(payload);
 
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                message: authMessages.success.OTP_SENT
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.OTP_SENT
+            );
 
         } catch ( error) {
             next( error);
@@ -161,10 +167,11 @@ export class ParentAuthController {
             };
 
             await this._resetPasswordUseCase.execute(payload);
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                message: authMessages.success.PASSWORD_RESET_SUCCESS
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.PASSWORD_RESET_SUCCESS
+            );
         } catch( error){
             next(error);
 
@@ -183,10 +190,12 @@ export class ParentAuthController {
             const { confirmPassword: _confirmPassword, ...data } = updatedData;
             const payload = { id: parentId, ...data };
             const parent = await this._updateProfile.execute( payload );
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: parent
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.PARENT_PROFILE_UPDATED,
+                parent
+            );
 
         }catch(error) {
             next(error);

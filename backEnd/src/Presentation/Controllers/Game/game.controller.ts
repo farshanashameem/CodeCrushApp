@@ -6,6 +6,8 @@ import { IGetGamesUseCase } from '@/Application/Games/Interfaces/IGetGames.useca
 import { IGetGameUseCase } from '@/Application/Games/Interfaces/IGetGame.usecase';
 import { gameIdSchema } from '@/Presentation/Validators/Game.validator';
 import { IChangeGameStatusUseCase } from '@/Application/Games/Interfaces/IChangeGameStatus.usecase';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
 
 export class GameManagementController {
 
@@ -21,10 +23,12 @@ export class GameManagementController {
 
             const games = await this._getAllGames.execute();
 
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: games
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.GAMES_FETCHED_SUCCESSFULLY,
+                games
+            );
 
         } catch (error) {
             next(error);
@@ -39,10 +43,12 @@ export class GameManagementController {
 
             const game = await this._getGame.execute({ gameId });
 
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: game
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.GAME_FETCHED_SUCCESSFULLY,
+                game
+            );
 
         } catch (error) {
             next(error);
@@ -56,10 +62,12 @@ export class GameManagementController {
 
             const result =await this._changeStatus.execute({ gameId });
 
-            return res.status( StatusCodes.OK ).json({
-                success: true,
-                data: result
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.GAME_STATUS_UPDATED,
+                result
+            );
 
         } catch (error) {
             next(error);
