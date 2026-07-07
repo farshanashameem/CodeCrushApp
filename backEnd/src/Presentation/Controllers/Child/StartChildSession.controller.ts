@@ -4,14 +4,15 @@ import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { env } from '@/Infrastructure/Config/env';
-import { StartChildSessionUseCase } from '@/Application/Child/UseCases/StartChildSession.usecase';
+import { IStartChildSessionUseCase } from '@/Application/Child/Interfaces/IStartChildSession.usecase';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 
 export class StartChildSessionController {
   constructor(
-    private _startChildSession: StartChildSessionUseCase
+    private _startChildSession: IStartChildSessionUseCase
   ) {}
 
-  startSession= async (req: Request, res: Response): Promise<void> => {
+  startSession= async (req: Request, res: Response): Promise<Response | void> => {
     
     if (!req.user?.id) {
         throw new AppError( authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED  );
@@ -25,9 +26,6 @@ export class StartChildSessionController {
       maxAge: env.CHILD_SESSION_TOKEN_MAX_AGE,
     });
 
-    res.status(StatusCodes.OK).json({
-      success: true,
-      data: result,
-    });
+    return sendSuccess(res, StatusCodes.OK, "", result);
   };
 }

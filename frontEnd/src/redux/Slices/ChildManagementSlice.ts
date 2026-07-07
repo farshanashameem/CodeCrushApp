@@ -166,7 +166,7 @@ export const adminToggleChildStatus = createAsyncThunk< ToggleChildStatusPayload
 
       if (!response.data.success) {
         return rejectWithValue("Invalid response");
-      }
+      } 
 
       return {
         id: response.data.data.id,

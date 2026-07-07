@@ -7,7 +7,7 @@ import type { AxiosError } from "axios";
 /* =========================
    THUNKS
 ========================= */
-
+ 
 export const fetchIcons = createAsyncThunk<
   Icon[],
   void,

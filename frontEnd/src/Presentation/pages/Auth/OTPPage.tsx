@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import AuthLayout from "../../layouts/AuthLayout";
-import AuthCard from "../../components/AuthCard";
+import AuthCard from "../../SharedComponents/AuthCard";
 import icon from "../../../assets/parentIcon.png";
 
 import { useDispatch } from "react-redux";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AuthLayout from "../../layouts/AuthLayout";
-import AuthCard from "../../components/AuthCard";
+import AuthCard from "../../SharedComponents/AuthCard";
 import { forgotPassword } from "../../../redux/Slices/authSlice";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../redux/store";

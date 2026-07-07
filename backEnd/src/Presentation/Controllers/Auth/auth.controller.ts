@@ -7,6 +7,8 @@ import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { GetMeInputDTO } from '@/Application/Common/dto/getMe.dto';
 import logger from '@/Infrastructure/Services/Logger';
 import { env } from '@/Infrastructure/Config/env';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
+import { AppError } from '@/Domain/Errors/app.error';
 
 export class AuthController {
     constructor (
@@ -20,10 +22,10 @@ export class AuthController {
             
 
             if(!req.user) {
-                return res.status( StatusCodes.UNAUTHORIZED).json({
-                    success: false,
-                    message: authMessages.error.UNAUTHORIZED
-                });
+                throw new AppError(
+                    authMessages.error.UNAUTHORIZED,
+                    StatusCodes.UNAUTHORIZED
+                );
             }
 
 
@@ -34,10 +36,12 @@ export class AuthController {
             };
 
             const user = await this._getMeUseCase.execute( payload );
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                user
-            });
+            return sendSuccess(
+                        res,
+                        StatusCodes.OK,
+                       authMessages.success.USER_FETCHED_SUCCESSFULLY,
+                        user
+                    );
 
 
         } catch ( error) {
@@ -69,10 +73,11 @@ export class AuthController {
                 path: '/'
             });
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                message: authMessages.success.TOKEN_REFRESHED
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.TOKEN_REFRESHED
+            );
         } catch(error) {
             next( error);
         }
@@ -101,7 +106,7 @@ export class AuthController {
                 path: '/'
             });
 
-            return res.status( StatusCodes.NO_CONTENT).send();
+            return res.sendStatus(StatusCodes.NO_CONTENT);
         } catch(error ) {
             next( error);
         }

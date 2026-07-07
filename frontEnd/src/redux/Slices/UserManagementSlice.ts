@@ -13,7 +13,7 @@ import type {
   ToggleUserStatusPayload,
 } from "../../Types/UserManagement";
 
-const initialState: UserState = {
+const initialState: UserState = { 
   loading: false,
 
   error: null,

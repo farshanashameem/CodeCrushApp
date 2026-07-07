@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../../../redux/store";
 import { gameImages } from "../../../../Constants/gameImages";
 import AdminDashboardLayout from "../../../layouts/AdminDashboardLayout";
-import ConfirmationModal from "../../../components/ConfirmationModal";
+import ConfirmationModal from "../../../SharedComponents/ConfirmationModal";
 
 import {
   fetchGames,

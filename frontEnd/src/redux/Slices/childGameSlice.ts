@@ -229,7 +229,7 @@ export const getGameProgress = createAsyncThunk<
         API_ROUTES.CHILD.PROGRESS.BY_GAME(childId, gameId),
       );
 
-      return response.data.result.levels;
+      return response.data.data.levels;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
 
@@ -254,7 +254,7 @@ export const submitLevel = createAsyncThunk<
         data,
       );
       
-      return response.data.result.progress;
+      return response.data.data.progress;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
 

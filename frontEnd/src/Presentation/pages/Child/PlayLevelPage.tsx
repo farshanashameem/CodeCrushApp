@@ -10,9 +10,9 @@ import {
   submitLevel,
 } from "../../../redux/Slices/childGameSlice";
 
-import ChildLayout from "../../components/Child/ChildLayout";
-import GameTimer from "../../components/Child/GameTimer";
-import LevelResultModal from "../../components/Child/LevelResultModal";
+import ChildLayout from "../../SharedComponents/Child/ChildLayout";
+import GameTimer from "../../SharedComponents/Child/GameTimer";
+import LevelResultModal from "../../SharedComponents/Child/LevelResultModal";
 
 import { gameTheme } from "../../../Constants/gameTheme";
 

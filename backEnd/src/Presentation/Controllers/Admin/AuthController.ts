@@ -5,6 +5,7 @@ import { loginSchema } from '@/Presentation/Validators/LoginValidator';
 import { NextFunction, Request, Response } from 'express';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 
 export class AdminAuthController {
 
@@ -38,11 +39,13 @@ export class AdminAuthController {
                 maxAge: env.JWT_REFRESH_TOKEN_MAX_AGE,
                 path: '/'
             });
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                admin,
-                message: authMessages.success.ADMIN_LOGIN_SUCCESS
-            });
+            console.log( "admin data",admin)
+            return sendSuccess(
+                    res,
+                    StatusCodes.OK,
+                    authMessages.success.ADMIN_LOGIN_SUCCESS,
+                    admin
+                    );
 
         } catch (error ){
             next( error );

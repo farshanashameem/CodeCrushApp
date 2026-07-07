@@ -10,6 +10,8 @@ export const authMessages = {
 
          //USER STATUS 
         USER_STATUS_UPDATED: 'User status updated',
+        USER_FETCHED_SUCCESSFULLY: "User fetched successfully",
+        USERS_FETCHED_SUCCESSFULLY: "Users fetched successfully",
 
         //  OTP
         OTP_SENT: 'OTP sent to email',
@@ -27,10 +29,13 @@ export const authMessages = {
 
         // GAME
         GAME_STATUS_UPDATED: 'game status updated',
-
+        GAMES_FETCHED_SUCCESSFULLY: 'Games fetched successfully',
+        GAME_FETCHED_SUCCESSFULLY:'Game fetched successfully',
+        
         // LEVELS
         LEVEL_ADDED: 'Level added successfully',
         LEVEL_UPDATED: 'Level updated successfully',
+        LEVEL_FETCHED_SUCCESSFULLY: 'Level fetched',
         LEVEL_STATUS_UPDATED: 'Level status updated successfully',
         LEVEL_DELETED: 'Level deleted successfully',
 
@@ -39,6 +44,7 @@ export const authMessages = {
         ICON_UPDATED: 'Icon updated successfully',
         ICON_STATUS_UPDATED: 'Icon status updated successfully',
         ICON_DELETED: 'Icon deleted successfully',
+        ICON_FETCHED:'Icon fetched',
 
         // IMAGES
         IMAGE_ADDED: 'Image added successfully',

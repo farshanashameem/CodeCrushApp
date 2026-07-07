@@ -12,11 +12,10 @@ import {
   getLevelProgress,
 } from "../../../../redux/Slices/childGameSlice";
 import click from "../../../../assets/audios/click.mp3";
-import ChildLayout from "../../../components/Child/ChildLayout";
-import GameHUD from "../../../components/Games/GamePlay/GameHUD";
-import GameTimer from "../../../components/Games/GamePlay/Gametimer";
-import FailureModal from "../../../components/Games/GamePlay/FailureModal";
-import SuccessModal from "../../../components/Games/GamePlay/SuccessModal";
+import ChildLayout from "../../../SharedComponents/Child/ChildLayout";
+import GameTimer from "../../../SharedComponents/Games/GamePlay/Gametimer";
+import FailureModal from "../../../SharedComponents/Games/GamePlay/FailureModal";
+import SuccessModal from "../../../SharedComponents/Games/GamePlay/SuccessModal";
 import { gameTheme } from "../../../../Constants/gameTheme";
 import type { Level, PicturePuzzleStepForm } from "../../../../Types/level";
 import type { Image } from "../../../../Types/image";
@@ -248,67 +247,67 @@ const PicturePlayPage = () => {
     <ChildLayout
       background={theme.background}
       child={currentChild}
-      coins={0}
       logo={theme.logo}
       title={selectedGame.name}
     >
-      <div className="max-w-6xl mx-auto px-6 pt-32 pb-10">
+      <div className="max-w-6xl mx-auto px-6 pt-2 pb-10">
         {!showSuccess && !showFailure && (
-          <GameHUD score={score} timer={timeLeft} stars={stars}>
+          <div className="fixed top-28 left-8 z-50">
             <GameTimer
               disabled={gameFinished || showFailure || showSuccess}
               timeLeft={timeLeft}
               onTick={setTimeLeft}
               onTimeUp={failLevel}
             />
-          </GameHUD>
+          </div>
         )}
 
-        <div className="mt-12 rounded-[40px] p-12 shadow-2xl text-center bg-cover bg-center bg-no-repeat">
-          <h2 className="text-slate-500 text-xl">Guess the Picture</h2>
-
-          <div className="flex justify-center mt-10">
+        <div className=" rounded-[40px] p-2 shadow-2xl text-center bg-cover bg-center bg-no-repeat">
+          <h2 className="text-5xl font-black text-yellow-400 drop-shadow-[3px_3px_0px_#2563eb]">
+  Guess the Picture
+</h2>
+          <div className="flex justify-center mt-4">
             <img
               src={currentStep.imageUrl}
               alt={currentStep.imageName}
-              className="h-72 rounded-3xl object-contain"
+              className="h-50 rounded-3xl object-contain"
             />
           </div>
 
           <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              keySound.currentTime = 0;
-              keySound.play().catch(() => {});
+    value={input}
+    onChange={(e) => setInput(e.target.value)}
+    onKeyDown={(e) => {
+      keySound.currentTime = 0;
+      keySound.play().catch(() => {});
 
-              if (e.key === "Enter") handleSubmitAnswer();
-            }}
-            autoFocus
-            placeholder="✨ Type the picture name..."
-            className="
-            w-full mt-10
-            rounded-3xl
-            border-4 border-yellow-300
-            bg-yellow-50
-            px-8 py-5
-            text-center
-            text-4xl
-            font-bold
-            text-pink-600
-            placeholder:text-pink-300
-            outline-none
-            focus:border-pink-400
-            focus:bg-white
-            transition-all
-            duration-300
-            shadow-xl
-          "
-          />
+      if (e.key === "Enter") handleSubmitAnswer();
+    }}
+    autoFocus
+    placeholder="✨ Type the picture name..."
+    className="
+      w-[90%] mt-2
+      rounded-3xl
+      border-4 border-yellow-300
+      bg-yellow-50
+      px-5 py-2
+      text-center
+      text-4xl
+      font-bold
+      text-pink-600
+      placeholder:text-pink-300
+      outline-none
+      focus:border-pink-400
+      focus:bg-white
+      transition-all
+      duration-300
+      shadow-xl
+    "
+  />
 
           <button
             onClick={handleSubmitAnswer}
-            className="mt-8 px-10 py-4 bg-indigo-500 text-white rounded-full font-mochiy"
+            className="mt-4 px-10 py-4 bg-indigo-500 text-white rounded-full font-mochiy"
           >
             Submit
           </button>

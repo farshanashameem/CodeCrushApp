@@ -36,7 +36,7 @@ export const getGameDetail = createAsyncThunk< Game, string, { rejectValue: stri
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get( API_ROUTES.ADMIN.GAMES.BY_ID(id) );
-
+        console.log(response)
       return response.data.data.game;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;

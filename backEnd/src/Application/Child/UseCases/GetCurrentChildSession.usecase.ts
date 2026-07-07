@@ -24,7 +24,7 @@ export class GetCurrentChildSessionUseCase implements IGetCurrentChildSessionUse
             name: child.getName(),
             age: child.getAge(),
             avatar: child.getAvatar(),
-
+            dob: child.getDob(),
             totalPlayTime: child.getTotalPlayedTime(),
             totalGamesPlayed: child.getTotalGamesPlayed(),
             lastPlayed: child.getLastPlayed(),

@@ -3,6 +3,7 @@ import { IGetGamesUseCase } from '@/Application/Games/Interfaces/IGetGames.useca
 import { IGetAllLevelsByGameIdUseCase } from '@/Application/Games/Interfaces/Level/IGetAllLevelsByGameId.usecase';
 import { IGetLevelUseCase } from '@/Application/Games/Interfaces/Level/IGetLevel.usecase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { gameIdSchema } from '@/Presentation/Validators/Game.validator';
 import { levelIdSchema } from '@/Presentation/Validators/LevelValidator';
 import { NextFunction, Request, Response } from 'express';
@@ -22,10 +23,7 @@ export class ChildGameController {
 
             const games = await this._getGames.execute();
 
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: games
-            });
+            return sendSuccess(res, StatusCodes.OK, "", games);
 
         } catch (error) {
             next(error);
@@ -40,10 +38,7 @@ export class ChildGameController {
 
             const game = await this._getGame.execute({ gameId });
 
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: game
-            });
+            return sendSuccess(res, StatusCodes.OK, "", game);
 
         } catch (error) {
             next(error);
@@ -56,10 +51,7 @@ export class ChildGameController {
             const { gameId } = gameIdSchema.parse( req.params );
 
             const levels = await this._getAllLevel.execute( gameId );
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data: levels
-            });
+            return sendSuccess(res, StatusCodes.OK,  "", levels);
         }catch( error) {
             next( error );
         }
@@ -71,10 +63,7 @@ export class ChildGameController {
             const { levelId } = levelIdSchema.parse( req.params );
             const level = await this._getLevel.execute( {levelId} );
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data: level
-            });
+            return sendSuccess(res, StatusCodes.OK, "", level);
 
 
         }catch(error) {

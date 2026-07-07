@@ -6,7 +6,7 @@ import { resetPassword } from "../../../redux/Slices/authSlice";
 import toast from "react-hot-toast";
 
 import AuthLayout from "../../layouts/AuthLayout";
-import AuthCard from "../../components/AuthCard";
+import AuthCard from "../../SharedComponents/AuthCard";
 import icon from "../../../assets/parentIcon.png";
 
 const ResetPasswordPage = () => {

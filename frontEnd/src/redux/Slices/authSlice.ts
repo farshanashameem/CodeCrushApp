@@ -55,9 +55,7 @@ export const loginUser = createAsyncThunk< { user: User; role: UserRole }, Login
   async ({ role, data }, { rejectWithValue }) => {
     try {
       const response = await api.post( API_ROUTES.AUTH.LOGIN(role), data );
-      const user =
-        response.data.parent ||
-        response.data.admin;
+      const user = response.data.data 
 
       if (!user) {
         return rejectWithValue("Invalid login credentials");
@@ -82,7 +80,7 @@ export const adminLogin = createAsyncThunk< { admin: User }, AdminLoginPayload, 
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await api.post( API_ROUTES.ADMIN.LOGIN, { email, password } );
-
+      
       const admin = response.data.data;
 
       if (!admin) {
@@ -123,7 +121,7 @@ export const getMe = createAsyncThunk< { user: User },  void, { rejectValue: str
     try {
       const response = await api.get( API_ROUTES.AUTH.ME );
 
-      const user = response.data.user;
+      const user = response.data.data;
 
       if (!user) {
         return rejectWithValue(
@@ -171,7 +169,7 @@ export const verifyOtp = createAsyncThunk<
     try {
       const response = await api.post(  API_ROUTES.AUTH.VERIFY_OTP(role),  { email, otp, type }  );
 
-      const data = response.data;
+      const data = response.data.data;
 
       // Safe fallback assignment for nested or direct structures
       const user = data.user || data.parent || data.data?.user || data.data?.parent || data;

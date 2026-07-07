@@ -10,9 +10,11 @@ import {
   getGameDetail, getGameProgress
 } from "../../../redux/Slices/childGameSlice";
 
-import ChildLayout from "../../components/Child/ChildLayout";
+import ChildLayout from "../../SharedComponents/Child/ChildLayout";
 
 import { gameTheme } from "../../../Constants/gameTheme";
+
+const LEVELS_PER_PAGE = 8; // Adjust this number based on your layout preference
 
 const GameDetailsPage = () => {
   const { gameId } = useParams();
@@ -24,10 +26,14 @@ const GameDetailsPage = () => {
     (state: RootState) => state.childGame
   );
 
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // 1. Fetch Child Session
   useEffect(() => {
-    dispatch( getCurrentChildSession())
+    dispatch(getCurrentChildSession());
   }, [dispatch]);
 
+  // 2. Fetch Game Data
   useEffect(() => {
     if (!gameId || !currentChild) return;
 
@@ -36,6 +42,23 @@ const GameDetailsPage = () => {
     dispatch(getGameProgress({ childId: currentChild.id, gameId }));
   }, [dispatch, gameId, currentChild]);
 
+  const currentGame = currentChild?.games.find(game => game.gameId === gameId);
+  const currentLevel = currentGame?.currentLevel ?? 1;
+  const totalStars = currentGame?.totalStars ?? 0;
+
+  // 3. Dynamic Initial Page Calculation based on current active level
+  useEffect(() => {
+    if (levels.length > 0 && currentLevel) {
+      // Find the index of the level object where levelNumber equals the current child level
+      const currentLevelIndex = levels.findIndex(lvl => lvl.levelNumber === currentLevel);
+      
+      if (currentLevelIndex !== -1) {
+        const targetPage = Math.floor(currentLevelIndex / LEVELS_PER_PAGE);
+        setCurrentPage(targetPage);
+      }
+    }
+  }, [levels, currentLevel]);
+
   if (!selectedGame) return null;
 
   const theme = gameTheme[selectedGame.name as keyof typeof gameTheme] || {
@@ -43,10 +66,11 @@ const GameDetailsPage = () => {
     logo: "🎮"
   };
 
- const currentGame = currentChild?.games.find(game => game.gameId === gameId);
+  // Pagination Variables
+  const totalPages = Math.ceil(levels.length / LEVELS_PER_PAGE);
+  const startIndex = currentPage * LEVELS_PER_PAGE;
+  const paginatedLevels = levels.slice(startIndex, startIndex + LEVELS_PER_PAGE);
 
-const currentLevel = currentGame?.currentLevel ?? 1;
-const totalStars = currentGame?.totalStars ?? 0;
   return (
     <ChildLayout
       background={theme.background}
@@ -102,22 +126,55 @@ const totalStars = currentGame?.totalStars ?? 0;
 
         {/* LEVELS PATH CONTAINER */}
         <div className="mt-12 bg-white/10 backdrop-blur-sm rounded-[2.5rem] p-8 border-4 border-dashed border-white/20">
-          <div className="flex items-center gap-2 mb-8 border-b-2 border-white/10 pb-4">
-            <span className="text-3xl animate-bounce-slow">🗺️</span>
-            <h2 className="font-mochiy text-2xl text-white tracking-wide">
-              Select Your Level
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 border-b-2 border-white/10 pb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-3xl animate-bounce-slow">🗺️</span>
+              <h2 className="font-mochiy text-2xl text-white tracking-wide">
+                Select Your Level
+              </h2>
+            </div>
+
+            {/* ARCADE STYLE PAGINATION NAVIGATION */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-3 bg-black/20 p-1.5 rounded-2xl border border-white/10">
+                <button
+                  disabled={currentPage === 0}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                  className="
+                    bg-white border-2 border-slate-300 disabled:opacity-40 disabled:pointer-events-none
+                    text-slate-700 w-9 h-9 flex items-center justify-center rounded-xl font-bold shadow-[0_3px_0_#cbd5e1]
+                    active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] transition-all
+                  "
+                >
+                  ◀
+                </button>
+                <span className="font-mochiy text-xs text-white px-2 tracking-wider">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                <button
+                  disabled={currentPage === totalPages - 1}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  className="
+                    bg-white border-2 border-slate-300 disabled:opacity-40 disabled:pointer-events-none
+                    text-slate-700 w-9 h-9 flex items-center justify-center rounded-xl font-bold shadow-[0_3px_0_#cbd5e1]
+                    active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] transition-all
+                  "
+                >
+                  ▶
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* PLAYFUL PATH ROW */}
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-10">
-            {levels.map((level) => {
+          {/* PLAYFUL PATH ROW (PAGINATED VIEW) */}
+          <div className="flex flex-wrap justify-center gap-x-12 gap-y-10 min-h-[320px]">
+            {paginatedLevels.map((level) => {
               const levelProgress = progress.find((p) => p.levelId === level.id);
               const isLocked = level.levelNumber > currentLevel;
               const stars = levelProgress?.stars || 0;
 
               return (
-                <div key={level.id} className="flex flex-col items-center group relative">
+                <div key={level.id} className="flex flex-col items-center group relative animate-fade-in">
                   {!isLocked ? (
                     <>
                       {/* Active Level Node */}
@@ -192,8 +249,15 @@ const totalStars = currentGame?.totalStars ?? 0;
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
         }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
         .animate-bounce-slow {
           animation: bounceSlow 3s ease-in-out infinite;
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.2s ease-out forwards;
         }
       `}</style>
     </ChildLayout>

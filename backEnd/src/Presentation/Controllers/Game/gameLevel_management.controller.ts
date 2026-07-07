@@ -4,7 +4,9 @@ import { IGetAllLevelsByGameIdUseCase } from '@/Application/Games/Interfaces/Lev
 import { IGetLevelUseCase } from '@/Application/Games/Interfaces/Level/IGetLevel.usecase';
 import { IUpdateLevelUseCase } from '@/Application/Games/Interfaces/Level/IUpdateLevel.usecase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { addLevelSchema, gameIdSchema, levelIdSchema, updateLevelSchema } from '@/Presentation/Validators/LevelValidator';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { NextFunction, Request, Response } from 'express';
 
 
@@ -22,10 +24,12 @@ export class GameLevelController {
             const levelData = addLevelSchema.parse( req.body);
             
             const result = await this._addLevel.execute(levelData);
-             return res.status( StatusCodes.CREATED).json({
-                success: true,
-                data: result
-             });
+             return sendSuccess(
+                    res,
+                    StatusCodes.CREATED,
+                    authMessages.success.LEVEL_ADDED,
+                    result
+                );
 
         } catch( error) {
             next( error );
@@ -44,10 +48,12 @@ export class GameLevelController {
             };
 
             const result = await this._updateLevel.execute( payload );
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data: result
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.LEVEL_UPDATED,
+                result
+            );
         }catch(error) {
             next( error);
         }
@@ -59,10 +65,12 @@ export class GameLevelController {
             const { gameId } = gameIdSchema.parse( req.params );
 
             const levels = await this._getAllLevel.execute( gameId );
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data: levels
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.LEVEL_FETCHED_SUCCESSFULLY,
+                levels
+            );
         }catch( error) {
             next( error );
         }
@@ -74,9 +82,13 @@ export class GameLevelController {
 
             const { levelId } = levelIdSchema.parse( req.params );
             await this._changeStatus.execute( levelId );
-            return res.status( StatusCodes.OK).json({
-                success: true
-            });
+           await this._changeStatus.execute(levelId);
+
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.LEVEL_STATUS_UPDATED
+            );
 
         }catch( error) {
             next( error);
@@ -89,10 +101,12 @@ export class GameLevelController {
             const { levelId } = levelIdSchema.parse( req.params );
             const level = await this._getLevel.execute( {levelId} );
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                data: level
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.LEVEL_FETCHED_SUCCESSFULLY,
+                level
+            );
 
 
         }catch(error) {

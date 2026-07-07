@@ -18,6 +18,7 @@ export interface CurrentChild {
   parentId: string;
   name: string;
   age: number;
+  dob?: Date;
   avatar: string;
   totalPlayTime: number;
   totalGamesPlayed: number;

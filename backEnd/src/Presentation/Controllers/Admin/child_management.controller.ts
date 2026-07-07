@@ -1,8 +1,9 @@
-import { AdminGetChildUseCase } from '@/Application/Admin/UseCases/UserManagement/GetChild.usecase';
-import { AdminToggleChildStatus } from '@/Application/Admin/UseCases/UserManagement/ToggleChildStatus.usecase';
+import { IAdminGetChild } from '@/Application/Admin/Interfaces/UserManagement/IAdminGetChild.usecase';
 import { ToggleUserStatusInputDTO } from '@/Application/Common/dto/UserStatus.dto';
+import { IToggleUserStatusUseCase } from '@/Application/Common/Interfaces/IToggleUseStatusUserCase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
+import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { updateStatusSchema, userIdSchema } from '@/Presentation/Validators/AdminValidator';
 import { childIdSchema } from '@/Presentation/Validators/child_management.validator';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
@@ -11,8 +12,8 @@ import { NextFunction, Request, Response } from 'express';
 
 export class ChildManagementController {
     constructor (
-        private _toggleStatus: AdminToggleChildStatus,
-        private _getChild: AdminGetChildUseCase
+        private _toggleStatus: IToggleUserStatusUseCase,
+        private _getChild: IAdminGetChild
     ) {}
 
     toggleStatus = async( req: Request, res: Response, next: NextFunction ) : Promise<Response | void > => {
@@ -34,11 +35,12 @@ export class ChildManagementController {
 
             const result = await this._toggleStatus.execute( payload );
 
-            return res.status( StatusCodes.OK).json({
-                success: true,
-                message: authMessages.success.CHILD_STATUS_UPDATED,
-                data: result
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.CHILD_STATUS_UPDATED,
+                result
+            );
 
         }catch(error){
             next(error);
@@ -62,10 +64,12 @@ export class ChildManagementController {
 
             const child = await this._getChild.execute( payload );
 
-            return res.status(StatusCodes.OK).json({
-                success: true,
-                data: child,
-            });
+            return sendSuccess(
+                res,
+                StatusCodes.OK,
+                authMessages.success.USER_FETCHED_SUCCESSFULLY,
+                child
+            );
 
         }catch ( error ) {
             next( error );

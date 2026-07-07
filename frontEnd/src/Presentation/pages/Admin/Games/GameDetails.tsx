@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import InfoItem from "../../../components/InfoItem";
+import InfoItem from "../../../SharedComponents/InfoItem";
 import type { AppDispatch, RootState } from "../../../../redux/store";
-import ConfirmationModal from "../../../components/ConfirmationModal";
+import ConfirmationModal from "../../../SharedComponents/ConfirmationModal";
 import AdminDashboardLayout from "../../../layouts/AdminDashboardLayout";
 import { gameImages } from "../../../../Constants/gameImages";
 import { getGameDetail, toggleGameStatus } from "../../../../redux/Slices/gameSlice";

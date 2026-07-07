@@ -13,6 +13,8 @@ import { avatarMap } from "../../../Constants/avatarMap";
 import { gameImages } from "../../../Constants/gameImages";
 
 import background from "../../../assets/kids-bg.png";
+import BirthdayCelebration from "./BirthdayCelebration";
+import BackgroundMusic from "../../SharedComponents/Games/BackgroundMusic";
 
 const gameSkills: Record<string, { label: string; bg: string; text: string }[]> = {
   "Mouse Trackers": [
@@ -38,15 +40,31 @@ const ChildHomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const { games, currentChild } = useSelector((state: RootState) => state.childGame);
-
-  
-
+  const [showBirthday, setShowBirthday] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
  useEffect(() => {
   dispatch(getCurrentChildSession());
   dispatch(fetchGames());
 }, [dispatch]);
+
+
+useEffect(() => {
+  if (!currentChild?.dob) return;
+
+  const today = new Date();
+  const dob = new Date(currentChild.dob);
+
+  const isBirthday =
+    today.getDate() === dob.getDate() &&
+    today.getMonth() === dob.getMonth();
+
+    const birthdayKey = `birthday-${currentChild.id}-${today.getFullYear()}`;
+
+  if (isBirthday && !sessionStorage.getItem(birthdayKey)) {
+    setShowBirthday(true);
+  }
+}, [currentChild]);
 
   const handleExit = async () => {
     try {
@@ -65,7 +83,7 @@ const ChildHomePage = () => {
       }}
     >
       
-
+      <BackgroundMusic paused={showBirthday} />
       {/* HEADER */}
       <header className="flex justify-between items-center px-6 md:px-12 py-6 bg-white/40 backdrop-blur-md border-b-4 border-dashed border-indigo-200 sticky top-0 z-40">
         <div className="animate-bounce-slow">
@@ -258,6 +276,21 @@ const ChildHomePage = () => {
           animation: fadeInDown 0.2s ease-out forwards;
         }
       `}</style>
+
+
+        {showBirthday && currentChild && (
+          <BirthdayCelebration
+            childName={currentChild.name}
+            age={currentChild.age}
+            onContinue={() => {
+                const key = `birthday-${currentChild.id}-${new Date().getFullYear()}`;
+
+                sessionStorage.setItem(key, "true");
+                setShowBirthday(false);
+              }}
+          />
+        )}
+
     </div>
   );
 };

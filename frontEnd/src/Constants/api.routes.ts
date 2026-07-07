@@ -54,6 +54,7 @@ export const API_ROUTES = {
       STATUS: (id: string) => `/auth/admin/levels/${id}/status`,
       BY_GAME: (gameId: string) => `/auth/admin/games/${gameId}/levels`,
       UPDATE: (id: string) => `/auth/admin/levels/${id}`,
+      
     },
 
     ICONS: {

@@ -124,4 +124,4 @@ const LevelResultModal = ({
   );
 };
 
-export default LevelResultModal;
+//export default LevelResultModal;

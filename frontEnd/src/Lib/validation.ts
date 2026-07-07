@@ -142,61 +142,75 @@ export const updateProfileSchema = z.object({
   }
 );
 
-export const addChildSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "Name must be at least 2 characters")
-    .max(30, "Name must be at most 30 characters")
-    .regex(
-      /^[A-Za-z]+( [A-Za-z]+)*$/,
-      "Name must contain only letters"
-    ),
+const childSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, "Name must be at least 2 characters")
+      .max(30, "Name must be at most 30 characters")
+      .regex(/^[A-Za-z]+( [A-Za-z]+)*$/, "Name must contain only letters"),
 
-  age: z.coerce
-    .number()
-    .min(1, "Age must be at least 1")
-    .max(18, "Age must be less than or equal to 18"),
+    age: z.coerce
+      .number()
+      .min(1, "Age must be at least 1")
+      .max(18, "Age must be less than or equal to 18"),
 
-  avatar: z
-    .string()
-    .trim()
-    .min(1, "Please select an avatar"),
+    avatar: z
+      .string()
+      .trim()
+      .min(1, "Please select an avatar"),
 
-  dob: z
-    .string()
-    .optional(),
-});
+    dob: z.string().min(1, "Date of birth is required"),
+  })
+  .superRefine(({ age, dob }, ctx) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
 
-export const updateChildSchema = z.object({
-  id: z
-    .string()
-    .trim()
-    .min(1, "Child id is required"),
+    // Invalid date
+    if (isNaN(birthDate.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dob"],
+        message: "Invalid date of birth",
+      });
+      return;
+    }
 
-  name: z
-    .string()
-    .trim()
-    .min(2, "Name must be at least 2 characters")
-    .max(30, "Name must be at most 30 characters")
-    .regex(
-      /^[A-Za-z]+( [A-Za-z]+)*$/,
-      "Name must contain only letters"
-    ),
+    // Future date
+    if (birthDate > today) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dob"],
+        message: "Date of birth cannot be in the future",
+      });
+      return;
+    }
 
-  age: z.coerce
-    .number()
-    .min(1, "Age must be at least 1")
-    .max(18, "Age must be less than or equal to 18"),
+    // Calculate actual age
+    let actualAge = today.getFullYear() - birthDate.getFullYear();
 
-  avatar: z
-    .string()
-    .trim()
-    .min(1, "Please select an avatar"),
+    const birthdayPassed =
+      today.getMonth() > birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() >= birthDate.getDate());
 
-  dob: z
-    .string()
-    .optional(),
+    if (!birthdayPassed) actualAge--;
+
+    if (actualAge !== age) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["age"],
+        message: `Age should be ${actualAge} based on the selected date of birth`,
+      });
+    }
+  });
+
+
+export const addChildSchema = childSchema;
+
+export const updateChildSchema = childSchema.extend({
+  id: z.string().trim().min(1, "Child id is required"),
 });
 
 
