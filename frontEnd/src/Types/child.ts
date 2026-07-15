@@ -24,6 +24,9 @@ export interface CurrentChild {
   totalGamesPlayed: number;
   lastPlayed?: string;
 
+  isPremium: boolean
+  
+
   games: {
     gameId: string;
     gameName: string;

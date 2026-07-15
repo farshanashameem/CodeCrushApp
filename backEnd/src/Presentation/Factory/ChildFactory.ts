@@ -32,6 +32,7 @@ import { LevelRepository } from '@/Infrastructure/Repositories/Level.repository'
 import { ImageRepository } from '@/Infrastructure/Repositories/Image.repository';
 import { IconRepository } from '@/Infrastructure/Repositories/Icon.repository';
 import { ProgressRepository } from '@/Infrastructure/Repositories/Progress.repository';
+import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
 
 //Services
 import { TokenService } from '@/Infrastructure/Services/TokenService';
@@ -44,6 +45,7 @@ const levelRepository = new LevelRepository();
 const imageRepository = new ImageRepository();
 const iconRepository = new IconRepository();
 const progressRepository = new ProgressRepository();
+const parentRepository = new ParentRepository();
 
 const tokenService = new TokenService();
 
@@ -82,7 +84,8 @@ const getLevelUseCase = new GetLevelUseCase(
 const submitLevelUseCase = new SubmitLevelUseCase(
     progressRepository,
     childRepository,
-    gameRepository
+    gameRepository,
+    parentRepository
 );
 
 const getGameProgressUseCase = new GetGameProgressUseCase(
@@ -92,11 +95,16 @@ const getGameProgressUseCase = new GetGameProgressUseCase(
 );
 
 const getCurrentChildSessionUsecase = new GetCurrentChildSessionUseCase(
-    childRepository
+    childRepository, 
+    parentRepository
 );
 
 const getLevelProgressUseCase = new GetLevelProgressUseCase(
-    progressRepository,childRepository,gameRepository
+    progressRepository,
+    childRepository,
+    gameRepository,
+    parentRepository,
+    levelRepository
 );
 
 export const startChildSessionController = new StartChildSessionController(

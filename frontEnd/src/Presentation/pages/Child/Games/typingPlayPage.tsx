@@ -240,6 +240,7 @@ const TypingPlayPage = () => {
       child={currentChild}
       logo={theme.logo}
       title={selectedGame.name}
+      isPremium= { currentChild?.isPremium}
     >
       <div className="max-w-6xl mx-auto px-6 pt-2 pb-10">
         {!showSuccess && !showFailure && (

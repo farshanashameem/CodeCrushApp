@@ -17,7 +17,7 @@ export class IconRepository extends BaseRepository< IconEntity, IIcon> implement
     }
 
     async getByNameKeyAndColor(name: string, key: string, color: string): Promise<IconEntity | null> {
-        const result = await this._model.findOne({name: name, iconKey: key});
+        const result = await this._model.findOne({name: name, iconKey: key, color: color});
         return result?this.mapToEntity(result) : null;
     }
 

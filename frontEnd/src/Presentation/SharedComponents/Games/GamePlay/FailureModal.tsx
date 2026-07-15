@@ -1,6 +1,5 @@
 import { useMemo, useEffect, useRef } from "react";
 import { gameTheme } from "../../../../Constants/gameTheme";
-// Import your sad audio file here
 import failureMusic from "../../../../assets/sad.mp3"; 
 
 interface FailureModalProps {

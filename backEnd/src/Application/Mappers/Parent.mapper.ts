@@ -4,7 +4,7 @@ import { IParent } from '@/Infrastructure/Database/Model/ParentModel';
 
 export class ParentMapper {
 
-    // DB → Domain
+    // DB → Entity
     static toEntity(doc: IParent): ParentEntity {
 
         return new ParentEntity(
@@ -15,12 +15,17 @@ export class ParentMapper {
             doc.childrenIds?.map(id => id.toString()) ?? [],
             doc.status,
             doc.refreshToken ?? '',
+            doc.pendingChildCredits,
+            doc.isPremium,
+            doc.subscriptionPlan,
+            doc.subscriptionStartDate,
+            doc.subscriptionExpiryDate,
             doc.createdAt,
             doc.updatedAt
         );
     }
 
-    // Domain → DB
+    // Entity → DB
     static toDocument(entity: ParentEntity) {
 
         return {
@@ -31,7 +36,13 @@ export class ParentMapper {
             status: entity.getStatus(),
 
             childrenIds: entity.getChildrenIds(),
-            refreshToken: entity.getRefreshToken()
+            refreshToken: entity.getRefreshToken(),
+            pendingChildCredits: entity.getPendingChildCredits(),
+
+            isPremium: entity.getIsPremium(),
+            subscriptionPlan: entity.getSubscriptionPlan(),
+            subscriptionStartDate: entity.getSubscriptionStartDate(),
+            subscriptionExpiryDate: entity.getSubscriptionExpiryDate(),
         };
     }
 }

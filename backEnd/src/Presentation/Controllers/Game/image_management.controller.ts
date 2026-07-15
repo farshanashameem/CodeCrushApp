@@ -79,7 +79,7 @@ export class ImageManagementController {
             return sendSuccess(
                 res,
                 StatusCodes.OK,
-                "",
+                '',
                 images
             );
 
@@ -96,7 +96,7 @@ export class ImageManagementController {
             return sendSuccess(
                 res,
                 StatusCodes.OK,
-                "",
+                '',
                 image
             );
 

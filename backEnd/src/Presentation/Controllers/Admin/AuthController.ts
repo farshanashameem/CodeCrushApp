@@ -39,7 +39,7 @@ export class AdminAuthController {
                 maxAge: env.JWT_REFRESH_TOKEN_MAX_AGE,
                 path: '/'
             });
-            console.log( "admin data",admin)
+            
             return sendSuccess(
                     res,
                     StatusCodes.OK,

@@ -8,12 +8,16 @@ import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { GetLevelProgressInputDTO, GetLevelProgressOutputDTO } from '../dto/GetLevelProgressInfo.dto';
 import { IGetLevelProgressInfoUseCase } from '../Interfaces/IGetLevelProgress.usecase';
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { ILevelRepository } from '@/Domain/RepositoryInterface/ILevel.repository';
 
 export class GetLevelProgressUseCase implements IGetLevelProgressInfoUseCase {
     constructor(
         private _progressRepo: IProgressRepository,
         private _childRepo: IChildRepository,
-        private _gameRepo: IGameRepository
+        private _gameRepo: IGameRepository,
+        private _parentRepo: IParentRepository,
+        private _levelRepo: ILevelRepository
     ) {}
 
     async execute( input: GetLevelProgressInputDTO ): Promise<GetLevelProgressOutputDTO> {
@@ -24,6 +28,32 @@ export class GetLevelProgressUseCase implements IGetLevelProgressInfoUseCase {
             throw new AppError( authMessages.error.CHILD_NOT_FOUND, StatusCodes.NOT_FOUND );
         }
 
+        const parent = await this._parentRepo.findById(child.getParentId()!);
+        if( !parent ) {
+            throw new AppError( authMessages.error.PARENT_NOT_FOUND, StatusCodes.NOT_FOUND);
+        }
+
+        const currentLevel = await this._levelRepo.findById(input.levelId);
+        if(!currentLevel ) {
+            throw new AppError( authMessages.error.LEVEL_NOT_FOUND, StatusCodes.NOT_FOUND);
+        }
+        const levelNumber = currentLevel?.getLevelNumber();
+        const isFreeLevel = levelNumber <= 5;
+
+        const isPremium = parent?.getIsPremium() ;
+        const today = new Date();
+        const lastReset = child.getDailyLevelCountDate();
+        const isSameDay = lastReset &&  lastReset.toDateString() === today.toDateString();
+
+        if (!isSameDay) {
+            child.resetDailyLevelCount(today);
+            await this._childRepo.save(child);
+        }
+
+        const canPlay = isPremium || isFreeLevel || child.getDailyLevelCount() < 3;
+
+        const reason = canPlay ? undefined
+                        : "You have reached today's free play limit.";
         const game = await this._gameRepo.getGameById(input.gameId);
 
         if (!game) {
@@ -45,6 +75,8 @@ export class GetLevelProgressUseCase implements IGetLevelProgressInfoUseCase {
                 totalAttempts: 0,
                 bestTime: 0,
                 totalMistakes: 0,
+                canPlay,
+                reason
             };
         }
 
@@ -57,6 +89,8 @@ export class GetLevelProgressUseCase implements IGetLevelProgressInfoUseCase {
             bestTime: progress.getBestTime(),
             totalMistakes: progress.getTotalMistakes(),
             lastPlayedAt: progress.getLastPlayedAt(),
+            canPlay,
+            reason
         };
     }
 }

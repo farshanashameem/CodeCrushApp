@@ -26,6 +26,6 @@ export class StartChildSessionController {
       maxAge: env.CHILD_SESSION_TOKEN_MAX_AGE,
     });
 
-    return sendSuccess(res, StatusCodes.OK, "", result);
+    return sendSuccess(res, StatusCodes.OK, '', result);
   };
 }

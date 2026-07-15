@@ -13,6 +13,8 @@ import {
 } from "../../../redux/Slices/ChildManagementSlice";
 
 import type { AppDispatch, RootState } from "../../../redux/store";
+import type { AddChildPayload } from "../../../Types/ChildManagement";
+import RazorpayPaymentModal from "../../SharedComponents/RazorpayPaymentModal";
 
 const AddChildPage = () => {
   const navigate = useNavigate();
@@ -30,6 +32,8 @@ const AddChildPage = () => {
   const [age, setAge] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState("");
+  const [pendingChild, setPendingChild] = useState<AddChildPayload | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
 
   const selectedAvatarImage =
     avatarMap[selectedAvatar as keyof typeof avatarMap];
@@ -94,17 +98,25 @@ const AddChildPage = () => {
           return;
         }
 
+        setPendingChild(validation.data);
+
         await dispatch(addChild(validation.data)).unwrap();
         toast.success("Explorer added");
       }
 
       navigate("/parent/dashboard");
     } catch (error: any) {
+      if( error.status === 402 ) {
+        setShowPayment(true);
+        return;
+      }
       toast.error(error || "Something went wrong");
     }
   };
 
   return (
+
+    
     <AuthLayout>
       <div
         className={`w-full max-w-5xl mx-auto px-6 py-8 transition-all duration-700 ${
@@ -244,6 +256,24 @@ const AddChildPage = () => {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
       `}</style>
+
+      <RazorpayPaymentModal
+          open={showPayment}
+          type="ADD_CHILD"
+          onClose={() => setShowPayment(false)}
+          onSuccess={async () => {
+            if (!pendingChild) return;
+
+            await dispatch(addChild(pendingChild)).unwrap();
+
+            toast.success("Explorer added");
+
+            navigate("/parent/dashboard");
+          }}
+        />
+
+
+
     </AuthLayout>
   );
 };

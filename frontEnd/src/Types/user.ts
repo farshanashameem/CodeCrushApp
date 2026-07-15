@@ -1,11 +1,18 @@
+import type { SubscriptionPlan } from "../Constants/payment";
 import type { UserRole } from "../Constants/Role";
+ interface Subscription {
+  isPremium: boolean;
+  plan?: SubscriptionPlan;
+  expiresAt?: Date;
+  daysRemaining?: number;
+}
 export interface User {
     id: string;
     email: string;
     name: string;
     role: string;
     
-
+    subscription?: Subscription;
 }
 
 export interface AuthState {

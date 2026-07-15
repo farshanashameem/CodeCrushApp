@@ -4,7 +4,6 @@ import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from '../dto/chan
 import { AppError } from '@/Domain/Errors/app.error';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
-import GameEntity from '@/Domain/Entities/game.entity';
 
 export class ChangeGameStatusUseCase implements IChangeGameStatusUseCase {
 

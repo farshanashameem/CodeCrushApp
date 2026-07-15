@@ -19,7 +19,7 @@ export class GetCurrentChildSessionController {
             }
 
             const result = await this._getCurrentChildSessionUseCase.execute( req.childId);
-            return sendSuccess(res, StatusCodes.OK, "", result);
+            return sendSuccess(res, StatusCodes.OK, '', result);
 
         }catch(error) {
             next( error);

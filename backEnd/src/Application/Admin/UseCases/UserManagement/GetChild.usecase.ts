@@ -1,13 +1,13 @@
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { IAdminGetChild } from "../../Interfaces/UserManagement/IAdminGetChild.usecase";
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { IAdminGetChild } from '../../Interfaces/UserManagement/IAdminGetChild.usecase';
 import {
   AdminGetChildInputDTO,
   GetChildDetailOutputDTO,
-} from "../../dto/UserManagement/getChildDetails.dto";
-import { AppError } from "@/Domain/Errors/app.error";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { ChildGameDTO } from "@/Application/Parent/dto/ChildGame.dto";
+} from '../../dto/UserManagement/getChildDetails.dto';
+import { AppError } from '@/Domain/Errors/app.error';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { ChildGameDTO } from '@/Application/Parent/dto/ChildGame.dto';
 
 export class AdminGetChildUseCase implements IAdminGetChild {
   constructor(private _childRepo: IChildRepository) {}

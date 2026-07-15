@@ -8,7 +8,7 @@ import { AppError } from '@/Domain/Errors/app.error';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { IImageRepository } from '@/Domain/RepositoryInterface/IImage.repository';
-import { LevelConfigResponse } from '@/Domain/Types/Config';
+import { ColorSorterConfig, LevelConfigResponse } from '@/Domain/Types/Config';
 import { IIconRepository } from '@/Domain/RepositoryInterface/IIcon.repository';
 
 export class GetLevelUseCase implements IGetLevelUseCase {
@@ -46,9 +46,10 @@ export class GetLevelUseCase implements IGetLevelUseCase {
       config = { steps };
     }
 
+    const colorConfig = config as ColorSorterConfig;
     if ('items' in config && 'targetColors' in config) {
     const items = await Promise.all(
-        config.items.map(async (item) => {
+        colorConfig.items.map(async (item) => {
             const icon = await this._iconRepo.findById(item.iconId);
 
             return {

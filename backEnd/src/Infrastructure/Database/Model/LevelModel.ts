@@ -1,3 +1,4 @@
+import { LevelConfig } from '@/Domain/Types/Config';
 import mongoose, { Types, Document, Schema, Model } from 'mongoose';
 
 export interface ILevel extends Document {
@@ -13,7 +14,7 @@ export interface ILevel extends Document {
 
     maxScore: number;
 
-    config: any;
+    config: LevelConfig;
 
     isActive: boolean;
 

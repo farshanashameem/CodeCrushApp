@@ -10,7 +10,7 @@ import puzzleLogo from "../assets/game-logos/puzzle-logo.png";
 
 
 import mouseSuccessImg from "../assets/games/mt-success.png"
-import mouseFailureImg from "../assets/games/cc-failure.png"
+import mouseFailureImg from "../assets/games/mt-failure.png"
 import typingSuccessImg from "../assets/games/tt-success.png"
 import typingFailureImg from "../assets/games/tt-failure.png"
 import colorSuccessImg from "../assets/games/cc-success.png"

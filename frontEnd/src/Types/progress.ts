@@ -46,4 +46,6 @@ export interface LevelProgressDetails {
   bestTime: number;
   totalMistakes: number;
   lastPlayedAt?: Date;
+  canPlay: boolean;
+  reason?: string;
 }

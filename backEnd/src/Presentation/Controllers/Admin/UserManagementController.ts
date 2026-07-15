@@ -6,7 +6,6 @@ import { ToggleUserStatusInputDTO } from '@/Application/Common/dto/UserStatus.dt
 import { IToggleUserStatusUseCase } from '@/Application/Common/Interfaces/IToggleUseStatusUserCase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
-import logger from '@/Infrastructure/Services/Logger';
 import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import {
   QuerySchema,

@@ -122,14 +122,24 @@ const MouseTrackerPlayPage = () => {
     const pos = getMousePos(e);
 
     if (!isOnRoad(pos.x, pos.y)) {
-      isMouseDown.current = false;
-      setDrawing(false);
-      setWrongAnswers((prev) => prev + 1);
-      setTimeLeft((prev) => Math.max(0, prev - 3));
-      setSegments([]);
-      stopDragSound();
-      return;
+  isMouseDown.current = false;
+  setDrawing(false);
+  setWrongAnswers((prev) => prev + 1);
+  setSegments([]);
+  stopDragSound();
+
+  setTimeLeft((prev) => {
+    const next = Math.max(0, prev - 3);
+
+    if (next === 0) {
+      setTimeout(() => failLevel(), 0);
     }
+
+    return next;
+  });
+
+  return;
+}
 
     setSegments((prev) => [...prev, pos]);
     playDragSound();
@@ -216,12 +226,16 @@ const MouseTrackerPlayPage = () => {
 
     setGameFinished(true);
     const timeTaken = selectedLevel.timer - timeLeft;
-    const baseScore = 100;
-    const mistakePenalty = wrongAnswers * 2;
-    const finalScore = Math.max(0, baseScore - mistakePenalty);
+
+    // Corrected Dynamic Score Calculation
+    const baseScore = selectedLevel.maxScore;
+    const penaltyPerMistake = baseScore * 0.02; // Each mistake loses 2% of the max score
+    const mistakePenalty = wrongAnswers * penaltyPerMistake;
+    const finalScore = Math.max(0, Math.round(baseScore - mistakePenalty));
 
     setScore(finalScore);
 
+    // Percentage is always safely scaled between 0 and 100 now
     const percentage = (finalScore / selectedLevel.maxScore) * 100;
     let earnedStars = 1;
     if (percentage >= 90) earnedStars = 3;
@@ -282,6 +296,7 @@ const MouseTrackerPlayPage = () => {
   };
 
   const failLevel = async () => {
+    
     if (gameFinished || !selectedLevel) return;
 
     setGameFinished(true);
@@ -314,6 +329,7 @@ const MouseTrackerPlayPage = () => {
       child={currentChild}
       logo={theme.logo}
       title={selectedGame.name}
+      isPremium= { currentChild?.isPremium}
     >
       <div className="max-w-6xl mx-auto px-4 md:px-6 pt-3 pb-10 font-sans select-none">
         {!showSuccess && !showFailure && (
@@ -332,12 +348,12 @@ const MouseTrackerPlayPage = () => {
             ✨ Follow the Magic Road! ✨
           </h2>
 
-          {/* Wrapper container handles fluid constraint sizing */}
-          <div className="relative w-full max-w-3xl mx-auto rounded-2xl overflow-hidden bg-emerald-100 p-1 shadow-inner aspect-[8/5]">
+          {/* Wrapper container updated with spacing padding and overflow properties */}
+          <div className="relative w-full max-w-3xl mx-auto rounded-2xl bg-emerald-100 p-6 shadow-inner aspect-[8/5] overflow-visible">
             <svg
               ref={svgRef}
               viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-              className="w-full h-full rounded-xl bg-gradient-to-br from-emerald-300 to-green-400 cursor-pointer shadow-md transition-all duration-150 touch-none"
+              className="w-full h-full rounded-xl bg-gradient-to-br from-emerald-300 to-green-400 cursor-pointer shadow-md transition-all duration-150 touch-none overflow-visible"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={stopDrawing}
@@ -388,40 +404,71 @@ const MouseTrackerPlayPage = () => {
               })}
 
               {/* STARTING POINT INDICATOR */}
-              {startPoint && (
-                <g transform={`translate(${startPoint.x * SVG_WIDTH}, ${startPoint.y * SVG_HEIGHT})`} className="animate-pulse">
-                  <circle r={pathWidth / 1.5} fill="#22c55e" stroke="white" strokeWidth={4} className="shadow" />
-                  <circle r={pathWidth / 2.2} fill="#16a34a" />
-                  <text
-                    textAnchor="middle"
-                    y={5}
-                    fill="white"
-                    fontWeight="bold"
-                    fontSize="12px"
-                    className="pointer-events-none select-none tracking-tight"
-                  >
-                    START
-                  </text>
-                </g>
-              )}
+              {startPoint && (() => {
+                const startX = startPoint.x * SVG_WIDTH;
+                const startY = startPoint.y * SVG_HEIGHT;
+                // Avoid edge clipping: shift label down if the node is at the top 15% of the SVG
+                const labelYOffset = startY < (SVG_HEIGHT * 0.15) ? 28 : -28;
+
+                return (
+                  <g transform={`translate(${startX}, ${startY})`}>
+                    {/* Subtle pulsing background ring */}
+                    <circle r={22} fill="#22c55e" opacity="0.4" className="animate-ping" />
+                    {/* Inner base circle */}
+                    <circle r={14} fill="#22c55e" stroke="white" strokeWidth={2.5} />
+                    {/* Play Icon (Start Symbol) */}
+                    <polygon points="-3,-5 6,0 -3,5" fill="white" />
+                    
+                    {/* Smart Positioning Label Badge */}
+                    <g transform={`translate(0, ${labelYOffset})`}>
+                      <rect x="-24" y="-10" width="48" height="18" rx="4" fill="#15803d" stroke="white" strokeWidth="1.5" />
+                      <text
+                        textAnchor="middle"
+                        y="2"
+                        fill="white"
+                        fontWeight="bold"
+                        fontSize="9px"
+                        className="pointer-events-none select-none tracking-wider"
+                      >
+                        START
+                      </text>
+                    </g>
+                  </g>
+                );
+              })()}
 
               {/* ENDING POINT INDICATOR */}
-              {endPoint && (
-                <g transform={`translate(${endPoint.x * SVG_WIDTH}, ${endPoint.y * SVG_HEIGHT})`}>
-                  <circle r={pathWidth / 1.5} fill="#ef4444" stroke="white" strokeWidth={4} />
-                  <circle r={pathWidth / 2.2} fill="#dc2626" />
-                  <text
-                    textAnchor="middle"
-                    y={5}
-                    fill="white"
-                    fontWeight="bold"
-                    fontSize="11px"
-                    className="pointer-events-none select-none tracking-tight"
-                  >
-                    FINISH
-                  </text>
-                </g>
-              )}
+              {endPoint && (() => {
+                const endX = endPoint.x * SVG_WIDTH;
+                const endY = endPoint.y * SVG_HEIGHT;
+                // Avoid edge clipping: shift label down if the node is at the top 15% of the SVG
+                const labelYOffset = endY < (SVG_HEIGHT * 0.15) ? 28 : -28;
+
+                return (
+                  <g transform={`translate(${endX}, ${endY})`}>
+                    {/* Inner base circle */}
+                    <circle r={14} fill="#ef4444" stroke="white" strokeWidth={2.5} />
+                    
+                    {/* Miniature Trophy/Star Icon inside Finish node */}
+                    <path d="M-5,-4 L5,-4 L3,1 L-3,1 Z M-1,1 L1,1 L1,5 L-1,5 Z M-3,5 L3,5" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
+                    
+                    {/* Smart Positioning Label Badge */}
+                    <g transform={`translate(0, ${labelYOffset})`}>
+                      <rect x="-26" y="-10" width="52" height="18" rx="4" fill="#b91c1c" stroke="white" strokeWidth="1.5" />
+                      <text
+                        textAnchor="middle"
+                        y="2"
+                        fill="white"
+                        fontWeight="bold"
+                        fontSize="9px"
+                        className="pointer-events-none select-none tracking-wider"
+                      >
+                        FINISH
+                      </text>
+                    </g>
+                  </g>
+                );
+              })()}
             </svg>
           </div>
 

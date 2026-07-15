@@ -338,6 +338,7 @@ const ColorSorterPlayPage = () => {
       child={currentChild}
       logo={theme.logo}
       title={selectedGame.name}
+      isPremium= { currentChild?.isPremium}
     >
       <div className="relative max-w-6xl mx-auto h-[calc(100vh-90px)] px-6 py-4 flex flex-col">
         {!showSuccess && !showFailure && (
@@ -351,7 +352,7 @@ const ColorSorterPlayPage = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col overflow-hidden rounded-[40px] p-6 bg-orange-500/40">
+        <div className="flex-1 flex flex-col overflow-hidden rounded-[40px] p-6 bg-white/50 shadow-xl backdrop-blur-sm">
           {/* Target Color */}
           <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">

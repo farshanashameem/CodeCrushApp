@@ -14,6 +14,6 @@ export class EndChildSessionController {
 
     res.clearCookie('childSession');
 
-   return sendSuccess(res, StatusCodes.OK, "", null);
+   return sendSuccess(res, StatusCodes.OK, '', null);
   };
 }

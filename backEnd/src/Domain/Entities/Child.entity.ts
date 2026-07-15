@@ -18,6 +18,8 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
   private totalPlayTime: number;
   private totalGamesPlayed: number;
   private lastPlayed?: Date;
+  private _dailyLevelCount: number;
+  private _dailyLevelCountDate?: Date;
   private games: ChildGameEntity[];
 
   constructor(
@@ -33,6 +35,8 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     totalPlayedTime: number = 0,
     totalGamesPlayed: number = 0,
     lastPlayed?: Date,
+    dailyLevelCount = 0,
+    dailyLevelCountDate?: Date,
     games: ChildGameEntity[] = [],
   ) {
     super(status);
@@ -48,6 +52,8 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     this.totalGamesPlayed = totalGamesPlayed;
     this.totalPlayTime = totalPlayedTime;
     this.lastPlayed = lastPlayed;
+    this._dailyLevelCount = dailyLevelCount;
+    this._dailyLevelCountDate = dailyLevelCountDate;
     this.games = games;
   }
 
@@ -93,6 +99,14 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
 
   public getLastPlayed(): Date | undefined {
     return this.lastPlayed;
+  }
+
+  getDailyLevelCount(): number {
+      return this._dailyLevelCount;
+  }
+
+  getDailyLevelCountDate(): Date | undefined {
+      return this._dailyLevelCountDate;
   }
 
   public getTotalGamesPlayed(): number {
@@ -144,6 +158,15 @@ public setTotalGamesPlayed(count: number): void {
 
 public addGame(game: ChildGameEntity): void {
   this.games.push(game);
+}
+
+resetDailyLevelCount(date: Date): void {
+    this._dailyLevelCount = 0;
+    this._dailyLevelCountDate = date;
+}
+
+incrementDailyLevelCount(): void {
+    this._dailyLevelCount += 1;
 }
 
 }
