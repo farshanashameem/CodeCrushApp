@@ -4,10 +4,12 @@ import { GetCurrentChildSessionOutputDTO } from '../dto/GetCurrentChildSession.d
 import { AppError } from '@/Domain/Errors/app.error';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
 
 export class GetCurrentChildSessionUseCase implements IGetCurrentChildSessionUseCase {
     constructor(
-        private _childRepository: IChildRepository
+        private _childRepository: IChildRepository,
+        private _parentRepository: IParentRepository
     ) {}
 
     async execute(childId: string): Promise<GetCurrentChildSessionOutputDTO> {
@@ -17,6 +19,10 @@ export class GetCurrentChildSessionUseCase implements IGetCurrentChildSessionUse
         throw new AppError( authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED  );
     }
 
+    const parent = await this._parentRepository.findById( child.getParentId()!);
+    if( !parent ) {
+        throw new AppError( authMessages.error.PARENT_NOT_FOUND, StatusCodes.NOT_FOUND);
+    }
     return {
         child: {
             id: child.getId()!,
@@ -28,6 +34,8 @@ export class GetCurrentChildSessionUseCase implements IGetCurrentChildSessionUse
             totalPlayTime: child.getTotalPlayedTime(),
             totalGamesPlayed: child.getTotalGamesPlayed(),
             lastPlayed: child.getLastPlayed(),
+
+            isPremium: parent.getIsPremium(),
 
             games: child.getGames().map(game => ({
                 gameId: game.getGameId(),

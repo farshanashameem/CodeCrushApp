@@ -1,5 +1,5 @@
 export interface DeleteIconInputDTO {
-    iconId: string;
+    id: string;
 }
 
 export interface DeleteIconOutputDTO {

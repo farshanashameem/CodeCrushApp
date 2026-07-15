@@ -3,7 +3,6 @@ import { IAddChildUseCase } from '@/Application/Parent/Interfaces/ChildManagemen
 import { IParentGetChildrenUseCase } from '@/Application/Parent/Interfaces/ChildManagementInterfaces/IGetChildrenUseCase';
 import { IParentGetChildUseCase } from '@/Application/Parent/Interfaces/ChildManagementInterfaces/IGetChildUseCase';
 import { IUpdateChildUseCase } from '@/Application/Parent/Interfaces/ChildManagementInterfaces/IUpdateChildUseCase';
-import { ParentToggleUserStatus } from '@/Application/Parent/useCases/ChildManagement/ToggleUserStatus.usecase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
 import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
@@ -33,7 +32,7 @@ export class ChildManagementController {
             const children = await this._getAllChildren.execute(payload);
             
 
-            return sendSuccess(res, StatusCodes.OK, "", children);
+            return sendSuccess(res, StatusCodes.OK, '', children);
 
         } catch (err) {
             next(err);
@@ -53,7 +52,7 @@ export class ChildManagementController {
                 parentId, ...childData
             };
             const child = await this._addChild.execute(payload);
-            return sendSuccess(res, StatusCodes.CREATED, "", child);
+            return sendSuccess(res, StatusCodes.CREATED, '', child);
         }catch(err) {
             next(err);
         }
@@ -71,7 +70,7 @@ export class ChildManagementController {
 
         const child = await this._getChild.execute({id: childId, parentId});
 
-        return sendSuccess(res, StatusCodes.OK,"", child);;
+        return sendSuccess(res, StatusCodes.OK,'', child);;
         } catch (error) {
             next(error);
         }
@@ -92,7 +91,7 @@ export class ChildManagementController {
            };
            const child = await this._updateChild.execute( payload );
            
-           return sendSuccess(res, StatusCodes.OK, "", child);
+           return sendSuccess(res, StatusCodes.OK, '', child);
 
         }catch(error) {
             next( error);
@@ -117,7 +116,7 @@ export class ChildManagementController {
             };
 
             const result = await this._toggleChildStatus.execute( payload );
-            return sendSuccess(res, StatusCodes.OK, "", result);
+            return sendSuccess(res, StatusCodes.OK, '', result);
 
         }catch(error) {
             next ( error );

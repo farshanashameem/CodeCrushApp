@@ -18,9 +18,7 @@ export class CreateImageUseCase implements ICreateImageUseCase {
         
         const image = await this._imageRepo.getByName( input.name.toLowerCase());
 
-        if( image ) {
-            throw new AppError ( authMessages.error.IMAGE_ALREADY_EXISTS, StatusCodes.CONFLICT);
-        }
+      
 
         const item = new ImageEntity(
             input.name,

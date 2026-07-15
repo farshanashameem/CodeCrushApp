@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-
+import toast from "react-hot-toast";
 import type { AppDispatch, RootState } from "../../../redux/store";
 
 import {
@@ -35,12 +35,19 @@ const GameDetailsPage = () => {
 
   // 2. Fetch Game Data
   useEffect(() => {
-    if (!gameId || !currentChild) return;
+  if (!gameId || !currentChild) return;
 
-    dispatch(getGameDetail(gameId));
-    dispatch(fetchLevelsByGame(gameId));
-    dispatch(getGameProgress({ childId: currentChild.id, gameId }));
-  }, [dispatch, gameId, currentChild]);
+  dispatch(getGameDetail(gameId))
+    .unwrap()
+    .then(() => {
+      dispatch(fetchLevelsByGame(gameId));
+      dispatch(getGameProgress({ childId: currentChild.id, gameId }));
+    })
+    .catch(() => {
+      toast.error("This game is currently unavailable.");
+      navigate(-1);
+    });
+}, [dispatch, gameId, currentChild, navigate]);
 
   const currentGame = currentChild?.games.find(game => game.gameId === gameId);
   const currentLevel = currentGame?.currentLevel ?? 1;
@@ -60,6 +67,7 @@ const GameDetailsPage = () => {
   }, [levels, currentLevel]);
 
   if (!selectedGame) return null;
+  
 
   const theme = gameTheme[selectedGame.name as keyof typeof gameTheme] || {
     background: "#6366f1",
@@ -78,6 +86,7 @@ const GameDetailsPage = () => {
       coins={0}
       logo={theme.logo}
       title={selectedGame.name}
+      isPremium= { currentChild?.isPremium}
     >
       <div className="max-w-5xl mx-auto px-6 py-6 selection:bg-amber-200">
         

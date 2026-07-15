@@ -16,15 +16,16 @@ interface Props {
 
   logo?: string;
   title?: string;
+  isPremium?: boolean;
 }
 
 const ChildLayout = ({
   children,
   background,
   child,
-  coins,
   logo,
   title,
+  isPremium,
 }: Props) => {
   return (
     <div
@@ -33,7 +34,7 @@ const ChildLayout = ({
         backgroundImage: `url(${background})`,
       }}
     >
-      <ChildHeader child={child} coins={coins} logo={logo} title={title} />
+      <ChildHeader child={child}  logo={logo} title={title}   isPremium={isPremium}/>
 
     
 

@@ -13,4 +13,7 @@ export interface GetLevelProgressOutputDTO {
     bestTime: number;
     totalMistakes: number;
     lastPlayedAt?: Date;
+
+    canPlay: boolean;
+    reason?: string;
 }

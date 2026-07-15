@@ -8,12 +8,14 @@ import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import ChildGameEntity from '@/Domain/Entities/ChildGame.entity';
 import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
 
 export class SubmitLevelUseCase implements ISubmitLevelUseCase {
   constructor(
     private _progressRepo: IProgressRepository,
     private _childrepo: IChildRepository,
     private _gameRepo: IGameRepository,
+    private _parentRepo: IParentRepository
   ) {}
 
   async execute(input: SubmitLevelDTO): Promise<SubmitLevelOutputDTO> {
@@ -21,19 +23,35 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
 
     const child = await this._childrepo.findById(input.childId);
     if (!child) {
-      throw new AppError(
-        authMessages.error.CHILD_NOT_FOUND,
-        StatusCodes.NOT_FOUND,
-      );
+      throw new AppError( authMessages.error.CHILD_NOT_FOUND,  StatusCodes.NOT_FOUND, );
     }
+
+    const parent = await this._parentRepo.findById( child.getParentId()!);
+    if( !parent ) {
+      throw new AppError( authMessages.error.PARENT_NOT_FOUND, StatusCodes.NOT_FOUND);
+    }
+    
 
     const existingGame = await this._gameRepo.getGameById(input.gameId);
     if (!existingGame) {
-      throw new AppError(
-        authMessages.error.GAME_NOT_FOUND,
-        StatusCodes.NOT_FOUND,
-      );
+      throw new AppError( authMessages.error.GAME_NOT_FOUND, StatusCodes.NOT_FOUND, );
     }
+
+    if( !existingGame.isGameActive() ) {
+      throw new AppError( authMessages.error.GAME_BLOCKED, StatusCodes.FORBIDDEN );
+    }
+
+    const today = new Date();
+    const lastReset = child.getDailyLevelCountDate();
+    const isSameDay = lastReset && lastReset.toDateString() === today.toDateString();
+    if (!isSameDay) {
+        child.resetDailyLevelCount(today);
+    }
+
+    if( !parent.getIsPremium() && input.levelNumber > 5) {
+      child.incrementDailyLevelCount();
+    }
+    
     const existing = await this._progressRepo.findByChildGameLevel(
       input.childId,
       input.gameId,

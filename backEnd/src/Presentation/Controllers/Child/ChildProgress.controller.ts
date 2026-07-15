@@ -19,7 +19,7 @@ export class ChildProgressController {
             return sendSuccess(
                 res,
                 StatusCodes.OK,
-                "",
+                '',
                 result
             );
         }catch(error){
@@ -36,7 +36,7 @@ export class ChildProgressController {
             return sendSuccess(
                 res,
                 StatusCodes.CREATED,
-                "",
+                '',
                 result
             );
         } catch( error) {

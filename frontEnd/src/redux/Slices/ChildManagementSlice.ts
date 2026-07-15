@@ -74,8 +74,13 @@ export const getChildDetail = createAsyncThunk< { child: Child }, { id: string }
   }
 );
 
+type ApiError = {
+  status?: number;
+  message: string;
+};
+
 //==== Add Child ==== //
-export const addChild = createAsyncThunk< Child, AddChildPayload, { rejectValue: string } >(
+export const addChild = createAsyncThunk< Child, AddChildPayload, { rejectValue: ApiError } >(
   "parent/addChild",
 
   async (payload, { rejectWithValue }) => {
@@ -83,7 +88,10 @@ export const addChild = createAsyncThunk< Child, AddChildPayload, { rejectValue:
       const response = await api.post( API_ROUTES.PARENT.CHILDREN.ADD,  payload );
 
       if (!response.data.success) {
-        return rejectWithValue("Invalid response");
+        return rejectWithValue({
+          status: response.status,
+          message: "Invalid response",
+        });
       }
 
       return response.data.data;
@@ -92,10 +100,10 @@ export const addChild = createAsyncThunk< Child, AddChildPayload, { rejectValue:
         message: string;
       }>;
 
-      return rejectWithValue(
-        err.response?.data?.message ||
-          "Failed adding child"
-      );
+      return rejectWithValue({
+        status: err.response?.status,
+        message: err.response?.data?.message || "Failed adding child",
+      });
     }
   }
 );

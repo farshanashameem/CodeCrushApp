@@ -10,8 +10,8 @@ export const authMessages = {
 
          //USER STATUS 
         USER_STATUS_UPDATED: 'User status updated',
-        USER_FETCHED_SUCCESSFULLY: "User fetched successfully",
-        USERS_FETCHED_SUCCESSFULLY: "Users fetched successfully",
+        USER_FETCHED_SUCCESSFULLY: 'User fetched successfully',
+        USERS_FETCHED_SUCCESSFULLY: 'Users fetched successfully',
 
         //  OTP
         OTP_SENT: 'OTP sent to email',
@@ -51,6 +51,11 @@ export const authMessages = {
         IMAGE_UPDATED: 'Image updated successfully',
         IMAGE_STATUS_UPDATED: 'Image status updated successfully',
         IMAGE_DELETED: 'Image deleted successfully',
+    
+        //PAYMENT
+        ORDER_CREATED_SUCCESSFULLY: 'Order created successfully',
+        PAYMENT_SUCCESS: 'Payment successfully completed',
+    
     },
 
     error: {
@@ -110,6 +115,8 @@ export const authMessages = {
         SESSION_EXPIRED: 'Session expired',
         // GAME
         GAME_NOT_FOUND: 'Game not found',
+        GAME_BLOCKED: 'Game is blocked by admin',
+        LEVEL_BLOCKED: 'Level is blocked',
 
         //PROGRESS
         PROGRESS_UPDATION_FAILED: 'Progress updation failed',
@@ -134,6 +141,18 @@ export const authMessages = {
         IMAGE_UPDATION_ERROR: 'Error while updating image',
         IMAGE_FILE_IS_REQUIRED:'IMmage file is required',
         
-        ONLY_IMAGE_FILES_ARE_ALLOWED: 'Only image files are allowed.'
+        ONLY_IMAGE_FILES_ARE_ALLOWED: 'Only image files are allowed.',
+        
+        //PAYMENT
+        ADD_CHILD_PAYMENT_REQUIRED: 'Payment is required for adding the child',
+
+
+        //SUBSCRIPTION
+        SUBSCRIPTION_PLAN_IS_REQUIRED: 'Subscriptionplan is required',
+        INVALID_PAYMENT_TYPE: 'Invalid payment type',
+        INVALID_PAYMENT: 'Invalid payment',
+        PAYMENT_NOT_EXIST: 'Payment not found'
+    
+    
     }
 };

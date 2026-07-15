@@ -22,6 +22,10 @@ export class GetGameUseCase implements IGetGameUseCase {
             throw new AppError( authMessages.error.GAME_NOT_FOUND, StatusCodes.NOT_FOUND );
         }
 
+        if( !game.isGameActive() ){
+            throw new AppError( authMessages.error.GAME_BLOCKED, StatusCodes.FORBIDDEN ); 
+        }
+
         return {
             game
         };

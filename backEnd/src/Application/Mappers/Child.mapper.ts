@@ -35,6 +35,8 @@ export class ChildMapper {
         doc.totalPlayTime,
         doc.totalGamesPlayed,
         doc.lastPlayed,
+        doc.dailyLevelCount,
+        doc.dailyLevelCountDate,
         games
     );
 }
@@ -54,6 +56,8 @@ export class ChildMapper {
             totalPlayTime: entity.getTotalPlayedTime(),
             totalGamesPlayed: entity.getTotalGamesPlayed(),
             lastPlayed: entity.getLastPlayed(),
+            dailyLevelCount: entity.getDailyLevelCount(),
+            dailyLevelCountDate: entity.getDailyLevelCountDate(),
 
             games: entity.getGames().map(g => ({
                 gameId: g.getGameId(),

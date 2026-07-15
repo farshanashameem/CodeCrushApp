@@ -161,9 +161,11 @@ const childSchema = z
       .trim()
       .min(1, "Please select an avatar"),
 
-    dob: z.string().min(1, "Date of birth is required"),
+    dob: z.string().optional(),
   })
   .superRefine(({ age, dob }, ctx) => {
+
+    if (!dob) return;
     const birthDate = new Date(dob);
     const today = new Date();
 

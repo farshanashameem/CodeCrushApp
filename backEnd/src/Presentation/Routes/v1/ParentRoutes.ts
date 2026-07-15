@@ -7,6 +7,8 @@ import { authParentHandler } from '@/Presentation/Middlewares/parentAuthMiddlewa
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
 import { forgotPasswordSchema, otpSchema, registerSchema, resendOtpSchema, resetPasswordSchema, UpdateProfileSchema } from '@/Presentation/Validators/RegisterValidator';
 import { childManagementcontroller } from '@/Presentation/Factory/ParentFactory';
+import { paymentController } from '@/Presentation/Factory/ParentFactory';
+
 const router = Express.Router();
 
 router.post(ROUTES.PARENT.LOGIN,validate(loginSchema, 'body'), parentAuthController.login);
@@ -26,5 +28,8 @@ router.post( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BASE, childManagementcontro
 router.put( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.BY_ID, childManagementcontroller.updateChild );
 router.patch( ROUTES.PARENT.CHILD_MANAGEMENT.CHILDREN.STATUS, childManagementcontroller.toggleChildStatus );
 
+
+router.post( ROUTES.PARENT.PAYMENT.CREATE, paymentController.createOrder);
+router.post( ROUTES.PARENT.PAYMENT.VERIFY, paymentController.verifyPayment);
 
 export default router;

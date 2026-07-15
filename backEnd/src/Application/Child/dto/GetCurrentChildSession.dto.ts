@@ -12,6 +12,8 @@ child: {
     totalGamesPlayed: number;
     lastPlayed?: Date;
 
+    isPremium: boolean;
+
     games: ChildGameDTO[];
   };
 }

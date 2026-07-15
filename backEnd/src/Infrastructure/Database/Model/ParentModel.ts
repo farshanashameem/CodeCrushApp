@@ -1,6 +1,7 @@
 import mongoose, { Types, Document, Schema, Model } from 'mongoose';
 import UserStatus from '@/Domain/enums/UserStatus.enum';
 import UserRole from '@/Domain/enums/UserRole.enum';
+import { SubscriptionPlan } from '@/Domain/enums/SubscriptionPlan.enum';
 
 export interface IParent extends Document {
     _id: Types.ObjectId;
@@ -11,6 +12,11 @@ export interface IParent extends Document {
     status: UserStatus;
     childrenIds: Types.ObjectId[];
     refreshToken?: string | null;
+    pendingChildCredits: number;
+    isPremium: boolean;
+    subscriptionPlan?: SubscriptionPlan;
+    subscriptionStartDate?: Date;
+    subscriptionExpiryDate?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -57,7 +63,32 @@ const ParentSchema: Schema<IParent> = new Schema(
     refreshToken: {
         type: String,
         default: null
+    },
+
+    pendingChildCredits: {
+        type: Number,
+        default: 0
+    },
+
+    isPremium: {
+        type: Boolean,
+        default: false
+    },
+
+    subscriptionPlan: {
+        type: String,
+        enum: Object.values(SubscriptionPlan)
+    },
+
+    subscriptionStartDate: {
+        type: Date
+    },
+
+    subscriptionExpiryDate: {
+        type: Date
     }
+
+    
 },
 { timestamps: true }
 );

@@ -23,7 +23,7 @@ export class ChildGameController {
 
             const games = await this._getGames.execute();
 
-            return sendSuccess(res, StatusCodes.OK, "", games);
+            return sendSuccess(res, StatusCodes.OK, '', games);
 
         } catch (error) {
             next(error);
@@ -38,7 +38,7 @@ export class ChildGameController {
 
             const game = await this._getGame.execute({ gameId });
 
-            return sendSuccess(res, StatusCodes.OK, "", game);
+            return sendSuccess(res, StatusCodes.OK, '', game);
 
         } catch (error) {
             next(error);
@@ -51,7 +51,7 @@ export class ChildGameController {
             const { gameId } = gameIdSchema.parse( req.params );
 
             const levels = await this._getAllLevel.execute( gameId );
-            return sendSuccess(res, StatusCodes.OK,  "", levels);
+            return sendSuccess(res, StatusCodes.OK,  '', levels);
         }catch( error) {
             next( error );
         }
@@ -63,7 +63,7 @@ export class ChildGameController {
             const { levelId } = levelIdSchema.parse( req.params );
             const level = await this._getLevel.execute( {levelId} );
 
-            return sendSuccess(res, StatusCodes.OK, "", level);
+            return sendSuccess(res, StatusCodes.OK, '', level);
 
 
         }catch(error) {

@@ -10,49 +10,76 @@ import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import UserStatus from '@/Domain/enums/UserStatus.enum';
 
 export class GetMeUseCase implements IGetMeUseCase {
-    constructor(
-        private _repositoryRegistry: Map<UserRole, IBaseRepository<( ParentEntity | AdminEntity)  >>
-    ) {}
+  constructor(
+    private _repositoryRegistry: Map<
+      UserRole,
+      IBaseRepository<ParentEntity | AdminEntity>
+    >,
+  ) {}
 
-    async execute(request: GetMeInputDTO): Promise<GetMeOutputDTO> {
-        
-        const repository = this._repositoryRegistry.get( request.role);
+  async execute(request: GetMeInputDTO): Promise<GetMeOutputDTO> {
+    const repository = this._repositoryRegistry.get(request.role);
 
-        if(!repository) {
-            throw new AppError( authMessages.error.UNAUTHORIZED ,StatusCodes.UNAUTHORIZED);
-        }
+    if (!repository) {
+      throw new AppError(
+        authMessages.error.UNAUTHORIZED,
+        StatusCodes.UNAUTHORIZED,
+      );
+    }
 
-        const user = await repository.findById( request.id);
+    const user = await repository.findById(request.id);
 
-        if( !user) {
-            throw new AppError(authMessages.error.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
-        }
+    if (!user) {
+      throw new AppError(
+        authMessages.error.UNAUTHORIZED,
+        StatusCodes.UNAUTHORIZED,
+      );
+    }
 
-        if ('getStatus' in user) {
-    const status = user.getStatus();
+    if ('getStatus' in user) {
+      const status = user.getStatus();
 
-    if (status === UserStatus.BLOCKED) {
+      if (status === UserStatus.BLOCKED) {
         throw new AppError(
-            authMessages.error.PARENT_BLOCKED,
-            StatusCodes.FORBIDDEN
+          authMessages.error.PARENT_BLOCKED,
+          StatusCodes.FORBIDDEN,
         );
-    }
+      }
 
-    if (status === UserStatus.DELETED) {
+      if (status === UserStatus.DELETED) {
         throw new AppError(
-            authMessages.error.PARENT_DELETED,
-            StatusCodes.FORBIDDEN
+          authMessages.error.PARENT_DELETED,
+          StatusCodes.FORBIDDEN,
         );
+      }
     }
-}
 
-        const id = user.getId()!;
-        return{
-            id: id,
-            name: user.getName(),
-            email: user.getEmail(),
-            role: user.getRole()
-        };
+    const id = user.getId()!;
+    const response: GetMeOutputDTO = {
+      id,
+      name: user.getName(),
+      email: user.getEmail(),
+      role: user.getRole(),
+    };
+
+    if (user instanceof ParentEntity) {
+      const expiresAt = user.getSubscriptionExpiryDate();
+
+      response.subscription = {
+        isPremium: user.getIsPremium(),
+        plan: user.getSubscriptionPlan(),
+        expiresAt,
+        daysRemaining: this.getDaysRemaining(expiresAt),
+      };
     }
-    
+    return response;
+  }
+
+  private getDaysRemaining(expiresAt?: Date): number | undefined {
+    if (!expiresAt) return undefined;
+
+    const diff = expiresAt.getTime() - Date.now();
+
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }
 }

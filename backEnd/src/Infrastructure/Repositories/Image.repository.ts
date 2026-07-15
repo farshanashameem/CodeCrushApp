@@ -22,7 +22,7 @@ export class ImageRepository extends BaseRepository<ImageEntity, IImage> impleme
     }
 
     async changeStatus(id: string, isActive: boolean): Promise<void> {
-        const iamge = await this._model.findById(id);
+        //const image = await this._model.findById(id);
         await this._model.findByIdAndUpdate( id, {isActive} );
     }
     

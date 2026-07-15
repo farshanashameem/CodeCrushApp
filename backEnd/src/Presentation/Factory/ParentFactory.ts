@@ -1,7 +1,7 @@
 //Controllers
 import { ParentAuthController } from '../Controllers/Parent/auth.controller';
 import { ChildManagementController } from '../Controllers/Parent/child_management.controller';
-
+import { PaymentController } from '../Controllers/Parent/payment.controller';
 
 //use case
 import { RegisterParentUseCase } from '@/Application/Parent/useCases/RegisterParent.usecase';
@@ -17,10 +17,14 @@ import { ParentToggleUserStatus } from '@/Application/Parent/useCases/ChildManag
 import { GetAllChildrenUseCase } from '@/Application/Parent/useCases/ChildManagement/getAllChildren.usecase';
 import { ParentGetChildUseCase } from '@/Application/Parent/useCases/ChildManagement/getChild.usecase';
 import { UpdateProfileUseCase } from '@/Application/Parent/useCases/UpdateProfile.usecase.dto';
+import { CreatePaymentOrderUseCase } from '@/Application/Parent/useCases/CreatePaymentOrder.usecase';
+import { VerifyPaymentUseCase } from '@/Application/Parent/useCases/VerifyPayment.usecase';
+
 
 //repositories
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
 import { ChildRepository } from '@/Infrastructure/Repositories/Child.repository';
+import { PaymentRepository } from '@/Infrastructure/Repositories/Payment.repository';
 
 //Services
 import { HashService } from '@/Infrastructure/Services/HashService';
@@ -28,18 +32,20 @@ import { OTPService } from '@/Infrastructure/Services/OTPService';
 import { TokenService } from '@/Infrastructure/Services/TokenService';
 import { MailService } from '@/Infrastructure/Services/MailService';
 import { OTPRepository } from '@/Infrastructure/Repositories/OTP.repository';
-
+import { RazorpayService } from '@/Infrastructure/Services/RazorpayService';
 
 
 const parentRepository = new ParentRepository();
 const otpRepository = new OTPRepository();
-const childRepository = new ChildRepository(); 
+const childRepository = new ChildRepository();
+const paymentRepository = new PaymentRepository();
 
 
 const hashService = new HashService();
 const otpService = new OTPService();
 export const tokenService = new TokenService();
 const mailService = new MailService();
+const razorpayService = new RazorpayService();
 
 const sendOtpUseCase = new SendOTPUseCase(
     otpRepository,
@@ -113,6 +119,17 @@ const updateProfileUseCase = new UpdateProfileUseCase(
     hashService
 );
 
+const createPaymentUseCase = new CreatePaymentOrderUseCase(
+    parentRepository,
+    paymentRepository,
+    razorpayService
+);
+
+const verifyPaymentUseCase = new VerifyPaymentUseCase(
+    paymentRepository,
+    parentRepository,
+    razorpayService
+);
 
 
 //Controllers
@@ -132,5 +149,10 @@ export const childManagementcontroller = new ChildManagementController(
     getChildUseCase,
     updateChildUseCase,
     toggleChildStatusUseCase
+);
+
+export const paymentController = new PaymentController(
+    createPaymentUseCase,
+    verifyPaymentUseCase
 );
 

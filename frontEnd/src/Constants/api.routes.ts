@@ -25,6 +25,10 @@ export const API_ROUTES = {
       UPDATE: (id: string) => `/auth/parent/children/${id}`,
       STATUS: (id: string) => `/auth/parent/child/${id}/status`,
     },
+    PAYMENT: {
+      CREATE : "/auth/parent/create-order",
+      VERIFY : "/auth/parent/verify"
+    }
   },
 
    ADMIN: {

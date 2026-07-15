@@ -67,7 +67,13 @@ export const ROUTES = {
                 BY_ID: '/children/:childId',
                 STATUS: '/child/:childId/status'
             }
+        },
+
+         PAYMENT : {
+            CREATE : '/create-order',
+            VERIFY : '/verify',
         }
+
     },
     CHILD : {
         BASE: '/child',
@@ -87,7 +93,7 @@ export const ROUTES = {
         PROGRESS : {
             BY_GAME: '/progress/:childId/:gameId',
             BY_LEVEL: '/games/:gameId/levels/:levelId/progress'
-        }
-
-    }
+        },     
+    },
+   
 };

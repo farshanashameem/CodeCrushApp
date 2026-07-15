@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-
+import DailyLimitModal from "../../SharedComponents/DailyLimitModal";
 import type { AppDispatch, RootState } from "../../../redux/store";
-
+import toast from "react-hot-toast";
 import {
   getGameDetail,
   getLevelDetail,
   getCurrentChildSession,
-  getLevelProgress
+  getLevelProgress,
 } from "../../../redux/Slices/childGameSlice";
 
 import ChildLayout from "../../SharedComponents/Child/ChildLayout";
@@ -30,11 +30,15 @@ const LevelIntroPage = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [showLimitModal, setShowLimitModal] = useState(false);
 
-  const { selectedGame, selectedLevel, currentChild, selectedLevelProgress, loading } = useSelector(
-    (state: RootState) => state.childGame,
-  );
-
+  const {
+    selectedGame,
+    selectedLevel,
+    currentChild,
+    selectedLevelProgress,
+    loading,
+  } = useSelector((state: RootState) => state.childGame);
 
   useEffect(() => {
     if (!currentChild) {
@@ -43,39 +47,48 @@ const LevelIntroPage = () => {
   }, [dispatch, currentChild]);
 
   useEffect(() => {
-    if (!gameId || !levelId ) return;
+  if (!gameId || !levelId) return;
 
-    dispatch(getGameDetail(gameId));
-    dispatch(getLevelDetail({ gameId, levelId }));
-  }, [dispatch, gameId, levelId]);
+  dispatch(getGameDetail(gameId))
+    .unwrap()
+    .then(() => {
+      dispatch(getLevelDetail({ gameId, levelId }));
+    })
+    .catch((err) => {
+      toast.error(err || "This game is currently unavailable.");
+      navigate("/play", { replace: true });
+    });
+}, [dispatch, gameId, levelId, navigate]);
 
   useEffect(() => {
-  if (!currentChild || !gameId || !levelId) return;
+    if (!currentChild || !gameId || !levelId) return;
 
-  dispatch(getLevelProgress({ gameId, levelId }));
-}, [dispatch, currentChild, gameId, levelId]);
+    dispatch(getLevelProgress({ gameId, levelId }));
+  }, [dispatch, currentChild, gameId, levelId]);
 
-
+  
 
   if (!selectedGame || !selectedLevel || !currentChild) return null;
- 
-if (loading) {
-  return <div>Loading...</div>;
-}
 
-if (!selectedGame || !selectedLevel || !currentChild) {
-  return null;
-}
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-const hasPlayed = !!selectedLevelProgress;
+  if (!selectedGame || !selectedLevel || !currentChild) {
+    return null;
+  }
 
-const earnedStars = selectedLevelProgress?.stars ?? 0;
-const completed = selectedLevelProgress?.completed ?? false;
-const highScore = selectedLevelProgress?.highScore ?? 0;
-const attempts = selectedLevelProgress?.totalAttempts ?? 0;
-const bestTime = selectedLevelProgress?.bestTime ?? 0;
-const mistakes = selectedLevelProgress?.totalMistakes ?? 0;
+  const hasPlayed = !!selectedLevelProgress;
 
+  const earnedStars = selectedLevelProgress?.stars ?? 0;
+  const canPlay = selectedLevelProgress?.canPlay ?? true;
+  const reason = selectedLevelProgress?.reason;
+  const completed = selectedLevelProgress?.completed ?? false;
+  const highScore = selectedLevelProgress?.highScore ?? 0;
+  const attempts = selectedLevelProgress?.totalAttempts ?? 0;
+  const bestTime = selectedLevelProgress?.bestTime ?? 0;
+  const mistakes = selectedLevelProgress?.totalMistakes ?? 0;
 
   const theme = gameTheme[selectedGame.name as keyof typeof gameTheme] || {
     background: "#6366f1",
@@ -107,6 +120,7 @@ const mistakes = selectedLevelProgress?.totalMistakes ?? 0;
       coins={0}
       logo={theme.logo}
       title={selectedGame.name}
+      isPremium= { currentChild?.isPremium}
     >
       <div className="max-w-4xl mx-auto px-6 py-6 selection:bg-amber-200">
         {/* TOP WRAPPER: Level Info & Mission Briefing side-by-side on desktop */}
@@ -190,54 +204,56 @@ const mistakes = selectedLevelProgress?.totalMistakes ?? 0;
         </div>
 
         {hasPlayed && (
-  <div className="mt-8 bg-white border-4 border-indigo-400 rounded-[2rem] p-6 shadow-[0_8px_0_#818cf8]">
-    <h2 className="font-mochiy text-xl text-indigo-600 mb-6">
-      🏆 Previous Performance
-    </h2>
+          <div className="mt-8 bg-white border-4 border-indigo-400 rounded-[2rem] p-6 shadow-[0_8px_0_#818cf8]">
+            <h2 className="font-mochiy text-xl text-indigo-600 mb-6">
+              🏆 Previous Performance
+            </h2>
 
-    <div className="grid md:grid-cols-2 gap-4">
-      <div className="bg-indigo-50 rounded-xl p-4">
-        <p className="text-sm text-slate-500">Stars Earned</p>
-        <p className="font-mochiy text-2xl text-amber-500">
-          {"⭐".repeat(earnedStars)}
-        </p>
-      </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm text-slate-500">Stars Earned</p>
+                <p className="font-mochiy text-2xl text-amber-500">
+                  {"⭐".repeat(earnedStars)}
+                </p>
+              </div>
 
-      <div className="bg-indigo-50 rounded-xl p-4">
-        <p className="text-sm text-slate-500">High Score</p>
-        <p className="font-mochiy text-2xl">{highScore}</p>
-      </div>
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm text-slate-500">High Score</p>
+                <p className="font-mochiy text-2xl">{highScore}</p>
+              </div>
 
-      <div className="bg-indigo-50 rounded-xl p-4">
-        <p className="text-sm text-slate-500">Attempts</p>
-        <p className="font-mochiy text-2xl">{attempts}</p>
-      </div>
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm text-slate-500">Attempts</p>
+                <p className="font-mochiy text-2xl">{attempts}</p>
+              </div>
 
-      <div className="bg-indigo-50 rounded-xl p-4">
-        <p className="text-sm text-slate-500">Best Time</p>
-        <p className="font-mochiy text-2xl">{bestTime}s</p>
-      </div>
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm text-slate-500">Best Time</p>
+                <p className="font-mochiy text-2xl">{bestTime}s</p>
+              </div>
 
-      <div className="bg-indigo-50 rounded-xl p-4">
-        <p className="text-sm text-slate-500">Mistakes</p>
-        <p className="font-mochiy text-2xl">{mistakes}</p>
-      </div>
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm text-slate-500">Mistakes</p>
+                <p className="font-mochiy text-2xl">{mistakes}</p>
+              </div>
 
-      <div className="bg-indigo-50 rounded-xl p-4">
-        <p className="text-sm text-slate-500">Status</p>
-        <p className="font-mochiy text-xl">
-          {completed ? "✅ Completed" : "❌ Not Completed"}
-        </p>
-      </div>
-    </div>
-  </div>
-)}
+              <div className="bg-indigo-50 rounded-xl p-4">
+                <p className="text-sm text-slate-500">Status</p>
+                <p className="font-mochiy text-xl">
+                  {completed ? "✅ Completed" : "❌ Not Completed"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* INTERACTIVE CONTROLS CONTAINER */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           {/* Back Button */}
           <button
-            onClick={() => navigate(`/play/${currentChild?.id}/games/${selectedGame?.id}`)}
+            onClick={() =>
+              navigate(`/play/${currentChild?.id}/games/${selectedGame?.id}`)
+            }
             className="
               sm:w-1/3
               bg-white
@@ -261,11 +277,17 @@ const mistakes = selectedLevelProgress?.totalMistakes ?? 0;
 
           {/* Start Button */}
           <button
-            onClick={() =>
+            onClick={() => {
+              if (!canPlay) {
+                setShowLimitModal(true);
+                return;
+              }
+
               navigate(
-                `/play/${currentChild?.id}/games/${gameId}/levels/${levelId}/start`, { replace: true }
-              )
-            }
+                `/play/${currentChild?.id}/games/${gameId}/levels/${levelId}/start`,
+                { replace: true },
+              );
+            }}
             className="
               flex-1
               bg-emerald-400
@@ -300,6 +322,11 @@ const mistakes = selectedLevelProgress?.totalMistakes ?? 0;
           animation: bounceSlow 2.5s ease-in-out infinite;
         }
       `}</style>
+
+      <DailyLimitModal
+        open={showLimitModal}
+        onBack={() => setShowLimitModal(false)}
+      />
     </ChildLayout>
   );
 };

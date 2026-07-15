@@ -1,5 +1,5 @@
-import { ApiResponse } from "@/types/response"
-import { Response } from "express"
+import { ApiResponse } from '@/types/response';
+import { Response } from 'express';
 
 
 export const sendSuccess = <T> (
@@ -12,7 +12,7 @@ export const sendSuccess = <T> (
         success: true,
         message,
         ...(data !== undefined && {data})
-    }
+    };
 
-    return res.status(statusCode).json(response)
-}
+    return res.status(statusCode).json(response);
+};

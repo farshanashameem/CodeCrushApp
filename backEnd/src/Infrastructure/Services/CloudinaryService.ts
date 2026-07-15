@@ -28,9 +28,13 @@ export class CloudinaryService implements ICloudinaryService {
 
         (error, result) => {
 
-          if (error || !result) {
-            return reject(error);
+          if (error) {
+            return reject(new Error(error.message));
           }
+
+          if (!result) {
+              return reject(new Error('Cloudinary upload failed.'));
+            }
 
           resolve({
             publicId: result.public_id,
