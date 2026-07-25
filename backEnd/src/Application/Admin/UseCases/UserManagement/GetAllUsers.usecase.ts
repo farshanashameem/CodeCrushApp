@@ -23,7 +23,8 @@ export class GetAllUsersUseCase implements IAdminGetAllUsersUseCase {
                         name: u.getName(),
                         email: u.getEmail(),
                         status: u.getStatus(),
-                        childrenIds: u.getChildrenIds()
+                        childrenIds: u.getChildrenIds(),
+                        isPremium: u.getIsPremium(),
                     };
                 })
                 .filter((u): u is NonNullable<typeof u> => u !== null),

@@ -16,7 +16,7 @@ import AuthPage from "./Presentation/pages/Auth/Auth";
 import OTPPage from "./Presentation/pages/Auth/OTPPage";
 import ForgotPasswordPage from "./Presentation/pages/Auth/ForgotPasswordPage";
 import ResetPasswordPage from "./Presentation/pages/Auth/ResetPasswordPage";
-import ReportsPage from "./Presentation/pages/Admin/Reports/ReportPage";
+import ReportPage from "./Presentation/pages/Admin/Reports/ReportPage";
 
 
 
@@ -274,7 +274,7 @@ function App() {
             path='admin/reports'
             element={   <AuthInitializer>
                           <ProtectedRoute allowedRole="admin" >
-                            <ReportsPage />
+                            <ReportPage />
                           </ProtectedRoute>
                         </AuthInitializer>
               

@@ -5,6 +5,9 @@ import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.reposito
 import { ParentMapper } from '@/Application/Mappers/Parent.mapper';
 import logger from '../Services/Logger';
 import mongoose, { QueryFilter, Types } from 'mongoose';
+import { ReportFilter, UserGrowthPoint, UserReportData } from '@/Domain/Types/UserReport';
+import UserStatus from '@/Domain/enums/UserStatus.enum';
+import { ChildModel } from '../Database/Model/ChildModel';
 
 export class ParentRepository extends BaseRepository<ParentEntity, IParent> implements IParentRepository {
 
@@ -67,6 +70,120 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
         await this._model.findByIdAndUpdate( parentId, {
             $push: { childrenIds: childId}
         }, {new: true});
+    }
+
+    async getUserReport(filter: ReportFilter): Promise<UserReportData> {
+        const [
+        totalParents,
+        activeParentIds,
+        blockedParents,
+        premiumParents,
+        freeParents,
+        newRegistrations,
+        userGrowth,
+        ] = await Promise.all([
+        this._model.countDocuments({ status: { $ne: UserStatus.DELETED } }),
+        ChildModel.distinct("parentId", {
+            lastPlayed: {
+            $gte: filter.from,
+            $lte: filter.to,
+            },
+        }),
+        this._model.countDocuments({ status: UserStatus.BLOCKED }),
+        this._model.countDocuments({
+            status: { $ne: UserStatus.DELETED },
+            isPremium: true,
+        }),
+        this._model.countDocuments({
+            status: { $ne: UserStatus.DELETED },
+             $or: [
+                { isPremium: false },
+                { isPremium: { $exists: false } },
+            ],
+        }),
+        this._model.countDocuments({
+            status: { $ne: UserStatus.DELETED },
+            createdAt: {
+            $gte: filter.from,
+            $lte: filter.to,
+            },
+        }),
+        this.getUserGrowth(filter),
+        ]);
+
+        const activeParents = activeParentIds.length;
+        
+        return {
+            metrics: {
+                totalParents,
+                activeParents,
+                blockedParents,
+                newRegistrations,
+                premiumParents,
+                freeParents,
+            },
+            userGrowth,
+            subscriptionDistribution: {
+                premium: premiumParents,
+                free: freeParents,
+            },
+        };
+    }
+
+    private async getUserGrowth( filter: ReportFilter ): Promise<UserGrowthPoint[]> {
+        let groupFormat: string;
+
+        switch (filter.range) {
+            case "today":
+            groupFormat = "%H:00";
+            break;
+
+            case "week":
+            case "month":
+            case "custom":
+            groupFormat = "%Y-%m-%d";
+            break;
+
+            case "year":
+            groupFormat = "%Y-%m";
+            break;
+
+            default:
+            groupFormat = "%Y-%m-%d";
+        }
+
+        const result = await this._model.aggregate([
+            {
+            $match: {
+                status: { $ne: UserStatus.DELETED },
+                createdAt: {
+                $gte: filter.from,
+                $lte: filter.to,
+                },
+            },
+            },
+            {
+            $group: {
+                _id: {
+                $dateToString: {
+                    format: groupFormat,
+                    date: "$createdAt",
+                },
+                },
+                count: { $sum: 1 },
+            },
+            },
+            {
+            $sort: {
+                _id: 1,
+            },
+            },
+        ]);
+
+        return result.map((item) => ({
+            label: item._id,
+            count: item.count,
+        }));
     }
 
     protected mapToEntity(doc: IParent): ParentEntity {

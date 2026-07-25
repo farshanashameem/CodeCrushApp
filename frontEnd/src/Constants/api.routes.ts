@@ -34,6 +34,20 @@ export const API_ROUTES = {
    ADMIN: {
     LOGIN: "/admin/login",
     DASHBOARD: "/admin/dashboard",
+    REPORTS : {
+      USER: '/auth/admin/reports/users',
+      CHILDREN: '/auth/admin/reports/children',
+      GAMES: '/auth/admin/reports/games',
+      LEVELS: '/auth/admin/reports/levels',
+      REVENUE: '/auth/admin/reports/revenue',
+    },
+    EXPORT_REPORTS: {
+      USER_REPORT: '/auth/admin/reports/users/export',
+      CHILD_REPORT: '/auth/admin/reports/children/export',
+      GAME_REPORT: '/auth/admin/reports/games/export',
+      LEVEL_REPORT: '/auth/admin/reports/levels/export',
+      REVENUE_REPORT: '/auth/admin/reports/revenue/export',
+    },
     USERS: {
       GET_ALL: "/auth/admin/users",
       BY_ID: (id: string) => `/auth/admin/users/${id}`,
@@ -99,5 +113,7 @@ export const API_ROUTES = {
         `/auth/child/progress/${childId}/${gameId}`,
       BY_LEVEL: (gameId: string, levelId: string )=> `/auth/child/games/${gameId}/levels/${levelId}/progress`,
     },
+    
   },
+ 
 };

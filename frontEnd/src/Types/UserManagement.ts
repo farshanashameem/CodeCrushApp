@@ -11,6 +11,7 @@ export interface User {
       | "DELETED";
 
     childrenIds: string[];
+    isPremium: boolean;
     createdAt: Date;
 }
  

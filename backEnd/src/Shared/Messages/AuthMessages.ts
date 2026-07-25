@@ -151,8 +151,12 @@ export const authMessages = {
         SUBSCRIPTION_PLAN_IS_REQUIRED: 'Subscriptionplan is required',
         INVALID_PAYMENT_TYPE: 'Invalid payment type',
         INVALID_PAYMENT: 'Invalid payment',
-        PAYMENT_NOT_EXIST: 'Payment not found'
+        PAYMENT_NOT_EXIST: 'Payment not found',
     
     
+        //DATE VALIDATION
+        FROM_AND_TO_DATE_NOT_MATCH: "From date cannot be after To date.",
+        INVALID_REPORT_RANGE: "Invalid report range",
+        
     }
 };

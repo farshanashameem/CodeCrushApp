@@ -6,6 +6,8 @@ import { GameLevelController } from '../Controllers/Game/gameLevel_management.co
 import { IconManagementController } from '../Controllers/Game/icon.controller';
 import { ImageManagementController } from '../Controllers/Game/image_management.controller';
 import { GameManagementController } from '../Controllers/Game/game.controller';
+import { ReportDataController } from '../Controllers/Admin/ReportData.controller';
+import { ExportReportController } from '../Controllers/Admin/ExportReports.controller';
 
 //Usecases
 import { AdminLoginUseCase } from '@/Application/Admin/UseCases/Auth/AdminLogin.useCase';
@@ -31,6 +33,17 @@ import { ChangeStatusUseCase } from '@/Application/Games/UseCases/Level/ChangeSt
 import { GetGameUseCase } from '@/Application/Games/UseCases/GetGame.usecase';
 import { GetGamesUseCase } from '@/Application/Games/UseCases/GetGames.usecase';
 import { ChangeGameStatusUseCase } from '@/Application/Games/UseCases/changeGameStatus.usecase';
+import { GetUserReportUseCase } from '@/Application/Admin/UseCases/GetUseReport.usecase';
+import { GetChildProgressReport } from '@/Application/Admin/UseCases/Reports/GetChildProgressReport.usecase';
+import { GetGamePerformanceReportUseCase } from '@/Application/Admin/UseCases/Reports/GetGamePerformanceReport.usecase';
+import { GetLevelPerformanceReportUseCase } from '@/Application/Admin/UseCases/Reports/GetLevelPerformanceReport.usecase';
+import { GetRevenueReportUseCase } from '@/Application/Admin/UseCases/Reports/GetRevenueReport.usecase';
+import { ExportChildReportUseCase } from '@/Application/Admin/UseCases/Export/ExportChildReport.usecase';
+import { ExportUserReportUseCase } from '@/Application/Admin/UseCases/Export/ExportUserReport.usecase';
+import { ExportGameReportUseCase } from '@/Application/Admin/UseCases/Export/ExportGameReport.usecase';
+import { ExportLevelReportUseCase } from '@/Application/Admin/UseCases/Export/ExportLevelReport.usecase';
+import { ExportRevenueReportUseCase } from '@/Application/Admin/UseCases/Export/ExportRevenue.usecase';
+
 //Repositories
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
 import { AdminRepository } from '@/Infrastructure/Repositories/Admin.repository';
@@ -39,11 +52,13 @@ import { LevelRepository } from '@/Infrastructure/Repositories/Level.repository'
 import { IconRepository } from '@/Infrastructure/Repositories/Icon.repository';
 import { ImageRepository } from '@/Infrastructure/Repositories/Image.repository';
 import { GameRepository } from '@/Infrastructure/Repositories/Game.repository';
+import { PaymentRepository } from '@/Infrastructure/Repositories/Payment.repository';
 
 //Services
 import { HashService } from '@/Infrastructure/Services/HashService';
 import { TokenService } from '@/Infrastructure/Services/TokenService';
 import { CloudinaryService } from '@/Infrastructure/Services/CloudinaryService';
+import { ExcelExportService } from '@/Infrastructure/Services/ExcelExportService';
 
 const adminRepository = new AdminRepository();
 const parentRepository = new ParentRepository();
@@ -52,11 +67,12 @@ const levelRepository = new LevelRepository();
 const iconRepository = new IconRepository();
 const imageRepository = new ImageRepository();
 const gameRepository = new GameRepository();
+const paymentRepository = new PaymentRepository();
 
 const hashService = new HashService();
 const tokenService = new TokenService();
 const cloudinarService = new CloudinaryService();
-
+const excelExportService = new ExcelExportService();
 
 const adminLoginUseCase = new AdminLoginUseCase(
     adminRepository,
@@ -155,6 +171,51 @@ const changeGameStatusUseCase = new ChangeGameStatusUseCase(
     gameRepository
 );
 
+const getUserReportUseCase = new GetUserReportUseCase(
+    parentRepository
+);
+
+const getChildReportUseCase = new GetChildProgressReport(
+    childRepository
+)
+
+const getGameReportUseCase = new GetGamePerformanceReportUseCase(
+    gameRepository
+)
+
+const getLevelReportUseCase = new GetLevelPerformanceReportUseCase(
+    levelRepository
+)
+
+const getRevenueReportUseCase = new GetRevenueReportUseCase(
+    paymentRepository
+)
+
+const exportRevenueReportUseCase = new ExportRevenueReportUseCase(
+    paymentRepository,
+    excelExportService
+)
+
+const exportUserReportUseCase = new ExportUserReportUseCase(
+    parentRepository,
+    excelExportService
+);
+
+const exportChildReportUseCase = new ExportChildReportUseCase(
+    childRepository,
+    excelExportService
+);
+
+const exportLevelReportUseCase = new ExportLevelReportUseCase(
+    levelRepository,
+    excelExportService,
+    gameRepository
+)
+
+const exportGameReportUseCase = new ExportGameReportUseCase(
+    gameRepository,
+    excelExportService
+)
 
 
 //Controllers
@@ -202,3 +263,23 @@ export const gameController = new GameManagementController(
     getGameUseCase,
     changeGameStatusUseCase
 );
+
+export const reportController = new ReportDataController(
+    getUserReportUseCase,
+    getChildReportUseCase,
+    getGameReportUseCase,
+    getLevelReportUseCase,
+    getRevenueReportUseCase
+)
+
+export const exportReportController = new ExportReportController (
+    exportUserReportUseCase,
+    exportChildReportUseCase,
+    exportGameReportUseCase,
+    exportLevelReportUseCase,
+    exportRevenueReportUseCase
+)
+
+
+
+

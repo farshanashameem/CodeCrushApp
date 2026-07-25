@@ -1,53 +1,191 @@
-import AdminDashboardLayout from "../../../layouts/AdminDashboardLayout";
-import AdminReports from "./AdminReports";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-const ReportsPage = () => {
-  const cards = [
-    { title: "Users", value: 1200, icon: "👨‍👩‍👧", color: "text-blue-600" },
-    { title: "Children", value: 500, icon: "🧒", color: "text-cyan-600" },
-    { title: "Games", value: 4, icon: "🎮", color: "text-violet-600" },
-    { title: "Levels", value: 40, icon: "⭐", color: "text-amber-500" },
-    { title: "Stars Earned", value: "8,540", icon: "🏆", color: "text-yellow-500" },
-    { title: "Play Time", value: "126h", icon: "⏱", color: "text-emerald-600" },
-  ];
+import AdminDashboardLayout from "../../../layouts/AdminDashboardLayout";
+
+import ReportHeader from "./components/ReportHeader";
+import { useDispatch, useSelector } from "react-redux";
+import UserReportSection from "./sections/UserReportSection/UserReportSection";
+import ChildReportSection from "./sections/childSections/ChildReportSection";
+import GameReportSection from "./sections/GameReportSection.tsx/GameReportSection";
+import LevelReportSection from "./sections/LevelReportSection/LevelReportSection";
+import RevenueReportSection from "./sections/RevenueReportSection/RevenueReportSection";
+
+import type { ReportRange } from "../../../../Types/reports";
+import { reportDateSchema } from "../../../../Lib/validation";
+import { exportChildReport
+  ,exportGameReport,
+   exportLevelReport,
+    exportRevenueReport,
+     exportUserReport } from "../../../../redux/Slices/reportSlice";
+
+import type { AppDispatch, RootState } from "../../../../redux/store";
+const ReportPage = () => {
+  // Values user is editing
+  const [dateRange, setDateRange] = useState<ReportRange>("month");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [selectedGame, setSelectedGame] = useState("");
+
+  // Values actually used by reports
+  const [appliedRange, setAppliedRange] = useState<ReportRange>("month");
+  const [appliedFromDate, setAppliedFromDate] = useState("");
+  const [appliedToDate, setAppliedToDate] = useState("");
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { exportLoading } = useSelector(
+    (state: RootState) => state.report
+  );
+
+  const [activeTab, setActiveTab] = useState< "user" | "child" | "game" | "level" | "revenue" >("user");
+  
+  // Automatically apply predefined ranges
+  useEffect(() => {
+    if (dateRange !== "custom") {
+      setAppliedRange(dateRange);
+      setAppliedFromDate("");
+      setAppliedToDate("");
+    }
+  }, [dateRange]);
+
+  const handleApply = () => {
+    const result = reportDateSchema.safeParse({
+      from: fromDate,
+      to: toDate,
+    });
+
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      return;
+    }
+
+    setAppliedRange("custom");
+    setAppliedFromDate(fromDate);
+    setAppliedToDate(toDate);
+
+    toast.success("Report updated");
+  };
+
+  const handleExport = () => {
+ const params = {
+  range: appliedRange,
+  from: appliedFromDate || undefined,
+  to: appliedToDate || undefined,
+  ...(activeTab === "level" && selectedGame
+    ? { gameId: selectedGame }
+    : {}),
+};
+
+
+  switch (activeTab) {
+    case "user":
+      dispatch(exportUserReport(params));
+      break;
+
+    case "child":
+      dispatch(exportChildReport(params));
+      break;
+
+    case "game":
+      dispatch(exportGameReport(params));
+      break;
+
+    case "level":
+      dispatch(exportLevelReport(params));
+      break;
+
+    case "revenue":
+      dispatch(exportRevenueReport(params));
+      break;
+  }
+};
 
   return (
-    <AdminDashboardLayout pageTitle="Reports Dashboard 📊">
-      <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/30 shadow-xl w-full">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-black text-violet-900">
-            Reports Dashboard 📊
-          </h1>
-          <p className="text-slate-700 text-xs md:text-sm mt-1 font-medium">
-            Platform statistics and analytics
-          </p>
-        </div>
+    <AdminDashboardLayout pageTitle="Reports">
+      <div className="space-y-6">
+        <ReportHeader
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+          fromDate={fromDate}
+          toDate={toDate}
+          onFromDateChange={setFromDate}
+          onToDateChange={setToDate}
+          onApply={handleApply}
+          onExport={handleExport}
+          exportLoading={exportLoading}
+        />
 
-        {/* Overview Cards Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          {cards.map((card) => (
-            <div
-              key={card.title}
-              className="bg-white/85 backdrop-blur-xl rounded-2xl p-4 md:p-5 border border-white/40 shadow-md hover:-translate-y-1 transition duration-200"
-            >
-              <div className="flex justify-between items-center">
-                <p className="text-[10px] md:text-xs uppercase font-bold text-slate-500 tracking-wider">
-                  {card.title}
-                </p>
-                <span className="text-xl md:text-2xl">{card.icon}</span>
-              </div>
-              <h2 className={`mt-2 md:mt-3 text-2xl md:text-3xl font-black ${card.color}`}>
-                {card.value}
-              </h2>
-            </div>
-          ))}
-        </div>
+      
 
-        {/* Embedded Sub-Section Components */}
-        <AdminReports />
+         <div className="rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 p-2 shadow-lg">
+         <div className="flex flex-wrap gap-2">
+            {[
+               { id: "user", label: "👤 User" },
+               { id: "child", label: "🧒 Child" },
+               { id: "game", label: "🎮 Game" },
+               { id: "level", label: "⭐ Level" },
+               { id: "revenue", label: "💰 Revenue" },
+            ].map((tab) => (
+               <button
+               key={tab.id}
+               onClick={() => setActiveTab(tab.id as typeof activeTab)}
+               className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+                  activeTab === tab.id
+                     ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg"
+                     : "bg-white/60 text-slate-700 hover:bg-white"
+               }`}
+               >
+               {tab.label}
+               </button>
+            ))}
+         </div>
+         </div>
+
+         {activeTab === "user" && (
+         <UserReportSection
+            dateRange={appliedRange}
+            fromDate={appliedFromDate}
+            toDate={appliedToDate}
+         />
+         )}
+
+         {activeTab === "child" && (
+         <ChildReportSection
+            dateRange={appliedRange}
+            fromDate={appliedFromDate}
+            toDate={appliedToDate}
+         />
+         )}
+
+         {activeTab === "game" && (
+         <GameReportSection
+            dateRange={appliedRange}
+            fromDate={appliedFromDate}
+            toDate={appliedToDate}
+         />
+         )}
+
+         {activeTab === "level" && (
+         <LevelReportSection
+            dateRange={appliedRange}
+            fromDate={appliedFromDate}
+            toDate={appliedToDate}
+            selectedGame={selectedGame}
+            onGameChange={setSelectedGame}
+         />
+         )}
+
+         {activeTab === "revenue" && (
+         <RevenueReportSection
+            dateRange={appliedRange}
+            fromDate={appliedFromDate}
+            toDate={appliedToDate}
+         />
+         )}
       </div>
     </AdminDashboardLayout>
   );
 };
 
-export default ReportsPage;
+export default ReportPage;
