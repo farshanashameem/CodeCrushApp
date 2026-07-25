@@ -8,6 +8,7 @@ import imageMangementSlice from './Slices/imageSlice'
 import leveleManagementSlice from './Slices/LevelSlice'
 import childGameManagementSlice from './Slices/childGameSlice'
 import paymentSlice from"./Slices/paymentSlice";
+import ReportSlice from "./Slices/reportSlice";
 
 export const store = configureStore({
     reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
         imageManagement: imageMangementSlice,
         levelManagement: leveleManagementSlice,
         childGame: childGameManagementSlice,
-        payment: paymentSlice
+        payment: paymentSlice,
+        report: ReportSlice,
     }
 })
 

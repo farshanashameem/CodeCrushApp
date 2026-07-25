@@ -1,174 +1,281 @@
 // src/features/Admin/pages/AdminDashboard/AdminDashboard.tsx
-import  { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import {ROUTES} from '../../../Constants/Routes'
+import { ROUTES } from '../../../Constants/Routes';
 import { useAuth } from "../../../Hooks/useAuth";
 
+// Import Polished Lucide Icons
+import { 
+  Users, 
+  Baby, 
+  Gamepad2, 
+  Sparkles, 
+  LogOut, 
+  TrendingUp, 
+  BarChart3, 
+  Shield, // Changed from ShieldAlert
+  ArrowRight 
+} from "lucide-react";
+
 import logo from "../../../assets/logo.png";
-import robotMain from "../../../assets/loginRobo.png"; // Standing robot
-import robotMini from "../../../assets/playingRobo2.png"; // Mini floating robot
+import robotMain from "../../../assets/loginRobo.png"; 
+import robotMini from "../../../assets/playingRobo2.png"; 
 import BG from "../../../assets/AdminBG.png";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [loadingLogout, setLoadingLogout] = useState(false);
+  const { logout } = useAuth();
 
-const { logout } = useAuth();
+  const handleLogout = async () => {
+    try {
+      setLoadingLogout(true);
+      await logout(); 
+      toast.success("Logged out successfully");
+      navigate(ROUTES.ADMIN.LOGIN, { replace: true });
+    } catch {
+      toast.error("Logout failed");
+    } finally {
+      setLoadingLogout(false);
+    }
+  };
 
-const handleLogout = async () => {
-  try {
-    setLoadingLogout(true);
-
-    await logout(); // clears backend + redux
-
-    toast.success(
-      "Logged out successfully"
-    );
-
-    navigate(
-      ROUTES.ADMIN.LOGIN,
-      { replace: true }
-    );
-
-  } catch {
-    toast.error(
-      "Logout failed"
-    );
-  } finally {
-    setLoadingLogout(false);
-  }
-};
+  // 8. Placeholders ready for backend data mapping
+  const dashboardStats = [
+    {
+      title: "Active Users",
+      value: "1,200", // Map to dynamic backend data later
+      icon: Users,
+      color: "text-blue-500",
+      iconBg: "bg-blue-500/10 border-blue-500/20",
+      glow: "bg-blue-400/20",
+    },
+    {
+      title: "Total Children",
+      value: "500", // Map to dynamic backend data later
+      icon: Baby,
+      color: "text-cyan-500",
+      iconBg: "bg-cyan-500/10 border-cyan-500/20",
+      glow: "bg-cyan-400/20",
+    },
+    {
+      title: "Games",
+      value: "4", // Map to dynamic backend data later
+      icon: Gamepad2,
+      color: "text-violet-500",
+      iconBg: "bg-violet-500/10 border-violet-500/20",
+      glow: "bg-violet-400/20",
+    },
+    {
+      title: "Levels",
+      value: "40", // Map to dynamic backend data later
+      icon: Sparkles,
+      color: "text-amber-500",
+      iconBg: "bg-amber-500/10 border-amber-500/20",
+      glow: "bg-amber-400/20",
+    },
+  ];
 
   return (
     <div
-      className="min-h-screen w-full bg-cover bg-center p-4 sm:p-6 overflow-x-hidden relative font-sans select-none flex flex-col justify-center"
+      className="min-h-screen w-full bg-cover bg-center py-8 px-4 sm:px-6 relative font-sans select-none flex flex-col items-center justify-start overflow-y-auto"
       style={{ backgroundImage: `url(${BG})` }}
     >
-      {/* Dark Ambient Layer for Rich Contrast */}
-      <div className="absolute inset-0 bg-slate-900/10 z-0" />
-      <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,_white,_transparent_40%)] z-0" />
+      {/* CSS Injection for Custom Floating Animation (Point 3) */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
+      `}</style>
 
-      <div className="max-w-6xl w-full mx-auto relative z-10">
+      {/* Dark Ambient Layer */}
+      <div className="absolute inset-0 bg-slate-950/40 z-0" />
+      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent z-0" />
+
+      <div className="max-w-6xl w-full mx-auto relative z-10 space-y-6">
         
         {/* Top Header Glass Panel */}
-        <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-4 border border-white/30 shadow-xl mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 relative">
+        <header className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 shadow-2xl flex flex-col sm:flex-row justify-between items-center gap-4 relative">
           
-          {/* Floating Mini Robot Asset */}
+          {/* Floating Mini Robot Asset with clean float (Point 3) */}
           <img
             src={robotMini}
-            className="absolute -top-7 -left-3 w-14 md:w-16 animate-float drop-shadow-md pointer-events-none select-none z-20"
+            className="absolute -top-10 -left-4 w-16 md:w-20 animate-float drop-shadow-lg pointer-events-none select-none z-20"
             alt="Mini Robo"
           />
 
-          <div className="flex items-center gap-3 pl-8 sm:pl-10 text-center sm:text-left">
-            <img src={logo} className="w-14 h-14 object-contain drop-shadow-sm" alt="Code Crush Logo" />
+          <div className="flex items-center gap-3 pl-12 sm:pl-14 text-left">
+            <img src={logo} className="w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-md" alt="Code Crush Logo" />
             <div>
-              <h1 className="text-xl font-black text-violet-900 tracking-wide uppercase text-sm md:text-base">Admin Dashboard 🎮</h1>
-              <p className="text-xs text-slate-700 font-medium">Manage your game universe from one place</p>
+              <h1 className="text-base md:text-lg font-black text-violet-950 tracking-wide uppercase">
+                Admin Dashboard
+              </h1>
+              <p className="text-xs text-slate-800 font-semibold">
+                Manage your game universe from one place
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
-            <div className="bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-xl shadow-sm border border-white/50 text-center sm:text-left">
-              <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Role</p>
-              <p className="text-xs font-black text-slate-800">Super Admin</p>
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            {/* 7. Richer Header Role Card with Online Indicator */}
+            <div className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-xl shadow-sm border border-white/60 text-right min-w-[100px]">
+              <p className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Super Admin</p>
+              <div className="flex items-center justify-end gap-1.5 mt-0.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-xs font-black text-slate-800">Online</p>
+              </div>
             </div>
 
             <button 
               onClick={handleLogout}
               disabled={loadingLogout}
-              className="bg-rose-500 hover:bg-rose-600 active:scale-95 transition text-white px-5 py-2.5 rounded-xl font-bold shadow-md text-xs tracking-wider uppercase disabled:opacity-50"
+              className="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 active:scale-95 transition-all text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-rose-500/20 text-xs tracking-wider uppercase disabled:opacity-50"
             >
+              <LogOut className="w-4 h-4" />
               {loadingLogout ? "Exiting..." : "Logout"}
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Welcome Block Banner (With Standing Robot integration space) */}
-        <div className="bg-gradient-to-r from-violet-600/90 to-blue-500/90 border border-white/20 backdrop-blur-md rounded-2xl text-white p-6 shadow-lg mb-5 relative overflow-hidden lg:pr-40">
-          <h2 className="text-2xl sm:text-3xl font-black mb-1 tracking-wide">Welcome Back!</h2>
-          <p className="text-xs sm:text-sm text-purple-100 font-medium">Platform performance is growing this week 🚀</p>
+        {/* Welcome Block Banner (Point 4 - Simplified Text) */}
+        <section className="bg-gradient-to-r from-violet-600 to-indigo-600 border border-white/20 rounded-2xl text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
+          <div className="relative z-10 max-w-lg">
+            <span className="flex items-center gap-1.5 bg-white/20 text-white text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full tracking-wider mb-3 w-max">
+              <TrendingUp className="w-3.5 h-3.5" /> SYSTEM ONLINE
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black mb-2 tracking-wide drop-shadow-sm">
+              Welcome Back, Admin!
+            </h2>
+            <p className="text-xs sm:text-sm text-indigo-100 font-medium">
+              Monitor activity and manage your learning platform with ease.
+            </p>
+          </div>
           
-          {/* Standing Robot Integrated Perfectly Inside Grid/Canvas view */}
           <img 
             src={robotMain} 
-            className="absolute right-4 -bottom-3 w-28 sm:w-32 hidden lg:block drop-shadow-xl pointer-events-none select-none z-20 transition-transform hover:scale-105 duration-300" 
+            className="absolute right-6 -bottom-4 w-28 sm:w-36 hidden lg:block drop-shadow-2xl pointer-events-none select-none z-20 transition-transform hover:scale-105 duration-300" 
             alt="Standing Robo" 
           />
-        </div>
+        </section>
 
         {/* Proportional Grid Summary Counters */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-          {[
-            ['Active Users', '1200', '👨‍👩‍👧', 'from-blue-500/10 to-blue-600/5', 'text-blue-600'],
-            ['Children', '500', '🧒', 'from-cyan-500/10 to-cyan-600/5', 'text-cyan-600'],
-            ['Games', '4', '🎲', 'from-purple-500/10 to-purple-600/5', 'text-purple-600'],
-            ['Levels', '40', '⭐', 'from-amber-500/10 to-amber-600/5', 'text-amber-500']
-          ].map(([title, value, icon,  textCol]) => (
-            <div key={title} className="bg-white/85 backdrop-blur-md border border-white/40 rounded-2xl p-4 shadow-md flex flex-col justify-between group hover:-translate-y-1 transition-all duration-200">
-              <div className="flex justify-between items-start">
-                <p className="text-[11px] font-bold text-slate-500 tracking-wider uppercase">{title}</p>
-                <div className="text-xl">{icon}</div>
-              </div>
-              <h3 className={`text-2xl font-black mt-2 tracking-tight ${textCol}`}>{value}</h3>
-            </div>
-          ))}
-        </div>
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {dashboardStats.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <div
+                key={item.title}
+                className="relative overflow-hidden bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-5 shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              >
+                <div className={`absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl ${item.glow}`} />
 
-        {/* Operations Core Splits */}
-        <div className="grid lg:grid-cols-2 gap-5 mb-5">
-          
-          {/* Quick Action Matrix Panel */}
-          <div className="bg-white/85 backdrop-blur-md border border-white/40 rounded-2xl p-5 shadow-md flex flex-col justify-between">
-            <h3 className="font-black text-sm uppercase tracking-wider text-slate-700 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-3 h-full">
-              <button onClick={() => navigate(ROUTES.ADMIN.USERS)} className="bg-blue-500 hover:bg-blue-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Manage Users</button>
-              <button onClick={() => navigate(ROUTES.ADMIN.GAMES)} className="bg-violet-500 hover:bg-violet-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Games</button>
-              <button className="bg-emerald-500 hover:bg-emerald-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Security</button>
-              <button className="bg-orange-500 hover:bg-orange-600 active:scale-98 text-white rounded-xl p-3 font-bold text-xs uppercase tracking-wider shadow-sm transition-all">Reports</button>
-            </div>
-          </div>
+                <div className="relative z-10 flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
+                      {item.title}
+                    </p>
+                    {/* 2. Stat numbers now use their custom accent color! */}
+                    <h3 className={`text-2xl sm:text-3xl font-black mt-2 ${item.color}`}>
+                      {item.value}
+                    </h3>
+                  </div>
 
-          {/* Analytics Chart Block */}
-          <div className="bg-white/85 backdrop-blur-md border border-white/40 rounded-2xl p-5 shadow-md">
-            <h3 className="font-black text-sm uppercase tracking-wider text-slate-700 mb-4">Weekly Analytics</h3>
-            <div className="h-32 flex items-end justify-between px-2">
-              {['35%', '70%', '50%', '90%', '45%', '75%', '95%'].map((h, i) => (
-                <div 
-                  key={i} 
-                  className="w-7 sm:w-8 rounded-t-lg bg-gradient-to-t from-violet-600 to-blue-400 transition-all duration-300 hover:opacity-80 shadow-inner" 
-                  style={{ height: h }} 
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+                  <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shadow-sm ${item.iconBg}`}>
+                    <IconComponent className={`w-6 h-6 ${item.color}`} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </section>
 
-        {/* Platform Core Performance Gauges */}
-        <div className="bg-white/85 backdrop-blur-md border border-white/40 rounded-2xl p-5 shadow-md">
-          <h3 className="font-black text-sm uppercase tracking-wider text-slate-700 mb-4">Platform Progress</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-xs font-bold text-slate-600 uppercase tracking-wide">User Growth</p>
-                <span className="text-xs font-black text-blue-600">85%</span>
+        {/* Admin Modules */}
+        <section className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-6">
+            Platform Management
+          </h3>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            {/* Users Card */}
+            <button
+              onClick={() => navigate(ROUTES.ADMIN.USERS)}
+              className="group relative overflow-hidden bg-white/90 hover:bg-white border border-white rounded-2xl p-5 text-left shadow-md hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+            >
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 mb-4 border border-blue-500/20">
+                <Users className="w-6 h-6" />
               </div>
-              <div className="bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
-                <div className="bg-gradient-to-r from-blue-500 to-cyan-400 h-full w-[85%] rounded-full" />
+              <h4 className="font-extrabold text-slate-900 text-base">Users</h4>
+              <p className="text-xs text-slate-600 mt-2 line-clamp-2">
+                Manage parent accounts, child accounts, and profiles.
+              </p>
+              <div className="mt-4 flex items-center font-bold text-xs text-blue-600 transition-transform">
+                Open Controls <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+
+            {/* Games Card */}
+            <button
+              onClick={() => navigate(ROUTES.ADMIN.GAMES)}
+              className="group relative overflow-hidden bg-white/90 hover:bg-white border border-white rounded-2xl p-5 text-left shadow-md hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+            >
+              <div className="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-600 mb-4 border border-violet-500/20">
+                <Gamepad2 className="w-6 h-6" />
+              </div>
+              <h4 className="font-extrabold text-slate-900 text-base">Games</h4>
+              <p className="text-xs text-slate-600 mt-2 line-clamp-2">
+                Create levels, modify questions, and customize gamification details.
+              </p>
+              <div className="mt-4 flex items-center font-bold text-xs text-violet-600 transition-transform">
+                Open Controls <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+
+            {/* Reports Card (Point 5 - Simplified Copy) */}
+            <button
+            onClick={ ()=> navigate(ROUTES.ADMIN.REPORTS)}
+              className="group relative overflow-hidden bg-white/90 hover:bg-white border border-white rounded-2xl p-5 text-left shadow-md hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+            >
+              <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-600 mb-4 border border-orange-500/20">
+                <BarChart3 className="w-6 h-6" />
+              </div>
+              <h4 className="font-extrabold text-slate-900 text-base">Reports</h4>
+              <p className="text-xs text-slate-600 mt-2 line-clamp-2">
+                View gameplay analytics, user trends, and platform performance.
+              </p>
+              <div className="mt-4 flex items-center font-bold text-xs text-orange-600 transition-transform">
+                Open Controls <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+
+            {/* Security Card (Point 9 - Disabled State & Coming Soon Badge) */}
+            <div
+              className="relative overflow-hidden bg-white/60 border border-white/40 rounded-2xl p-5 text-left shadow-sm cursor-not-allowed opacity-80"
+            >
+              <span className="absolute top-4 right-4 bg-slate-250 border border-slate-350 text-slate-600 text-[9px] font-extrabold px-2 py-0.5 rounded-full tracking-wider uppercase">
+                Soon
+              </span>
+
+              {/* Point 6 - Shield Icon used instead of ShieldAlert */}
+              <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center text-slate-400 mb-4 border border-slate-500/20">
+                <Shield className="w-6 h-6" />
+              </div>
+              <h4 className="font-extrabold text-slate-400 text-base">Security</h4>
+              <p className="text-xs text-slate-400 mt-2 line-clamp-2">
+                Configure roles, API access points, and system credentials safely.
+              </p>
+              <div className="mt-4 flex items-center font-bold text-xs text-slate-300 gap-1 select-none">
+                Locked <Shield className="w-3.5 h-3.5" />
               </div>
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-xs font-bold text-slate-600 uppercase tracking-wide">Game Completion</p>
-                <span className="text-xs font-black text-violet-600">70%</span>
-              </div>
-              <div className="bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
-                <div className="bg-gradient-to-r from-violet-500 to-fuchsia-400 h-full w-[70%] rounded-full" />
-              </div>
-            </div>
+
           </div>
-        </div>
+        </section>
 
       </div>
     </div>

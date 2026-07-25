@@ -22,7 +22,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
             throw new AppError( authMessages.error.PAYMENT_NOT_EXIST, StatusCodes.NOT_FOUND);
         }
 
-        const result = await this._razorpayService.verifySignature(payment.getRazorpayOrderId(), data.paymentId, data.signature);
+        const result = this._razorpayService.verifySignature(payment.getRazorpayOrderId(), data.paymentId, data.signature);
         if( !result) {
             await this._paymentRepo.updateFailed(payment.getRazorpayOrderId());
             throw new AppError( authMessages.error.INVALID_PAYMENT, StatusCodes.BAD_REQUEST );

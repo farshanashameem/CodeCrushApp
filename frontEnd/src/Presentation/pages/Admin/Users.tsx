@@ -20,6 +20,7 @@ const Users = () => {
     (state: RootState) => state.user
   );
 
+   
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,6 +93,7 @@ const Users = () => {
                   <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-xs">
                     <th className="py-4 px-6">User</th>
                     <th className="py-4 px-6 text-center">Children</th>
+                    <th className="py-4 px-6 text-center">Type</th>
                     <th className="py-4 px-6 text-center">Status</th>
                     <th className="py-4 px-6 text-center">Actions</th>
                   </tr>
@@ -122,6 +124,9 @@ const Users = () => {
 
                         <td className="py-4 px-6 text-center font-mono text-slate-600">
                           {user.childrenIds?.length || 0}
+                        </td>
+                        <td className="py-4 px-6 text-center font-mono text-slate-600">
+                          {user.isPremium? "Premium":" Free"}
                         </td>
 
                         <td className="py-4 px-6 text-center">

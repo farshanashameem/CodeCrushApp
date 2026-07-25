@@ -1,4 +1,4 @@
-import { adminLoginController, userManagementController, childManagementController, gameLevelController, iconManagementController, imageManagementcontroller, gameController } from '@/Presentation/Factory/AdminFactory';
+import { adminLoginController, userManagementController, childManagementController, gameLevelController, iconManagementController, imageManagementcontroller, gameController, reportController, exportReportController } from '@/Presentation/Factory/AdminFactory';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
 import { authAdminHandler } from '@/Presentation/Middlewares/AdminAuthMiddleware';
 import { ROUTES } from '@/Shared/Routes';
@@ -41,4 +41,17 @@ router.delete( ROUTES.ADMIN.IMAGE_MANAGEMENT.BY_ID, imageManagementcontroller.de
 router.get(ROUTES.ADMIN.GAME_MANAGEMENT.BASE, gameController.getAllGames);
 router.get( ROUTES.ADMIN.GAME_MANAGEMENT.BY_ID, gameController.getGame );
 router.patch( ROUTES.ADMIN.GAME_MANAGEMENT.STATUS, gameController.changeStatus);
+
+router.get( ROUTES.ADMIN.REPORT_MANAGEMENT.USER_REPORT, reportController.userReport);
+router.get( ROUTES.ADMIN.REPORT_MANAGEMENT.CHILD_REPORT, reportController.childReport);
+router.get( ROUTES.ADMIN.REPORT_MANAGEMENT.GAME_REPORT, reportController.gamereport );
+router.get( ROUTES.ADMIN.REPORT_MANAGEMENT.LEVEL_REPORT, reportController.levelReport);
+router.get( ROUTES.ADMIN.REPORT_MANAGEMENT.REVENUE_REPORT, reportController.revenueReport);
+
+
+router.get( ROUTES.ADMIN.EXPORT_REPORTS.USER_REPORT, exportReportController.exportUserReport);
+router.get( ROUTES.ADMIN.EXPORT_REPORTS.CHILD_REPORT, exportReportController.exportChildReport);
+router.get( ROUTES.ADMIN.EXPORT_REPORTS.GAME_REPORT, exportReportController.exportGameReport);
+router.get( ROUTES.ADMIN.EXPORT_REPORTS.LEVEL_REPORT, exportReportController.exportLevelReport);
+router.get( ROUTES.ADMIN.EXPORT_REPORTS.REVENUE_REPORT, exportReportController.exportRevenueReport);
 export default router;

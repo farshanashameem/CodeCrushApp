@@ -216,5 +216,60 @@ export const updateChildSchema = childSchema.extend({
 });
 
 
+export const reportDateSchema = z
+  .object({
+    from: z.string().min(1, "From date is required"),
+    to: z.string().min(1, "To date is required"),
+  })
+  .superRefine(({ from, to }, ctx) => {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+    fromDate.setHours(0, 0, 0, 0);
+    toDate.setHours(0, 0, 0, 0);
+
+    if (isNaN(fromDate.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["from"],
+        message: "Invalid from date",
+      });
+    }
+
+    if (isNaN(toDate.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["to"],
+        message: "Invalid to date",
+      });
+    }
+
+    if (fromDate > today) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["from"],
+        message: "From date cannot be in the future",
+      });
+    }
+
+    if (toDate > today) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["to"],
+        message: "To date cannot be in the future",
+      });
+    }
+
+    if (fromDate > toDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["to"],
+        message: "To date must be after From date",
+      });
+    }
+  });
+
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>

@@ -28,9 +28,9 @@ export default function AdminDashboardLayout({
   // 2. Define your menu links here for clean management
   const menuItems = [
     { name: "Dashboard 🏠", path: ROUTES.ADMIN.DASHBOARD || "/admin/dashboard" },
-    { name: "Users Management 👥", path: "/admin/users" }, 
-    { name: "Reports 📊", path: "/admin/reports" },
-    { name: "Games 🎲", path: "/admin/games" },
+    { name: "Users Management 👥", path: ROUTES.ADMIN.USERS  ||"/admin/users" }, 
+    { name: "Reports 📊", path:  ROUTES.ADMIN.REPORTS ||"/admin/reports" },
+    { name: "Games 🎲", path: ROUTES.ADMIN.GAMES ||"/admin/games" },
   ];
 
   const handleLogout = async () => {
@@ -103,40 +103,39 @@ export default function AdminDashboardLayout({
           </div>
         )}
 
-        {/* 3. NEW SIDEBAR + CONTENT CONTAINER */}
-        <div className="w-full relative z-10 flex-1 flex flex-col md:flex-row gap-5 items-start">
-          
-          {/* PERSISTENT SIDEBAR MENU */}
-          <nav className="w-full md:w-64 bg-white/30 backdrop-blur-md border border-white/40 p-4 rounded-3xl shadow-lg flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible">
-            <p className="hidden md:block text-[10px] font-black text-violet-900/60 uppercase tracking-widest px-3 mb-2">
-              Navigation Menu
-            </p>
-            {menuItems.map((item) => {
-              const isActive = item.path === (ROUTES.ADMIN.DASHBOARD || "/admin/dashboard")
-                              ? location.pathname === item.path
-                              : location.pathname.startsWith(item.path);
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`whitespace-nowrap md:whitespace-normal px-4 py-3 rounded-xl font-bold text-xs tracking-wide uppercase transition-all duration-200 text-center md:text-left flex-1 md:flex-initial ${
-                    isActive
-                      ? "bg-violet-600 text-white shadow-md scale-102"
-                      : "bg-white/60 text-slate-700 hover:bg-white/90 hover:text-violet-950"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
 
-          {/* INNER PAGE CONTENT MOUNT POINT */}
-          <div className="w-full flex-1 flex flex-col min-w-0">
-            {children}
+          {/* Top Navigation */}
+          <div className="relative z-10 mb-5">
+            <nav className="bg-white/25 backdrop-blur-xl border border-white/30 rounded-2xl shadow-lg p-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {menuItems.map((item) => {
+                  const isActive =
+                    item.path === (ROUTES.ADMIN.DASHBOARD || "/admin/dashboard")
+                      ? location.pathname === item.path
+                      : location.pathname.startsWith(item.path);
+
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wide transition-all duration-200 ${
+                        isActive
+                          ? "bg-violet-600 text-white shadow-md"
+                          : "bg-white/70 text-slate-700 hover:bg-white hover:text-violet-700"
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </nav>
           </div>
 
-        </div>
+          {/* Page Content */}
+          <div className="relative z-10 flex-1 w-full">
+            {children}
+          </div>
 
       </div>
     </div>

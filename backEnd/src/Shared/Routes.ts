@@ -48,6 +48,20 @@ export const ROUTES = {
             CREATE : '/images',
             BY_ID: '/images/:imageId',
             STATUS : '/images/:imageId/status'
+        },
+        REPORT_MANAGEMENT : {
+            USER_REPORT: '/reports/users',
+            CHILD_REPORT: '/reports/children',
+            GAME_REPORT: '/reports/games',
+            LEVEL_REPORT: '/reports/levels',
+            REVENUE_REPORT: '/reports/revenue'
+        },
+        EXPORT_REPORTS : {
+            USER_REPORT: '/reports/users/export',
+            CHILD_REPORT: '/reports/children/export',
+            GAME_REPORT: '/reports/games/export',
+            LEVEL_REPORT: '/reports/levels/export',
+            REVENUE_REPORT: '/reports/revenue/export'
         }
     },
 
