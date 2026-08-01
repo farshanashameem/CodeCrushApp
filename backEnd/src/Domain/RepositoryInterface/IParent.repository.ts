@@ -9,6 +9,9 @@ export interface IParentRepository extends IAuthRepository<ParentEntity> {
     updatePassword( id: string, hashedPassword: string ): Promise<void>;
     addChildToParent( parentId: string, childId: string ) : Promise<void>;
     getUserReport( filter: ReportFilter ): Promise<UserReportData>;
-    
-
+    findPremiumParents(): Promise<ParentEntity[]>;
+    findPremiumParentsExpiringBetween( from: Date, to: Date ): Promise<ParentEntity[]>;
+    findPremiumParentsExpiredBetween( from: Date, to: Date ): Promise<ParentEntity[]>;
+    cleanupDeleted(): Promise<void>;
+    cleanupExpiredPremiumSubscriptions(): Promise<void>;
 }

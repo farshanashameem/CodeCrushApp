@@ -49,6 +49,16 @@ export class ChildRepository extends BaseRepository < ChildEntity, IChild > impl
 
         }
 
+        async cleanupDeleted(): Promise<void> {
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 90);
+
+            await this._model.deleteMany({
+                status: UserStatus.DELETED,
+                updatedAt: { $lte: cutoffDate }
+            });
+        }
+
         private async getChildMetrics ( filter: ReportFilter ): Promise<ChildReportMetrics> {
             const totalChildren = await this._model.countDocuments({ status: { $ne: UserStatus.DELETED }});
             const activeChildren = await this._model.countDocuments({

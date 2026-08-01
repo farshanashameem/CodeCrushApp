@@ -21,7 +21,9 @@ export class ParentMapper {
             doc.subscriptionStartDate,
             doc.subscriptionExpiryDate,
             doc.createdAt,
-            doc.updatedAt
+            doc.updatedAt,
+            doc.deletedAt,
+            
         );
     }
 
@@ -43,6 +45,7 @@ export class ParentMapper {
             subscriptionPlan: entity.getSubscriptionPlan(),
             subscriptionStartDate: entity.getSubscriptionStartDate(),
             subscriptionExpiryDate: entity.getSubscriptionExpiryDate(),
+            deletedAt: entity.getDeletedAt()
         };
     }
 }

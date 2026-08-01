@@ -16,6 +16,7 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
     private subscriptionPlan?: SubscriptionPlan;
     private subscriptionStartDate?: Date;
     private subscriptionExpiryDate?: Date;
+    private deletedAt?: Date;
     constructor(
         name: string,
         email: string,
@@ -30,7 +31,8 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
         subscriptionStartDate?: Date,
         subscriptionExpiryDate?: Date,
         createdAt?: Date,
-        updatedAt?: Date
+        updatedAt?: Date,
+        deletedAt?: Date,
     ) {
         super(name, email, password, UserRole.PARENT, id ,createdAt, updatedAt) ;
 
@@ -42,6 +44,7 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
         this.subscriptionPlan = subscriptionPlan;
         this.subscriptionStartDate = subscriptionStartDate;
         this.subscriptionExpiryDate = subscriptionExpiryDate;
+        this.deletedAt= deletedAt;
     }
 
     public getChildrenIds() : string[] {
@@ -62,10 +65,12 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
 
     public delete(): void {
         this.statusEntity.delete();
+        this.deletedAt = new Date();
     }
 
     public restore(): void {
         this.statusEntity.restore();
+        this.deletedAt = undefined;
     }
 
     public getStatus(): UserStatus {
@@ -90,6 +95,13 @@ export default class ParentEntity extends BaseUser implements IStatusEntity {
 
     public getSubscriptionExpiryDate(): Date | undefined {
         return this.subscriptionExpiryDate;
+    }
+
+    public getDeletedAt(): Date | undefined {
+        return this.deletedAt;
+    }
+    public setDeletedAt(date?: Date): void {
+        this.deletedAt = date;
     }
 
     public update( data:ParentUpdateData ) {

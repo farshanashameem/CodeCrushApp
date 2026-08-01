@@ -39,6 +39,9 @@ const ColorSorterPlayPage = () => {
   const [isNewHighScore, setIsNewHighScore] = useState(false);
   const [isNewBestTime, setIsNewBestTime] = useState(false);
 
+  // State to handle wrong drop feedback
+  const [isMistake, setIsMistake] = useState(false);
+
   interface DraggableItem {
     id: string;
     iconKey: string;
@@ -56,11 +59,20 @@ const ColorSorterPlayPage = () => {
   const hoverAudio = React.useRef(new Audio(hoverSound));
   const correctAudio = React.useRef(new Audio(correctSound));
   const wrongAudio = React.useRef(new Audio(wrongSound));
+
   const playSound = (audio: HTMLAudioElement) => {
     audio.currentTime = 0;
     audio.volume = 0.5;
     audio.play().catch(() => {});
   };
+
+  const triggerMistakeFeedback = () => {
+    setIsMistake(true);
+    setTimeout(() => {
+      setIsMistake(false);
+    }, 600);
+  };
+
   useEffect(() => {
     dispatch(getCurrentChildSession());
   }, [dispatch]);
@@ -110,6 +122,7 @@ const ColorSorterPlayPage = () => {
     setGameFinished(false);
     setIsNewBestTime(false);
     setIsNewHighScore(false);
+    setIsMistake(false);
   }, [levelId]);
 
   if (!currentChild || !selectedGame || !selectedLevel) return null;
@@ -122,6 +135,7 @@ const ColorSorterPlayPage = () => {
   const targetColors = config.targetColors;
   const targetColor = targetColors[targetIndex];
   const totalItems = config.items.reduce((sum, item) => sum + item.count, 0);
+
   useEffect(() => {
     if (!selectedLevel) return;
 
@@ -229,6 +243,7 @@ const ColorSorterPlayPage = () => {
 
     if (item.color !== targetColor) {
       playSound(wrongAudio.current);
+      triggerMistakeFeedback();
 
       setWrongAnswers((prev) => prev + 1);
       setTimeLeft((prev) => Math.max(0, prev - 5));
@@ -287,6 +302,7 @@ const ColorSorterPlayPage = () => {
     setScore(0);
     setStars(0);
     setGameFinished(false);
+    setIsMistake(false);
 
     setTimeLeft(selectedLevel.timer);
   };
@@ -338,7 +354,7 @@ const ColorSorterPlayPage = () => {
       child={currentChild}
       logo={theme.logo}
       title={selectedGame.name}
-      isPremium= { currentChild?.isPremium}
+      isPremium={currentChild?.isPremium}
     >
       <div className="relative max-w-6xl mx-auto h-[calc(100vh-90px)] px-6 py-4 flex flex-col">
         {!showSuccess && !showFailure && (
@@ -352,9 +368,9 @@ const ColorSorterPlayPage = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col overflow-hidden rounded-[40px] p-6 bg-white/50 shadow-xl backdrop-blur-sm">
-          {/* Target Color */}
-          <div className="text-center mb-4">
+        <div className="flex-1 flex flex-col justify-between overflow-hidden rounded-[40px] p-6 bg-white/50 shadow-xl backdrop-blur-sm">
+          {/* Target Color Header */}
+          <div className="text-center mb-2">
             <h2 className="text-2xl font-bold">
               Drag all
               <span className="mx-2 capitalize" style={{ color: targetColor }}>
@@ -364,7 +380,7 @@ const ColorSorterPlayPage = () => {
             </h2>
           </div>
 
-          <div className="flex-1 grid grid-cols-2 gap-6 items-center overflow-hidden">
+          <div className="flex-1 min-h-0 grid grid-cols-2 gap-6 items-center overflow-hidden my-auto">
             {/* LEFT DROP BOX */}
             <div
               onDragOver={(e) => {
@@ -378,42 +394,56 @@ const ColorSorterPlayPage = () => {
               }}
               onDragLeave={() => setIsOverDropZone(false)}
               onDrop={handleDrop}
-              className="flex justify-center items-center"
+              className="relative flex justify-center items-center"
             >
+              {/* Floating Oops Badge on Wrong Drop */}
+              {isMistake && (
+                <div className="absolute -top-12 z-20 animate-bounce bg-red-500 text-white font-black px-4 py-1.5 rounded-full shadow-lg border-2 border-white text-base sm:text-lg">
+                  Oops! Wrong Color ❌
+                </div>
+              )}
+
               <img
                 src={basket}
                 alt="Basket"
                 draggable={false}
-                className={`w-[28vw] min-w-40 max-w-72 transition-all duration-200 select-none
-      ${
-        isOverDropZone
-          ? "scale-110 drop-shadow-[0_0_35px_rgba(255,210,0,.8)]"
-          : "scale-100"
-      }
-    `}
+                className={`w-[26vw] min-w-36 max-w-64 transition-all duration-200 select-none ${
+                  isMistake
+                    ? "animate-shake filter drop-shadow-[0_0_30px_rgba(239,68,68,0.9)]"
+                    : isOverDropZone
+                    ? "scale-110 drop-shadow-[0_0_35px_rgba(255,210,0,.8)]"
+                    : "scale-100"
+                }`}
               />
             </div>
 
             {/* RIGHT ICONS */}
-            <div className="grid flex-1 grid-cols-4 gap-4 place-items-center">
+            <div className="grid flex-1 grid-cols-4 gap-4 place-items-center overflow-y-auto max-h-full">
               {items.map((item) => (
                 <div
                   key={item.id}
                   draggable
                   onDragStart={(e) => onDragStart(e, item)}
                   onDragEnd={onDragEnd}
-                  className="h-[8vw] w-[8vw] min-h-14 min-w-14 max-h-20 max-w-20 rounded-2xl   flex flex-col items-center justify-center cursor-grab hover:scale-110 transition"
+                  className="h-[7vw] w-[7vw] min-h-12 min-w-12 max-h-20 max-w-20 rounded-2xl flex flex-col items-center justify-center cursor-grab hover:scale-110 transition active:cursor-grabbing"
                 >
-                  <span className="text-4xl md:text-5xl ms-2">
-                    {item.iconKey}
-                  </span>
+                  <span className="text-3xl md:text-5xl">{item.iconKey}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-4 text-center">
-            <p className="text-red-500">Mistakes : {wrongAnswers}</p>
+          {/* Footer with High-Contrast Mistakes Badge */}
+          <div className="mt-2 text-center pt-2 border-t border-slate-200/60">
+            <span
+              className={`inline-block px-5 py-1.5 rounded-full font-bold transition-all duration-300 ${
+                isMistake
+                  ? "bg-red-500 text-white scale-110 shadow-lg"
+                  : "bg-red-100 text-red-600 border border-red-200"
+              }`}
+            >
+              Mistakes : {wrongAnswers}
+            </span>
           </div>
         </div>
 

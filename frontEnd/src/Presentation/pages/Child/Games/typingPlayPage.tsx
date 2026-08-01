@@ -37,6 +37,11 @@ const TypingPlayPage = () => {
   const [levels, setLevels] = useState<Level[]>([]);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
   const [isNewBestTime, setIsNewBestTime] = useState(false);
+
+  // Feedback states for friendly messaging & shake effect
+  const [shake, setShake] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
   const { currentChild, selectedGame, selectedLevel, selectedLevelProgress } =
     useSelector((state: RootState) => state.childGame);
   const keySound = useMemo(() => new Audio(click), []);
@@ -49,14 +54,12 @@ const TypingPlayPage = () => {
     if (!gameId || !levelId) return;
 
     dispatch(getGameDetail(gameId));
-
     dispatch(
       getLevelDetail({
         gameId,
         levelId,
       }),
     );
-
     dispatch(
       getLevelProgress({
         gameId,
@@ -88,19 +91,17 @@ const TypingPlayPage = () => {
     setGameFinished(false);
     setIsNewBestTime(false);
     setIsNewHighScore(false);
+    setFeedbackMessage(null);
   }, [levelId]);
 
   if (!currentChild || !selectedGame || !selectedLevel) return null;
 
   const words = (selectedLevel.config as { words: string[] }).words ?? [];
-
   const currentWord = words[currentIndex];
-
   const theme = gameTheme[selectedGame.name as keyof typeof gameTheme];
 
   const nextLevel = useMemo(() => {
     const sorted = [...levels].sort((a, b) => a.levelNumber - b.levelNumber);
-
     const levelIndex = sorted.findIndex((level) => level.id === levelId);
 
     if (levelIndex === -1) return null;
@@ -114,17 +115,13 @@ const TypingPlayPage = () => {
     setGameFinished(true);
 
     const timeTaken = selectedLevel.timer - timeLeft;
-
     const baseScore = 100;
     const mistakePenalty = wrongAnswers * 2;
-
     const finalScore = Math.max(0, baseScore - mistakePenalty);
 
     setScore(finalScore);
 
-    // Star calculation
     const percentage = (finalScore / selectedLevel.maxScore) * 100;
-
     let earnedStars = 1;
 
     if (percentage >= 90) earnedStars = 3;
@@ -132,7 +129,6 @@ const TypingPlayPage = () => {
 
     setStars(earnedStars);
 
-    // Compare with previous attempt
     const previousScore = selectedLevelProgress?.highScore ?? 0;
     const previousBestTime =
       selectedLevelProgress?.bestTime ?? Number.MAX_SAFE_INTEGER;
@@ -167,7 +163,17 @@ const TypingPlayPage = () => {
   const handleSubmitWord = () => {
     if (gameFinished || !currentWord) return;
 
-    if (input.trim().toLowerCase() === currentWord.toLowerCase()) {
+    const sanitizedInput = input.trim().toLowerCase();
+
+    // 1. FRIENDLY HINT FOR EMPTY SUBMISSIONS (Does not count as a mistake)
+    if (!sanitizedInput) {
+      setFeedbackMessage("Type the word first! ✍️");
+      setTimeout(() => setFeedbackMessage(null), 2000);
+      return;
+    }
+
+    if (sanitizedInput === currentWord.toLowerCase()) {
+      setFeedbackMessage(null);
       const isLastWord = currentIndex === words.length - 1;
 
       if (isLastWord) {
@@ -176,7 +182,13 @@ const TypingPlayPage = () => {
         setCurrentIndex((prev) => prev + 1);
       }
     } else {
+      // 2. MISTAKE FEEDBACK FOR INCORRECT TYPING
       setWrongAnswers((prev) => prev + 1);
+      setShake(true);
+      setFeedbackMessage("Oops! Try again! 🤔");
+
+      setTimeout(() => setShake(false), 500);
+      setTimeout(() => setFeedbackMessage(null), 2500);
     }
 
     setInput("");
@@ -192,13 +204,16 @@ const TypingPlayPage = () => {
     setScore(0);
     setStars(0);
     setGameFinished(false);
+    setFeedbackMessage(null);
 
     setTimeLeft(selectedLevel.timer);
   };
 
   const onNext = async () => {
     if (!nextLevel) {
-      navigate(`/play/${currentChild?.id}/games/${gameId}/levels/${nextLevel}`);
+      navigate(`/play/${currentChild?.id}/games/${gameId}`, {
+        replace: true,
+      });
       return;
     }
 
@@ -212,7 +227,6 @@ const TypingPlayPage = () => {
     if (gameFinished || !selectedLevel) return;
 
     setGameFinished(true);
-
     const timeTaken = selectedLevel.timer;
 
     await dispatch(
@@ -221,9 +235,7 @@ const TypingPlayPage = () => {
         gameId: gameId!,
         levelId: levelId!,
         levelNumber: selectedLevel.levelNumber,
-
         completed: false,
-
         score: 0,
         stars: 0,
         timeTaken,
@@ -240,7 +252,7 @@ const TypingPlayPage = () => {
       child={currentChild}
       logo={theme.logo}
       title={selectedGame.name}
-      isPremium= { currentChild?.isPremium}
+      isPremium={currentChild?.isPremium}
     >
       <div className="max-w-6xl mx-auto px-6 pt-2 pb-10">
         {!showSuccess && !showFailure && (
@@ -254,18 +266,29 @@ const TypingPlayPage = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col justify-center items-center rounded-[40px] bg-white/20 backdrop-blur-md shadow-2xl p-6 lg:p-10">
+        <div
+          className={`flex-1 flex flex-col justify-center items-center rounded-[40px] bg-white/20 backdrop-blur-md shadow-2xl p-6 lg:p-10 transition-all duration-300 border-4 ${
+            shake ? "border-rose-400 animate-shake" : "border-white/30"
+          }`}
+        >
           {/* Title */}
-          <h2 className="text-2xl lg:text-3xl font-mochiy text-blue-700 drop-shadow animate-bounce">
+          <h2 className="text-2xl lg:text-3xl font-mochiy text-blue-700 drop-shadow">
             ⌨️ Type This Word
           </h2>
 
           {/* Word Card */}
-          <div className="mt-6 rounded-3xl bg-white border-4 border-yellow-300 px-8 lg:px-12 py-6 shadow-2xl animate-pulse">
+          <div className="mt-6 rounded-3xl bg-white border-4 border-yellow-300 px-8 lg:px-12 py-6 shadow-2xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-mochiy text-pink-600 tracking-wide text-center break-words">
               {currentWord}
             </h1>
           </div>
+
+          {/* Dynamic Feedback Message */}
+          {feedbackMessage && (
+            <div className="animate-bounce font-mochiy text-base md:text-lg text-rose-500 mt-4">
+              {feedbackMessage}
+            </div>
+          )}
 
           {/* Input */}
           <input
@@ -279,49 +302,50 @@ const TypingPlayPage = () => {
             }}
             autoFocus
             placeholder="✨ Type here..."
-            className="
-      mt-8
-      w-[95%] sm:w-[85%] lg:w-[70%]
-      rounded-3xl
-      border-4 border-yellow-300
-      bg-yellow-50
-      px-6 py-4
-      text-center
-      text-2xl lg:text-3xl
-      font-mochiy
-      text-fuchsia-600
-      placeholder:text-fuchsia-300
-      tracking-wide
-      outline-none
-      shadow-xl
-      transition-all
-      duration-300
-      focus:border-pink-500
-      focus:bg-white
-      focus:scale-105
-    "
+            className={`
+              mt-6
+              w-[95%] sm:w-[85%] lg:w-[70%]
+              rounded-3xl
+              border-4
+              bg-yellow-50
+              px-6 py-4
+              text-center
+              text-2xl lg:text-3xl
+              font-mochiy
+              text-fuchsia-600
+              placeholder:text-fuchsia-300
+              tracking-wide
+              outline-none
+              shadow-xl
+              transition-all
+              duration-300
+              ${
+                shake
+                  ? "border-rose-400 bg-rose-50 focus:border-rose-500"
+                  : "border-yellow-300 focus:border-pink-500 focus:bg-white"
+              }
+            `}
           />
 
           {/* Submit */}
           <button
             onClick={handleSubmitWord}
             className="
-      mt-6
-      rounded-full
-      bg-gradient-to-r
-      from-pink-500
-      via-orange-400
-      to-yellow-400
-      px-10 py-4
-      text-xl lg:text-2xl
-      font-mochiy
-      text-white
-      shadow-xl
-      hover:scale-110
-      hover:shadow-2xl
-      active:scale-95
-      transition-all
-    "
+              mt-6
+              rounded-full
+              bg-gradient-to-r
+              from-pink-500
+              via-orange-400
+              to-yellow-400
+              px-10 py-4
+              text-xl lg:text-2xl
+              font-mochiy
+              text-white
+              shadow-xl
+              hover:scale-105
+              active:scale-95
+              transition-all
+            "
           >
             🚀 Submit
           </button>
@@ -332,8 +356,12 @@ const TypingPlayPage = () => {
               📖 {currentIndex + 1} / {words.length}
             </div>
 
-            <div className="rounded-full bg-red-500 px-6 py-3 text-white font-bold shadow-lg">
-              ❌ {wrongAnswers}
+            <div
+              className={`rounded-full px-6 py-3 text-white font-bold shadow-lg transition-transform ${
+                shake ? "bg-rose-600 scale-110" : "bg-red-500"
+              }`}
+            >
+              ❌ Mistakes: {wrongAnswers}
             </div>
           </div>
         </div>

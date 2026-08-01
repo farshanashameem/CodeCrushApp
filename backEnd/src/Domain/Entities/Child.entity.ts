@@ -14,6 +14,7 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
   private avatar: string;
   private blockedBy: BlockedBy | null;
   private createdAt: Date;
+  private deletedAt?: Date;
 
   private totalPlayTime: number;
   private totalGamesPlayed: number;
@@ -30,6 +31,7 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     id?: string,
     dob?: Date,
     createdAt?: Date,
+    deletedAt?: Date,
     status: UserStatus = UserStatus.ACTIVE,
     blockedBy: BlockedBy | null = null,
     totalPlayedTime: number = 0,
@@ -49,6 +51,7 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
     this.blockedBy = blockedBy;
     this.id = id;
     this.createdAt = createdAt ?? new Date();
+    this.deletedAt = deletedAt;
     this.totalGamesPlayed = totalGamesPlayed;
     this.totalPlayTime = totalPlayedTime;
     this.lastPlayed = lastPlayed;
@@ -80,6 +83,20 @@ export default class ChildEntity extends BaseStatusEntity implements IStatusEnti
   public getBlockedBy(): BlockedBy | null {
     return this.blockedBy;
   }
+
+  public override delete(): void {
+    super.delete();
+    this.deletedAt = new Date();
+  }
+
+public override restore(): void {
+    super.restore();
+    this.deletedAt = undefined;
+}
+
+public getDeletedAt(): Date | undefined {
+    return this.deletedAt;
+}
 
   public setBlockedBy(blockedBy: BlockedBy): void {
       this.blockedBy = blockedBy;
