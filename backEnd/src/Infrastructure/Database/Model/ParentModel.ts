@@ -17,6 +17,7 @@ export interface IParent extends Document {
     subscriptionPlan?: SubscriptionPlan;
     subscriptionStartDate?: Date;
     subscriptionExpiryDate?: Date;
+    deletedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -86,7 +87,12 @@ const ParentSchema: Schema<IParent> = new Schema(
 
     subscriptionExpiryDate: {
         type: Date
-    }
+    },
+
+    deletedAt: {
+        type: Date,
+        default: undefined,
+    },
 
     
 },

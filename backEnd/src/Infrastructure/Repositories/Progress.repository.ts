@@ -4,6 +4,7 @@ import { IProgress, ProgressModel } from '../Database/Model/ProgressModal';
 import ProgressEntity from '@/Domain/Entities/Progress.entity';
 import { ProgressMapper } from '@/Application/Mappers/Progress.mapper';
 import { Types } from 'mongoose';
+import { WeeklyProgressReportDTO, WeeklyProgressStatistics } from '@/Application/Cron/dto/WeeklyProgressReport.dto';
 
 export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress> implements IProgressRepository {
     constructor() {
@@ -26,9 +27,57 @@ export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress
         return updated? ProgressMapper.toEntity(updated) : null;
     }
 
+    async getWeeklyProgressStatistics(childId: string, gameId: string, from: Date, to: Date): Promise<WeeklyProgressStatistics> {
+        const stats = await this._model.aggregate([
+            {
+                $match: {
+                    childId: new Types.ObjectId( childId ),
+                    gameId: new Types.ObjectId(gameId),
+                    lastPlayedAt: { $gte: from, $lte: to }
+                }
+            },
+            {
+                $group : {
+                    _id: null,
+                    levelsPlayedThisWeek: { $sum: 1},
+                    levelsCompletedThisWeek: {
+                        $sum: { $cond: ["$completed", 1, 0]}
+                    },
+                    highestScoreThisWeek: { $max: "$highScore"},
+                    bestTimeThisWeek: { $min: "$bestTime"},
+                    averageStarsThisWeek: { $avg: "$stars"}
+                }
+            }
+        ]);
+
+       if(!stats.length) {
+             return {
+                          
+                levelsPlayedThisWeek: 0,
+                levelsCompletedThisWeek: 0,
+                highestScoreThisWeek: 0,
+                bestTimeThisWeek: 0,
+                averageStarsThisWeek: 0,
+              
+                }
+        }
+
+       return {
+           
+
+            levelsPlayedThisWeek: stats[0].levelsPlayedThisWeek,
+            levelsCompletedThisWeek: stats[0].levelsCompletedThisWeek,
+            highestScoreThisWeek: stats[0].highestScoreThisWeek,
+            bestTimeThisWeek: stats[0].bestTimeThisWeek,
+            averageStarsThisWeek: Number(stats[0].averageStarsThisWeek.toFixed(1)),
+
+        };
+
+    }
+
    protected mapToEntity(doc: IProgress): ProgressEntity {
-    return ProgressMapper.toEntity(doc);
-}
+        return ProgressMapper.toEntity(doc);
+    }
 
 protected mapToPersistence(
     entity: Partial<ProgressEntity>

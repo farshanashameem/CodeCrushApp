@@ -30,6 +30,7 @@ export interface IChild extends Document {
   games: IChildGame[];
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date;
 }
 
 // Sub-schema (no _id)
@@ -135,6 +136,11 @@ const ChildSchema: Schema<IChild> = new Schema(
 
     dailyLevelCountDate: {
       type: Date,
+    },
+
+    deletedAt: {
+        type: Date,
+        default: null,
     },
 
     games: {

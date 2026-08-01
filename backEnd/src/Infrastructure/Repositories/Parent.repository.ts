@@ -130,6 +130,64 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
         };
     }
 
+    async findPremiumParents(): Promise<ParentEntity[]> {
+        const parents = await this._model.find( { isPremium: true, status:UserStatus.ACTIVE });
+        return parents.map( parent => this.mapToEntity( parent))
+    }
+
+    async findPremiumParentsExpiringBetween(from: Date, to: Date): Promise<ParentEntity[]> {
+        const parents = await this._model.find( {
+            isPremium: true, status: UserStatus.ACTIVE, 
+            subscriptionExpiryDate: {
+                $gte:from, $lte: to
+            }
+        });
+        return parents.map( parent => this.mapToEntity( parent ));
+    }
+
+    async findPremiumParentsExpiredBetween(from: Date, to: Date): Promise<ParentEntity[]> {
+        const parents = await this._model.find({
+            isPremium: true,status: UserStatus.ACTIVE,
+            subscriptionExpiryDate: {
+                $gte: from,
+                $lte: to,
+            },
+        });
+
+        return parents.map(parent => this.mapToEntity(parent));
+    }
+
+     async cleanupDeleted(): Promise<void> {
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - 90);
+    
+                await this._model.deleteMany({
+                    status: UserStatus.DELETED,
+                    updatedAt: { $lte: cutoffDate }
+                });
+    }
+
+    async cleanupExpiredPremiumSubscriptions(): Promise<void> {
+    const now = new Date();
+
+    await this._model.updateMany(
+        {
+            isPremium: true,
+            subscriptionExpiryDate: { $lte: now }
+        },
+        {
+            $set: {
+                isPremium: false
+            },
+            $unset: {
+                subscriptionPlan: "",
+                subscriptionStartDate: "",
+                subscriptionExpiryDate: ""
+            }
+        }
+    );
+}
+
     private async getUserGrowth( filter: ReportFilter ): Promise<UserGrowthPoint[]> {
         let groupFormat: string;
 

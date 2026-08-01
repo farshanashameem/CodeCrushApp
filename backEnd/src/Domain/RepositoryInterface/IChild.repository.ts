@@ -7,4 +7,5 @@ export interface IChildRepository extends IBaseRepository<ChildEntity> {
     findByParentId( parentId: string): Promise<ChildEntity[] >
     findByParentIdAndName(parentId: string, name: string) : Promise<ChildEntity | null >
     getChildProgressReport( filter: ReportFilter) : Promise<ChildProgressReportData>
+    cleanupDeleted(): Promise<void>;
 }

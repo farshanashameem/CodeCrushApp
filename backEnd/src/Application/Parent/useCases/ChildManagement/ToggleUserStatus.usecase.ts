@@ -60,7 +60,7 @@ export class ParentToggleUserStatus implements IToggleUserStatusUseCase {
                     );
                 }
                 child.restore();
-                break;
+                break; 
 
             default:
                 throw new AppError(

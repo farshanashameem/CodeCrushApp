@@ -19,6 +19,7 @@ export class ChildMapper {
             g.totalScore,
             g.totalAttempts,
             g.lastPlayedAt ?? new Date()
+
         )
     );
 
@@ -30,6 +31,7 @@ export class ChildMapper {
         doc._id?.toString(),
         doc.dob,
         doc.createdAt,
+        doc.deletedAt,
         doc.status,
         doc.blockedBy,
         doc.totalPlayTime,
@@ -52,7 +54,7 @@ export class ChildMapper {
             avatar: entity.getAvatar(),
             status: entity.getStatus(),
             blockedBy: entity.getBlockedBy(),
-
+            deletedAt: entity.getDeletedAt(),
             totalPlayTime: entity.getTotalPlayedTime(),
             totalGamesPlayed: entity.getTotalGamesPlayed(),
             lastPlayed: entity.getLastPlayed(),

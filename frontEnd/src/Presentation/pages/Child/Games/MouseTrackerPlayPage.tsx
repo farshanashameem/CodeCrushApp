@@ -38,12 +38,17 @@ const MouseTrackerPlayPage = () => {
   const [drawing, setDrawing] = useState(false);
   const [segments, setSegments] = useState<{ x: number; y: number }[]>([]);
 
+  // Visual mistake feedback states
+  const [mistakePoint, setMistakePoint] = useState<{ x: number; y: number } | null>(null);
+  const [isRoadError, setIsRoadError] = useState(false);
+
   const isMouseDown = useRef(false);
-  
+  const segmentCountRef = useRef(0);
+
   // Reference for the tracking audio sound effect
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Constants representing internal coordinates (Coordinate Space)
+  // Internal coordinate constants
   const SVG_WIDTH = 800;
   const SVG_HEIGHT = 500;
 
@@ -73,15 +78,6 @@ const MouseTrackerPlayPage = () => {
     audio.pause();
   };
 
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
-  }, []);
-
-  // Safely calculates mouse ratios based on current bounding container
   const getMousePos = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current) return { x: 0, y: 0 };
     const rect = svgRef.current.getBoundingClientRect();
@@ -91,7 +87,6 @@ const MouseTrackerPlayPage = () => {
     };
   };
 
-  // Uses SVG_WIDTH dynamically to map tolerances perfectly
   const isOnRoad = (x: number, y: number) => {
     const tolerance = pathWidth / SVG_WIDTH / 2;
     return pathCoordinates.some((point) => {
@@ -108,8 +103,9 @@ const MouseTrackerPlayPage = () => {
     const tolerance = pathWidth / SVG_WIDTH / 2;
 
     if (Math.hypot(start.x - pos.x, start.y - pos.y) > tolerance) return;
-    
+
     isMouseDown.current = true;
+    segmentCountRef.current = 1;
     setDrawing(true);
     setSegments([pos]);
     playDragSound();
@@ -122,25 +118,31 @@ const MouseTrackerPlayPage = () => {
     const pos = getMousePos(e);
 
     if (!isOnRoad(pos.x, pos.y)) {
-  isMouseDown.current = false;
-  setDrawing(false);
-  setWrongAnswers((prev) => prev + 1);
-  setSegments([]);
-  stopDragSound();
+      isMouseDown.current = false;
+      segmentCountRef.current = 0;
+      setDrawing(false);
+      setWrongAnswers((prev) => prev + 1);
+      setSegments([]);
+      stopDragSound();
 
-  setTimeLeft((prev) => {
-    const next = Math.max(0, prev - 3);
+      // Trigger Visual Mistake Indicators
+      setMistakePoint(pos);
+      setIsRoadError(true);
+      setTimeout(() => setMistakePoint(null), 800);
+      setTimeout(() => setIsRoadError(false), 500);
 
-    if (next === 0) {
-      setTimeout(() => failLevel(), 0);
+      setTimeLeft((prev) => {
+        const next = Math.max(0, prev - 3);
+        if (next === 0) {
+          setTimeout(() => failLevel(), 0);
+        }
+        return next;
+      });
+
+      return;
     }
 
-    return next;
-  });
-
-  return;
-}
-
+    segmentCountRef.current += 1;
     setSegments((prev) => [...prev, pos]);
     playDragSound();
 
@@ -149,7 +151,7 @@ const MouseTrackerPlayPage = () => {
     const dy = lastPoint.y - pos.y;
     const tolerance = pathWidth / SVG_WIDTH / 2;
 
-    if (Math.hypot(dx, dy) < tolerance && segments.length > 20) {
+    if (Math.hypot(dx, dy) < tolerance && segmentCountRef.current > 15) {
       if (!gameFinished) {
         stopDragSound();
         finishLevel();
@@ -159,6 +161,7 @@ const MouseTrackerPlayPage = () => {
 
   const stopDrawing = () => {
     isMouseDown.current = false;
+    segmentCountRef.current = 0;
     if (!drawing) return;
     setDrawing(false);
     stopDragSound();
@@ -200,7 +203,10 @@ const MouseTrackerPlayPage = () => {
     setIsNewHighScore(false);
     setSegments([]);
     setDrawing(false);
+    setMistakePoint(null);
+    setIsRoadError(false);
     isMouseDown.current = false;
+    segmentCountRef.current = 0;
     stopDragSound();
   }, [levelId]);
 
@@ -227,15 +233,13 @@ const MouseTrackerPlayPage = () => {
     setGameFinished(true);
     const timeTaken = selectedLevel.timer - timeLeft;
 
-    // Corrected Dynamic Score Calculation
     const baseScore = selectedLevel.maxScore;
-    const penaltyPerMistake = baseScore * 0.02; // Each mistake loses 2% of the max score
+    const penaltyPerMistake = baseScore * 0.02;
     const mistakePenalty = wrongAnswers * penaltyPerMistake;
     const finalScore = Math.max(0, Math.round(baseScore - mistakePenalty));
 
     setScore(finalScore);
 
-    // Percentage is always safely scaled between 0 and 100 now
     const percentage = (finalScore / selectedLevel.maxScore) * 100;
     let earnedStars = 1;
     if (percentage >= 90) earnedStars = 3;
@@ -278,7 +282,10 @@ const MouseTrackerPlayPage = () => {
     setShowSuccess(false);
     setSegments([]);
     setDrawing(false);
+    setMistakePoint(null);
+    setIsRoadError(false);
     isMouseDown.current = false;
+    segmentCountRef.current = 0;
     setWrongAnswers(0);
     setScore(0);
     setStars(0);
@@ -296,7 +303,6 @@ const MouseTrackerPlayPage = () => {
   };
 
   const failLevel = async () => {
-    
     if (gameFinished || !selectedLevel) return;
 
     setGameFinished(true);
@@ -329,7 +335,7 @@ const MouseTrackerPlayPage = () => {
       child={currentChild}
       logo={theme.logo}
       title={selectedGame.name}
-      isPremium= { currentChild?.isPremium}
+      isPremium={currentChild?.isPremium}
     >
       <div className="max-w-6xl mx-auto px-4 md:px-6 pt-3 pb-10 font-sans select-none">
         {!showSuccess && !showFailure && (
@@ -343,12 +349,15 @@ const MouseTrackerPlayPage = () => {
           </div>
         )}
 
-        <div className="rounded-3xl md:rounded-[40px] bg-emerald-50 border-4 md:border-8 border-emerald-200 p-2 md:p-4 shadow-xl text-center">
+        <div
+          className={`rounded-3xl md:rounded-[40px] bg-emerald-50 border-4 md:border-8 border-emerald-200 p-2 md:p-4 shadow-xl text-center transition-transform duration-100 ${
+            isRoadError ? "animate-bounce" : ""
+          }`}
+        >
           <h2 className="text-2xl md:text-4xl font-extrabold text-emerald-800 mb-4 md:mb-6 tracking-wide drop-shadow-sm">
             ✨ Follow the Magic Road! ✨
           </h2>
 
-          {/* Wrapper container updated with spacing padding and overflow properties */}
           <div className="relative w-full max-w-3xl mx-auto rounded-2xl bg-emerald-100 p-6 shadow-inner aspect-[8/5] overflow-visible">
             <svg
               ref={svgRef}
@@ -359,20 +368,20 @@ const MouseTrackerPlayPage = () => {
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
             >
-              {/* Main Background Road */}
+              {/* Main Background Road - Flashes Red on Off-Road Error */}
               <polyline
                 points={pathCoordinates
                   .map((p) => `${p.x * SVG_WIDTH},${p.y * SVG_HEIGHT}`)
                   .join(" ")}
                 fill="none"
-                stroke="#3b82f6"
+                stroke={isRoadError ? "#ef4444" : "#3b82f6"}
                 strokeWidth={pathWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="opacity-90"
+                className="opacity-90 transition-colors duration-200"
               />
-              
-              {/* Center Dashboard Line */}
+
+              {/* Center Dashed Line */}
               <polyline
                 points={pathCoordinates
                   .map((p) => `${p.x * SVG_WIDTH},${p.y * SVG_HEIGHT}`)
@@ -403,23 +412,34 @@ const MouseTrackerPlayPage = () => {
                 );
               })}
 
+              {/* MISTAKE INDICATOR FLASH */}
+              {mistakePoint && (
+                <g transform={`translate(${mistakePoint.x * SVG_WIDTH}, ${mistakePoint.y * SVG_HEIGHT})`}>
+                  <circle r={28} fill="#ef4444" opacity="0.6" className="animate-ping" />
+                  <circle r={18} fill="#dc2626" stroke="white" strokeWidth={2} />
+                  <text
+                    textAnchor="middle"
+                    y="5"
+                    fontSize="14"
+                    className="select-none pointer-events-none"
+                  >
+                    💥
+                  </text>
+                </g>
+              )}
+
               {/* STARTING POINT INDICATOR */}
               {startPoint && (() => {
                 const startX = startPoint.x * SVG_WIDTH;
                 const startY = startPoint.y * SVG_HEIGHT;
-                // Avoid edge clipping: shift label down if the node is at the top 15% of the SVG
-                const labelYOffset = startY < (SVG_HEIGHT * 0.15) ? 28 : -28;
+                const labelYOffset = startY < SVG_HEIGHT * 0.15 ? 28 : -28;
 
                 return (
                   <g transform={`translate(${startX}, ${startY})`}>
-                    {/* Subtle pulsing background ring */}
                     <circle r={22} fill="#22c55e" opacity="0.4" className="animate-ping" />
-                    {/* Inner base circle */}
                     <circle r={14} fill="#22c55e" stroke="white" strokeWidth={2.5} />
-                    {/* Play Icon (Start Symbol) */}
                     <polygon points="-3,-5 6,0 -3,5" fill="white" />
-                    
-                    {/* Smart Positioning Label Badge */}
+
                     <g transform={`translate(0, ${labelYOffset})`}>
                       <rect x="-24" y="-10" width="48" height="18" rx="4" fill="#15803d" stroke="white" strokeWidth="1.5" />
                       <text
@@ -441,18 +461,13 @@ const MouseTrackerPlayPage = () => {
               {endPoint && (() => {
                 const endX = endPoint.x * SVG_WIDTH;
                 const endY = endPoint.y * SVG_HEIGHT;
-                // Avoid edge clipping: shift label down if the node is at the top 15% of the SVG
-                const labelYOffset = endY < (SVG_HEIGHT * 0.15) ? 28 : -28;
+                const labelYOffset = endY < SVG_HEIGHT * 0.15 ? 28 : -28;
 
                 return (
                   <g transform={`translate(${endX}, ${endY})`}>
-                    {/* Inner base circle */}
                     <circle r={14} fill="#ef4444" stroke="white" strokeWidth={2.5} />
-                    
-                    {/* Miniature Trophy/Star Icon inside Finish node */}
                     <path d="M-5,-4 L5,-4 L3,1 L-3,1 Z M-1,1 L1,1 L1,5 L-1,5 Z M-3,5 L3,5" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
-                    
-                    {/* Smart Positioning Label Badge */}
+
                     <g transform={`translate(0, ${labelYOffset})`}>
                       <rect x="-26" y="-10" width="52" height="18" rx="4" fill="#b91c1c" stroke="white" strokeWidth="1.5" />
                       <text
@@ -475,7 +490,7 @@ const MouseTrackerPlayPage = () => {
           {/* Child-Friendly Mistake Counter */}
           <div className="mt-4 md:mt-6 flex justify-center items-center gap-2">
             <span className="px-4 py-2 md:px-6 md:py-2.5 rounded-full bg-orange-100 border-2 border-orange-300 text-orange-700 font-bold text-sm md:text-lg shadow-sm">
-              Oups Count 🧸 : {wrongAnswers}
+              Oops Count 🧸 : {wrongAnswers}
             </span>
           </div>
         </div>
