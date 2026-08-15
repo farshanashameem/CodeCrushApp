@@ -9,28 +9,45 @@ import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import ChildGameEntity from '@/Domain/Entities/ChildGame.entity';
 import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
 import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IContestRepository } from '@/Domain/RepositoryInterface/IContest.repository';
+import { IContestProgressRepository } from '@/Domain/RepositoryInterface/IContestProgress.repository';
+import { IUpdateContestProgressUseCase } from '../Interfaces/Contest/IUpdateContestProgress.usecase';
 
 export class SubmitLevelUseCase implements ISubmitLevelUseCase {
   constructor(
     private _progressRepo: IProgressRepository,
     private _childrepo: IChildRepository,
     private _gameRepo: IGameRepository,
-    private _parentRepo: IParentRepository
+    private _parentRepo: IParentRepository,
+    private _contestRepo: IContestRepository,
+    private _contestProgressRepo: IContestProgressRepository,
+    private _updateContestProgressUseCase: IUpdateContestProgressUseCase
   ) {}
 
   async execute(input: SubmitLevelDTO): Promise<SubmitLevelOutputDTO> {
     let progress: ProgressEntity;
 
+    // ============================================================
+    // CHILD
+    // ============================================================
     const child = await this._childrepo.findById(input.childId);
     if (!child) {
       throw new AppError( authMessages.error.CHILD_NOT_FOUND,  StatusCodes.NOT_FOUND, );
     }
+
+    // ============================================================
+    // PARENT
+    // ============================================================
 
     const parent = await this._parentRepo.findById( child.getParentId()!);
     if( !parent ) {
       throw new AppError( authMessages.error.PARENT_NOT_FOUND, StatusCodes.NOT_FOUND);
     }
     
+     // ============================================================
+    // GAME
+    // ============================================================
+
 
     const existingGame = await this._gameRepo.getGameById(input.gameId);
     if (!existingGame) {
@@ -40,6 +57,11 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
     if( !existingGame.isGameActive() ) {
       throw new AppError( authMessages.error.GAME_BLOCKED, StatusCodes.FORBIDDEN );
     }
+
+     // ============================================================
+    // DAILY LEVEL LIMIT
+    // ============================================================
+
 
     const today = new Date();
     const lastReset = child.getDailyLevelCountDate();
@@ -51,6 +73,11 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
     if( !parent.getIsPremium() && input.levelNumber > 5) {
       child.incrementDailyLevelCount();
     }
+
+    // ============================================================
+    // NORMAL GAME PROGRESS
+    // ============================================================
+
     
     const existing = await this._progressRepo.findByChildGameLevel(
       input.childId,
@@ -101,6 +128,11 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
 
       progress = result;
     }
+
+     // ============================================================
+    // UPDATE CHILD GAME
+    // ============================================================
+
     const now = new Date();
     const game = child.getGames().find((g) => g.getGameId() === input.gameId);
 
@@ -155,6 +187,90 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
 
     await this._childrepo.update(child.getId()!, child);
 
+     // ============================================================
+    // CONTEST PROGRESS
+    // ============================================================
+
+    if (input.completed) {
+      await this.updateContestProgress(input);
+    }
+
     return { progress };
   }
+
+  // ================================================================
+  // CONTEST PROGRESS
+  // ================================================================
+
+  private async updateContestProgress(
+    input: SubmitLevelDTO
+  ): Promise<void> {
+
+    // --------------------------------------------------------------
+    // 1. Get active contests
+    // --------------------------------------------------------------
+
+    const activeContests = await this._contestRepo.findActiveContests();
+
+    if (!activeContests.length) {
+      return;
+    }
+
+    // --------------------------------------------------------------
+    // 2. Get contests joined by this child
+    // --------------------------------------------------------------
+
+    const childContestProgress =
+      await this._contestProgressRepo.findByChildId(
+        input.childId
+      );
+
+    if (!childContestProgress.length) {
+      return;
+    }
+
+    // --------------------------------------------------------------
+    // 3. Check every contest
+    // --------------------------------------------------------------
+
+    for (const contestProgress of childContestProgress) {
+
+      const contestId = contestProgress.getContestId();
+
+      // Find corresponding active contest
+      const contest = activeContests.find(
+        (contest) =>
+          contest.getId() === contestId
+      );
+
+      if (!contest) {
+        continue;
+      }
+
+      // ------------------------------------------------------------
+      // 4. Check whether this game belongs to contest
+      // ------------------------------------------------------------
+
+      const gameIds = contest.getGameIds();
+
+      const gameIncluded = gameIds.length === 0 || gameIds.includes(input.gameId);
+
+      if (!gameIncluded) {
+        continue;
+      }
+
+      // ------------------------------------------------------------
+      // 5. Update contest progress
+      // ------------------------------------------------------------
+
+      await this._updateContestProgressUseCase.execute({
+        contestId,
+        childId: input.childId,
+        levelId: input.levelId,
+        score: input.score,
+        stars: input.stars,
+      });
+    }
+  }
+
 }

@@ -1,12 +1,12 @@
-import { WeeklyProgressReportDTO } from "@/Application/Cron/dto/WeeklyProgressReport.dto";
+import { WeeklyProgressReportDTO } from '@/Application/Cron/dto/WeeklyProgressReport.dto';
 const formatDuration = (seconds: number): string => {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
 
   return [hrs, mins, secs]
-    .map((value) => value.toString().padStart(2, "0"))
-    .join(":");
+    .map((value) => value.toString().padStart(2, '0'))
+    .join(':');
 };
 export const WeeklyProgressReportTemplate = (
   report: WeeklyProgressReportDTO,
@@ -65,7 +65,7 @@ export const WeeklyProgressReportTemplate = (
             </div>
         `,
         )
-        .join("");
+        .join('');
 
       return `
             <div style="
@@ -100,7 +100,7 @@ export const WeeklyProgressReportTemplate = (
                             ${
                               child.lastPlayed
                                 ? child.lastPlayed.toLocaleDateString()
-                                : "No activity"
+                                : 'No activity'
                             }
                         </td>
                     </tr>
@@ -144,7 +144,7 @@ export const WeeklyProgressReportTemplate = (
             </div>
         `;
     })
-    .join("");
+    .join('');
 
   return `
 <!DOCTYPE html>

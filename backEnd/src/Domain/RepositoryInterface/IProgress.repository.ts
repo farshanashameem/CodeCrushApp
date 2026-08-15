@@ -1,4 +1,4 @@
-import { WeeklyChildProgressDTO, WeeklyProgressReportDTO, WeeklyProgressStatistics } from '@/Application/Cron/dto/WeeklyProgressReport.dto';
+import { WeeklyProgressStatistics } from '@/Application/Cron/dto/WeeklyProgressReport.dto';
 import ProgressEntity from '../Entities/Progress.entity';
 import { IBaseRepository } from './IBase.repository';
 

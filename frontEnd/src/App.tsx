@@ -17,6 +17,8 @@ import OTPPage from "./Presentation/pages/Auth/OTPPage";
 import ForgotPasswordPage from "./Presentation/pages/Auth/ForgotPasswordPage";
 import ResetPasswordPage from "./Presentation/pages/Auth/ResetPasswordPage";
 import ReportPage from "./Presentation/pages/Admin/Reports/ReportPage";
+import Contests from "./Presentation/pages/Admin/Contests";
+import ChildContestsPage from "./Presentation/pages/Child/Contest/ChildcontestPage";
 
 
 
@@ -281,6 +283,17 @@ function App() {
                     }
           />
 
+          <Route
+            path='admin/contests'
+            element={   <AuthInitializer>
+                          <ProtectedRoute allowedRole="admin" >
+                            <Contests />
+                          </ProtectedRoute>
+                        </AuthInitializer>
+              
+                    }
+          />
+
 
 
           <Route
@@ -302,6 +315,11 @@ function App() {
           <Route
             path={ROUTES.CHILD.START_LEVEL}
             element={<GameStartPage />}
+          />
+
+          <Route
+            path={ROUTES.CHILD.CONTESTS}
+            element={<ChildContestsPage />}
           />
     
     

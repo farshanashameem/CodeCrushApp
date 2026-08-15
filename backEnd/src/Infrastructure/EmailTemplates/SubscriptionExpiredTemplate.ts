@@ -1,4 +1,4 @@
-import { SubscriptionExpiredNotificationDTO } from "@/Application/Cron/dto/SubscriptionReminder.dto";
+import { SubscriptionExpiredNotificationDTO } from '@/Application/Cron/dto/SubscriptionReminder.dto';
 
 export const SubscriptionExpiredTemplate = (
     dto: SubscriptionExpiredNotificationDTO

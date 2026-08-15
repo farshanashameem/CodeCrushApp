@@ -26,27 +26,27 @@ export const API_ROUTES = {
       STATUS: (id: string) => `/auth/parent/child/${id}/status`,
     },
     PAYMENT: {
-      CREATE : "/auth/parent/create-order",
-      VERIFY : "/auth/parent/verify"
-    }
+      CREATE: "/auth/parent/create-order",
+      VERIFY: "/auth/parent/verify",
+    },
   },
 
-   ADMIN: {
+  ADMIN: {
     LOGIN: "/admin/login",
     DASHBOARD: "/admin/dashboard",
-    REPORTS : {
-      USER: '/auth/admin/reports/users',
-      CHILDREN: '/auth/admin/reports/children',
-      GAMES: '/auth/admin/reports/games',
-      LEVELS: '/auth/admin/reports/levels',
-      REVENUE: '/auth/admin/reports/revenue',
+    REPORTS: {
+      USER: "/auth/admin/reports/users",
+      CHILDREN: "/auth/admin/reports/children",
+      GAMES: "/auth/admin/reports/games",
+      LEVELS: "/auth/admin/reports/levels",
+      REVENUE: "/auth/admin/reports/revenue",
     },
     EXPORT_REPORTS: {
-      USER_REPORT: '/auth/admin/reports/users/export',
-      CHILD_REPORT: '/auth/admin/reports/children/export',
-      GAME_REPORT: '/auth/admin/reports/games/export',
-      LEVEL_REPORT: '/auth/admin/reports/levels/export',
-      REVENUE_REPORT: '/auth/admin/reports/revenue/export',
+      USER_REPORT: "/auth/admin/reports/users/export",
+      CHILD_REPORT: "/auth/admin/reports/children/export",
+      GAME_REPORT: "/auth/admin/reports/games/export",
+      LEVEL_REPORT: "/auth/admin/reports/levels/export",
+      REVENUE_REPORT: "/auth/admin/reports/revenue/export",
     },
     USERS: {
       GET_ALL: "/auth/admin/users",
@@ -72,7 +72,6 @@ export const API_ROUTES = {
       STATUS: (id: string) => `/auth/admin/levels/${id}/status`,
       BY_GAME: (gameId: string) => `/auth/admin/games/${gameId}/levels`,
       UPDATE: (id: string) => `/auth/admin/levels/${id}`,
-      
     },
 
     ICONS: {
@@ -88,9 +87,24 @@ export const API_ROUTES = {
       UPDATE: (id: string) => `/auth/admin/images/${id}`,
       STATUS: (id: string) => `/auth/admin/images/${id}/status`,
     },
+    CONTESTS: {
+      GET_ALL: "/auth/admin/contests",
+      CREATE: "/auth/admin/contests",
+      BY_ID: (contestId: string) => `/auth/admin/contests/${contestId}`,
+      UPDATE: (contestId: string) => `/auth/admin/contests/${contestId}`,
+    },
   },
 
   CHILD: {
+
+     CONTEST: {
+        BASE: "/auth/child/contests/available",
+        JOINED: "/auth/child/contests/joined",
+        JOIN: "/auth/child/contests/:contestId/join",
+        PROGRESS: "/auth/child/contests/:contestId/progress",
+        LEADERBOARD: "/auth/child/contests/:contestId/leaderboard",
+        COMPLETED_PARTICIPANTS: "/auth/child/contests/:contestId/participants/completed",
+    },
     SESSION: {
       START: "/auth/child/session/start",
       CURRENT: "/auth/child/session/current",
@@ -111,9 +125,9 @@ export const API_ROUTES = {
     PROGRESS: {
       BY_GAME: (childId: string, gameId: string) =>
         `/auth/child/progress/${childId}/${gameId}`,
-      BY_LEVEL: (gameId: string, levelId: string )=> `/auth/child/games/${gameId}/levels/${levelId}/progress`,
+      BY_LEVEL: (gameId: string, levelId: string) =>
+        `/auth/child/games/${gameId}/levels/${levelId}/progress`,
     },
-    
+   
   },
- 
 };

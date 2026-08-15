@@ -363,7 +363,7 @@ const UserDetails = () => {
               />
               <InfoItem
                 label="Cumulative Playtime"
-                value={`${selectedChild.totalPlayTime || 0} Mins`}
+                value={`${formatTime(selectedChild.totalPlayTime) || 0} Mins`}
               />
               <InfoItem
                 label="Total Task Launches"
@@ -379,6 +379,7 @@ const UserDetails = () => {
 
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
+                  
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-slate-50 border-b">
@@ -421,9 +422,9 @@ const UserDetails = () => {
                             </td>
 
                             <td className="text-center">
-                              {game.lastPlayedAt
+                              {game.lastPlayed
                                 ? new Date(
-                                    game.lastPlayedAt,
+                                    game.lastPlayed,
                                   ).toLocaleDateString("en-IN")
                                 : "-"}
                             </td>

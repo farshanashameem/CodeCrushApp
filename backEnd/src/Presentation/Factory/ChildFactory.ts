@@ -7,9 +7,9 @@ import { ChildGameController } from '../Controllers/Child/childGame.controller';
 import { ChildProgressController } from '../Controllers/Child/ChildProgress.controller';
 import { GetCurrentChildSessionController } from '../Controllers/Child/GetCurrentChildSession.controller';
 import { GetLevelProgressController } from '../Controllers/Child/GetLevelProgress.controller';
+import { ChildContestController } from '../Controllers/Child/Contest.controller';
 
 //UseCases
-
 
 import { StartChildSessionUseCase } from '@/Application/Child/UseCases/StartChildSession.usecase';
 import { ValidateChildSessionUseCase } from '@/Application/Child/UseCases/ValidateChildSession.usecase';
@@ -22,6 +22,13 @@ import { GetGameProgressUseCase } from '@/Application/Child/UseCases/GetGameProg
 import { SubmitLevelUseCase } from '@/Application/Child/UseCases/SubmitLevel.usecase';
 import { GetCurrentChildSessionUseCase } from '@/Application/Child/UseCases/GetCurrentChildSession.usecase';
 import { GetLevelProgressUseCase } from '@/Application/Child/UseCases/GetLevelProgress.usecase';
+import { GetAvailableContestsUseCase } from '@/Application/Child/UseCases/Contest/GetAvailableContests.usecase';
+import { GetCompletedParticipantsUseCase } from '@/Application/Child/UseCases/Contest/GetCompletedParticipants.usecase';
+import { GetContestLeaderboardUseCase } from '@/Application/Child/UseCases/Contest/GetContestLeaderboard.usecase';
+import { GetContestProgressUseCase } from '@/Application/Child/UseCases/Contest/GetContestProgress.usecase';
+import { GetJoinedContestsUseCase } from '@/Application/Child/UseCases/Contest/GetJoinedContests.usecase';
+import { JoinContestUseCase } from '@/Application/Child/UseCases/Contest/JoinContest.usecase';
+import { UpdateContestProgressUseCase } from '@/Application/Child/UseCases/Contest/UpdateContestProgress.usecase';
 
 //Repositories
 
@@ -33,6 +40,8 @@ import { ImageRepository } from '@/Infrastructure/Repositories/Image.repository'
 import { IconRepository } from '@/Infrastructure/Repositories/Icon.repository';
 import { ProgressRepository } from '@/Infrastructure/Repositories/Progress.repository';
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
+import { ContestRepository } from '@/Infrastructure/Repositories/Contest.repository';
+import { ContestProgressRepository } from '@/Infrastructure/Repositories/ContestProgress.repository';
 
 //Services
 import { TokenService } from '@/Infrastructure/Services/TokenService';
@@ -46,6 +55,8 @@ const imageRepository = new ImageRepository();
 const iconRepository = new IconRepository();
 const progressRepository = new ProgressRepository();
 const parentRepository = new ParentRepository();
+const contestRepository = new ContestRepository();
+const contestProgressRepository = new ContestProgressRepository();
 
 const tokenService = new TokenService();
 
@@ -81,11 +92,19 @@ const getLevelUseCase = new GetLevelUseCase(
     iconRepository
 );
 
+const updateContestProgressUseCase = new UpdateContestProgressUseCase(
+    contestProgressRepository
+);
+
 const submitLevelUseCase = new SubmitLevelUseCase(
     progressRepository,
     childRepository,
     gameRepository,
-    parentRepository
+    parentRepository,
+    contestRepository,
+    contestProgressRepository,
+    updateContestProgressUseCase
+
 );
 
 const getGameProgressUseCase = new GetGameProgressUseCase(
@@ -106,6 +125,35 @@ const getLevelProgressUseCase = new GetLevelProgressUseCase(
     parentRepository,
     levelRepository
 );
+
+const getAvailableContestsUseCase = new GetAvailableContestsUseCase(
+    contestRepository,
+    contestProgressRepository
+);
+
+const getCompletedParticipantsUseCase = new GetCompletedParticipantsUseCase(
+    contestProgressRepository
+);
+
+const getContestLeaderboardUseCase = new GetContestLeaderboardUseCase(
+    contestProgressRepository
+);
+
+const getContestProgressUseCase = new GetContestProgressUseCase(
+    contestProgressRepository
+);
+
+const getJoinedContestsUseCase = new GetJoinedContestsUseCase(
+    contestRepository,
+    contestProgressRepository
+);
+
+const joinContestUseCase = new JoinContestUseCase(
+    contestRepository,
+    contestProgressRepository
+);
+
+
 
 export const startChildSessionController = new StartChildSessionController(
     startChildSessionUseCase
@@ -138,4 +186,14 @@ export const getCurrentChildSessionController = new GetCurrentChildSessionContro
 
 export const getLevelProgressController = new GetLevelProgressController(
     getLevelProgressUseCase
+);
+
+export const childContestController = new ChildContestController(
+    getAvailableContestsUseCase,
+    joinContestUseCase,
+    getJoinedContestsUseCase,
+    getContestProgressUseCase,
+    updateContestProgressUseCase,
+    getContestLeaderboardUseCase,
+    getCompletedParticipantsUseCase
 );

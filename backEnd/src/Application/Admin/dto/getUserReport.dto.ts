@@ -1,9 +1,9 @@
 export type ReportRange =
-  | "today"
-  | "week"
-  | "month"
-  | "year"
-  | "custom";
+  | 'today'
+  | 'week'
+  | 'month'
+  | 'year'
+  | 'custom';
 
 export interface GetUserReportDTO {
   range: ReportRange;

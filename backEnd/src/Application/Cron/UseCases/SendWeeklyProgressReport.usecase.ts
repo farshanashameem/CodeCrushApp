@@ -1,9 +1,9 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { IProgressRepository } from "@/Domain/RepositoryInterface/IProgress.repository";
-import { IEmailService } from "@/Application/Interfaces/Services/IEmailService";
-import { ISendWeeklyProgressReportUseCase } from "../Interfaces/ISendWeeklyProgressReport.usecase";
-import { WeeklyChildProgressDTO, WeeklyGameProgressDTO, WeeklyProgressReportDTO } from "../dto/WeeklyProgressReport.dto";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { IProgressRepository } from '@/Domain/RepositoryInterface/IProgress.repository';
+import { IEmailService } from '@/Application/Interfaces/Services/IEmailService';
+import { ISendWeeklyProgressReportUseCase } from '../Interfaces/ISendWeeklyProgressReport.usecase';
+import { WeeklyChildProgressDTO, WeeklyGameProgressDTO, WeeklyProgressReportDTO } from '../dto/WeeklyProgressReport.dto';
 
 export class SendWeeklyProgressReportUseCase
     implements ISendWeeklyProgressReportUseCase {
@@ -50,7 +50,7 @@ export class SendWeeklyProgressReportUseCase
                     totalPlayTime: child.getTotalPlayedTime(),
                     lastPlayed: child.getLastPlayed(),
                     games: gameReports
-                })
+                });
 
             }
 

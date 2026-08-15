@@ -8,7 +8,15 @@ import { Types } from 'mongoose';
 import { ReportFilter } from '@/Domain/Types/UserReport';
 import { PlanDistributionPoint, RecentTransaction, RevenueByPlanPoint, RevenueMetrics, RevenueReportData, RevenueTrendPoint, TopPayingParent } from '@/Domain/Types/RevenueReport';
 import { PaymentType } from '@/Domain/enums/PaymentType.enum';
-import { IParent } from '../Database/Model/ParentModel';
+
+
+interface RevenueMetricsAggregation {
+    totalRevenue: number;
+    totalPurchases: number;
+    averagePurchaseValue: number;
+}
+
+
 
 export class PaymentRepository
     extends BaseRepository<PaymentEntity, IPayment>
@@ -66,7 +74,7 @@ export class PaymentRepository
 
    private async getRevenueMetrics( filter: ReportFilter ): Promise<RevenueMetrics> {
 
-        const payments = await PaymentModel.aggregate([
+        const payments = await PaymentModel.aggregate<RevenueMetricsAggregation>([
             {
                 $match: {
                     status: PaymentStatus.SUCCESS,
@@ -81,7 +89,7 @@ export class PaymentRepository
                     _id: null,
 
                     totalRevenue: {
-                        $sum: "$amount",
+                        $sum: '$amount',
                     },
 
                     totalPurchases: {
@@ -89,14 +97,14 @@ export class PaymentRepository
                     },
 
                     averagePurchaseValue: {
-                        $avg: "$amount",
+                        $avg: '$amount',
                     },
                 },
             },
         ]);
 
         const premiumSubscribers = await PaymentModel.distinct(
-            "parentId",
+            'parentId',
             {
                 status: PaymentStatus.SUCCESS,
                 type: PaymentType.PREMIUM,
@@ -122,9 +130,9 @@ export class PaymentRepository
     private async getRevenueTrend( filter: ReportFilter ): Promise<RevenueTrendPoint[]> {
 
         const format =
-            filter.range === "year"
-                ? "%Y-%m"
-                : "%Y-%m-%d";
+            filter.range === 'year'
+                ? '%Y-%m'
+                : '%Y-%m-%d';
 
         const result = await PaymentModel.aggregate([
             {
@@ -141,11 +149,11 @@ export class PaymentRepository
                     _id: {
                         $dateToString: {
                             format,
-                            date: "$createdAt",
+                            date: '$createdAt',
                         },
                     },
                     revenue: {
-                        $sum: "$amount",
+                        $sum: '$amount',
                     },
                 },
             },
@@ -177,7 +185,7 @@ export class PaymentRepository
             },
             {
                 $group: {
-                    _id: "$plan",
+                    _id: '$plan',
                     purchases: {
                         $sum: 1,
                     },
@@ -211,9 +219,9 @@ export class PaymentRepository
             },
             {
                 $group: {
-                    _id: "$plan",
+                    _id: '$plan',
                     revenue: {
-                        $sum: "$amount",
+                        $sum: '$amount',
                     },
                 },
             },
@@ -240,8 +248,8 @@ export class PaymentRepository
             },
         })
         .populate<{ parentId: { _id: Types.ObjectId; name: string } }>(
-            "parentId",
-            "name"
+            'parentId',
+            'name'
         )
         .sort({ createdAt: -1 })
         .limit(10);
@@ -251,8 +259,8 @@ export class PaymentRepository
             parentName: payment.parentId.name,
             type: payment.type,
             plan: payment.type === PaymentType.ADD_CHILD
-                    ? "Add Child"
-                    : payment.plan ?? "N/A",
+                    ? 'Add Child'
+                    : payment.plan ?? 'N/A',
             amount: payment.amount,
             purchasedAt: payment.createdAt,
         }));
@@ -273,9 +281,9 @@ export class PaymentRepository
             },
             {
                 $group: {
-                    _id: "$parentId",
+                    _id: '$parentId',
                     totalSpent: {
-                        $sum: "$amount",
+                        $sum: '$amount',
                     },
                     totalPayments: {
                         $sum: 1,
@@ -292,20 +300,20 @@ export class PaymentRepository
             },
             {
                 $lookup: {
-                    from: "parents",
-                    localField: "_id",
-                    foreignField: "_id",
-                    as: "parent",
+                    from: 'parents',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'parent',
                 },
             },
             {
-                $unwind: "$parent",
+                $unwind: '$parent',
             },
             {
                 $project: {
                     _id: 0,
-                    parentId: "$parent._id",
-                    parentName: "$parent.name",
+                    parentId: '$parent._id',
+                    parentName: '$parent.name',
                     totalSpent: 1,
                     totalPayments: 1,
                 },

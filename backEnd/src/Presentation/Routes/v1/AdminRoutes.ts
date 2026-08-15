@@ -1,4 +1,4 @@
-import { adminLoginController, userManagementController, childManagementController, gameLevelController, iconManagementController, imageManagementcontroller, gameController, reportController, exportReportController } from '@/Presentation/Factory/AdminFactory';
+import { adminLoginController, userManagementController, childManagementController, gameLevelController, iconManagementController, imageManagementcontroller, gameController, reportController, exportReportController, contestController } from '@/Presentation/Factory/AdminFactory';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
 import { authAdminHandler } from '@/Presentation/Middlewares/AdminAuthMiddleware';
 import { ROUTES } from '@/Shared/Routes';
@@ -54,4 +54,9 @@ router.get( ROUTES.ADMIN.EXPORT_REPORTS.CHILD_REPORT, exportReportController.exp
 router.get( ROUTES.ADMIN.EXPORT_REPORTS.GAME_REPORT, exportReportController.exportGameReport);
 router.get( ROUTES.ADMIN.EXPORT_REPORTS.LEVEL_REPORT, exportReportController.exportLevelReport);
 router.get( ROUTES.ADMIN.EXPORT_REPORTS.REVENUE_REPORT, exportReportController.exportRevenueReport);
+
+router.get( ROUTES.ADMIN.CONTEST_MANAGEMENT.BASE, contestController.getAllContests);
+router.post( ROUTES.ADMIN.CONTEST_MANAGEMENT.BASE, contestController.createContest);
+router.get( ROUTES.ADMIN.CONTEST_MANAGEMENT.BY_ID, contestController.getContest);
+router.put( ROUTES.ADMIN.CONTEST_MANAGEMENT.BY_ID, contestController.updateContest);
 export default router;

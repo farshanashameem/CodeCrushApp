@@ -1,6 +1,6 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { ISendSubscriptionExpiryReminderUseCase } from "../Interfaces/ISendSubscriptionReminder.usecase";
-import { IEmailService } from "@/Application/Interfaces/Services/IEmailService";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { ISendSubscriptionExpiryReminderUseCase } from '../Interfaces/ISendSubscriptionReminder.usecase';
+import { IEmailService } from '@/Application/Interfaces/Services/IEmailService';
 
 export class SendSubscriptionExpiryReminderUseCase implements ISendSubscriptionExpiryReminderUseCase {
     constructor (

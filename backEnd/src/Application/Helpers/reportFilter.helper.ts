@@ -1,7 +1,7 @@
-import StatusCodes from "@/Domain/enums/StatusCodes.enum";
-import { AppError } from "@/Domain/Errors/app.error";
-import { ReportFilter, ReportRange } from "@/Domain/Types/UserReport";
-import { authMessages } from "@/Shared/Messages/AuthMessages";
+import StatusCodes from '@/Domain/enums/StatusCodes.enum';
+import { AppError } from '@/Domain/Errors/app.error';
+import { ReportFilter, ReportRange } from '@/Domain/Types/UserReport';
+import { authMessages } from '@/Shared/Messages/AuthMessages';
 
  export interface ReportFilterInput {
   range: ReportRange;
@@ -15,7 +15,7 @@ import { authMessages } from "@/Shared/Messages/AuthMessages";
             let to: Date;
 
             switch (input.range) {
-                case "today": {
+                case 'today': {
                     from = new Date(now);
                     from.setHours(0, 0, 0, 0);
 
@@ -24,7 +24,7 @@ import { authMessages } from "@/Shared/Messages/AuthMessages";
                     break;
                 }
 
-                case "week": {
+                case 'week': {
                     const day = now.getDay(); // Sunday = 0
 
                     from = new Date(now);
@@ -37,7 +37,7 @@ import { authMessages } from "@/Shared/Messages/AuthMessages";
                     break;
                 }
 
-                case "month":{
+                case 'month':{
                     from = new Date(now.getFullYear(), now.getMonth(), 1);
                     from.setHours(0, 0, 0, 0);
 
@@ -45,7 +45,7 @@ import { authMessages } from "@/Shared/Messages/AuthMessages";
                     to.setHours(23, 59, 59, 999);
                     break;
                 }
-                case "year": {
+                case 'year': {
                     from = new Date(now.getFullYear(), 0, 1);
                     from.setHours(0, 0, 0, 0);
 
@@ -54,7 +54,7 @@ import { authMessages } from "@/Shared/Messages/AuthMessages";
                     break;
                 }
 
-                case "custom":{
+                case 'custom':{
                     from = new Date(input.from!);
                     from.setHours(0, 0, 0, 0);
 
