@@ -62,6 +62,10 @@ export const ROUTES = {
             GAME_REPORT: '/reports/games/export',
             LEVEL_REPORT: '/reports/levels/export',
             REVENUE_REPORT: '/reports/revenue/export'
+        },
+        CONTEST_MANAGEMENT: {
+            BASE: '/contests',
+            BY_ID: '/contests/:contestId'
         }
     },
 
@@ -107,7 +111,15 @@ export const ROUTES = {
         PROGRESS : {
             BY_GAME: '/progress/:childId/:gameId',
             BY_LEVEL: '/games/:gameId/levels/:levelId/progress'
-        },     
+        },  
+        CONTEST: {
+            BASE: '/contests/available',
+            JOINED: '/contests/joined',
+            JOIN: '/contests/:contestId/join',
+            PROGRESS: '/contests/:contestId/progress',
+            LEADERBOARD: '/contests/:contestId/leaderboard',
+            COMPLETED_PARTICIPANTS: '/contests/:contestId/participants/completed',
+        },   
     },
    
 };

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import { ILevelRepository } from '@/Domain/RepositoryInterface/ILevel.repository';
 import { ILevel, LevelModel } from '../Database/Model/LevelModel';
 import LevelEntity from '@/Domain/Entities/Level.entity';
@@ -10,6 +10,42 @@ import { ReportFilter } from '@/Domain/Types/UserReport';
 import { ProgressModel } from '../Database/Model/ProgressModal';
 import { GameModel } from '../Database/Model/GameModel';
 
+
+interface LevelMetricsAggregation {
+    totalAttempts: number;
+    totalCompletions: number;
+    totalProgress: number;
+    averageScore: number;
+}
+
+interface AttemptsAggregation {
+    _id: Types.ObjectId;
+    attempts: number;
+}
+
+interface SuccessRateAggregation {
+    _id: Types.ObjectId;
+    successRate: number;
+}
+
+interface AverageScoreAggregation {
+    _id: Types.ObjectId;
+    averageScore: number;
+}
+
+interface HardestLevelAggregation {
+    _id: Types.ObjectId;
+    averageAttempts: number;
+    totalPlayers: number;
+    successRate: number;
+}
+
+interface MostCompletedLevelAggregation {
+    _id: Types.ObjectId;
+    completedPlayers: number;
+    averageScore: number;
+    completionRate: number;
+}
 export class LevelRepository extends BaseRepository<LevelEntity, ILevel> implements ILevelRepository {
 
     constructor() {
@@ -49,12 +85,18 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
             const objectGameId = gameId
                 ? new mongoose.Types.ObjectId(gameId)
                 : undefined;
-            const levelQuery: any = {};
+            const levelQuery:{ gameId?: Types.ObjectId; } = {};
             if (objectGameId) {
                 levelQuery.gameId = objectGameId;
             }
             const totalLevels = await LevelModel.countDocuments(levelQuery);
-            const progressQuery: any = {
+            const progressQuery: {
+                lastPlayedAt: {
+                    $gte: Date;
+                    $lte: Date;
+                };
+                gameId?: Types.ObjectId;
+            } = {
                 lastPlayedAt: {
                     $gte: filter.from,
                     $lte: filter.to,
@@ -64,21 +106,21 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 progressQuery.gameId = objectGameId;
             }
 
-            const progress = await ProgressModel.aggregate([
+            const progress = await ProgressModel.aggregate<LevelMetricsAggregation>([
                 {
                     $match: progressQuery,
                 },
                 {
                     $group: {
                         _id: null,
-                        totalAttempts: { $sum: "$totalAttempts" },
+                        totalAttempts: { $sum: '$totalAttempts' },
                         totalCompletions: {
                             $sum: {
-                                $cond: ["$completed", 1, 0],
+                                $cond: ['$completed', 1, 0],
                             },
                         },
                         totalProgress: { $sum: 1 },
-                        averageScore: { $avg: "$highScore" },
+                        averageScore: { $avg: '$highScore' },
                     },
                 },
             ]);
@@ -87,11 +129,12 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
 
             const totalAttempts = stats?.totalAttempts ?? 0;
             const totalCompletions = stats?.totalCompletions ?? 0;
+            const totalProgress = stats?.totalProgress ?? 0;
             const averageScore = stats?.averageScore ?? 0;
 
             const averageSuccessRate =
                 stats?.totalProgress
-                    ? (stats.totalCompletions / stats.totalProgress) * 100
+                    ? (stats.totalCompletions / totalProgress) * 100
                     : 0;
 
             return {
@@ -116,15 +159,15 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 ...(objectGameId && { gameId: objectGameId }),
                 };
 
-            const result = await ProgressModel.aggregate([
+            const result = await ProgressModel.aggregate<AttemptsAggregation>([
                 {
                     $match: match,
                 },
                 {
                     $group: {
-                        _id: gameId ? "$levelId" : "$gameId",
+                        _id: gameId ? '$levelId' : '$gameId',
                         attempts: {
-                            $sum: "$totalAttempts",
+                            $sum: '$totalAttempts',
                         },
                     },
                 },
@@ -141,7 +184,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                     _id: {
                         $in: result.map(item => item._id),
                     },
-                }).select("levelNumber");
+                }).select('levelNumber');
 
                 const attemptsMap = new Map(
                     result.map(item => [
@@ -162,7 +205,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 _id: {
                     $in: result.map(item => item._id),
                 },
-            }).select("name");
+            }).select('name');
 
             const gameMap = new Map(
                 games.map(game => [
@@ -172,7 +215,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
             );
 
             return result.map(item => ({
-                label: gameMap.get(item._id.toString()) ?? "Unknown",
+                label: gameMap.get(item._id.toString()) ?? 'Unknown',
                 attempts: item.attempts,
             }));
         }
@@ -190,19 +233,19 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 ...(objectGameId && { gameId: objectGameId }),
             };
 
-            const result = await ProgressModel.aggregate([
+            const result = await ProgressModel.aggregate<SuccessRateAggregation>([
                 {
                     $match: match,
                 },
                 {
                     $group: {
-                        _id: gameId ? "$levelId" : "$gameId",
+                        _id: gameId ? '$levelId' : '$gameId',
                         totalProgress: {
                             $sum: 1,
                         },
                         completedProgress: {
                             $sum: {
-                                $cond: ["$completed", 1, 0],
+                                $cond: ['$completed', 1, 0],
                             },
                         },
                     },
@@ -211,14 +254,14 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                     $project: {
                         successRate: {
                             $cond: [
-                                { $eq: ["$totalProgress", 0] },
+                                { $eq: ['$totalProgress', 0] },
                                 0,
                                 {
                                     $multiply: [
                                         {
                                             $divide: [
-                                                "$completedProgress",
-                                                "$totalProgress",
+                                                '$completedProgress',
+                                                '$totalProgress',
                                             ],
                                         },
                                         100,
@@ -243,7 +286,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                     _id: {
                         $in: result.map(item => item._id),
                     },
-                }).select("levelNumber");
+                }).select('levelNumber');
 
                 const successRateMap = new Map(
                     result.map(item => [
@@ -264,7 +307,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 _id: {
                     $in: result.map(item => item._id),
                 },
-            }).select("name");
+            }).select('name');
 
             const gameMap = new Map(
                 games.map(game => [
@@ -274,7 +317,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
             );
 
             return result.map(item => ({
-                label: gameMap.get(item._id.toString()) ?? "Unknown",
+                label: gameMap.get(item._id.toString()) ?? 'Unknown',
                 successRate: Math.round(item.successRate),
             }));
         }
@@ -292,15 +335,15 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 ...(objectGameId && { gameId: objectGameId }),
             };
 
-            const result = await ProgressModel.aggregate([
+            const result = await ProgressModel.aggregate<AverageScoreAggregation>([
                 {
                     $match: match,
                 },
                 {
                     $group: {
-                        _id: gameId ? "$levelId" : "$gameId",
+                        _id: gameId ? '$levelId' : '$gameId',
                         averageScore: {
-                            $avg: "$highScore",
+                            $avg: '$highScore',
                         },
                     },
                 },
@@ -319,7 +362,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                     _id: {
                         $in: result.map(item => item._id),
                     },
-                }).select("levelNumber");
+                }).select('levelNumber');
 
                 const averageScoreMap = new Map(
                     result.map(item => [
@@ -340,7 +383,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 _id: {
                     $in: result.map(item => item._id),
                 },
-            }).select("name");
+            }).select('name');
 
             const gameMap = new Map(
                 games.map(game => [
@@ -350,7 +393,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
             );
 
             return result.map(item => ({
-                label: gameMap.get(item._id.toString()) ?? "Unknown",
+                label: gameMap.get(item._id.toString()) ?? 'Unknown',
                 averageScore: Math.round(item.averageScore),
             }));
         }
@@ -371,22 +414,22 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 },
             };
 
-            const result = await ProgressModel.aggregate([
+            const result = await ProgressModel.aggregate<HardestLevelAggregation>([
                 {
                     $match: match,
                 },
                 {
                     $group: {
-                        _id: "$levelId",
+                        _id: '$levelId',
                         averageAttempts: {
-                            $avg: "$totalAttempts",
+                            $avg: '$totalAttempts',
                         },
                         totalPlayers: {
                             $sum: 1,
                         },
                         completedPlayers: {
                             $sum: {
-                                $cond: ["$completed", 1, 0],
+                                $cond: ['$completed', 1, 0],
                             },
                         },
                     },
@@ -397,14 +440,14 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                         totalPlayers: 1,
                         successRate: {
                             $cond: [
-                                { $eq: ["$totalPlayers", 0] },
+                                { $eq: ['$totalPlayers', 0] },
                                 0,
                                 {
                                     $multiply: [
                                         {
                                             $divide: [
-                                                "$completedPlayers",
-                                                "$totalPlayers",
+                                                '$completedPlayers',
+                                                '$totalPlayers',
                                             ],
                                         },
                                         100,
@@ -428,7 +471,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 _id: {
                     $in: result.map(item => item._id),
                 },
-            }).select("levelNumber difficulty");
+            }).select('levelNumber difficulty');
 
             const levelMap = new Map(
                 levels.map(level => [
@@ -442,8 +485,8 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
 
                 return {
                     levelId: item._id.toString(),
-                    levelName: `Level ${level?.levelNumber ?? ""}`,
-                    difficulty: level?.difficulty ?? "Unknown",
+                    levelName: `Level ${level?.levelNumber ?? ''}`,
+                    difficulty: level?.difficulty ?? 'Unknown',
                     averageAttempts: Math.round(item.averageAttempts),
                     successRate: Math.round(item.successRate),
                 };
@@ -466,13 +509,13 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 },
             };
 
-            const result = await ProgressModel.aggregate([
+            const result = await ProgressModel.aggregate<MostCompletedLevelAggregation>([
                 {
                     $match: match,
                 },
                 {
                     $group: {
-                        _id: "$levelId",
+                        _id: '$levelId',
 
                         totalPlayers: {
                             $sum: 1,
@@ -480,12 +523,12 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
 
                         completedPlayers: {
                             $sum: {
-                                $cond: ["$completed", 1, 0],
+                                $cond: ['$completed', 1, 0],
                             },
                         },
 
                         averageScore: {
-                            $avg: "$highScore",
+                            $avg: '$highScore',
                         },
                     },
                 },
@@ -496,14 +539,14 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
 
                         completionRate: {
                             $cond: [
-                                { $eq: ["$totalPlayers", 0] },
+                                { $eq: ['$totalPlayers', 0] },
                                 0,
                                 {
                                     $multiply: [
                                         {
                                             $divide: [
-                                                "$completedPlayers",
-                                                "$totalPlayers",
+                                                '$completedPlayers',
+                                                '$totalPlayers',
                                             ],
                                         },
                                         100,
@@ -527,7 +570,7 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
                 _id: {
                     $in: result.map(item => item._id),
                 },
-            }).select("levelNumber difficulty");
+            }).select('levelNumber difficulty');
 
             const levelMap = new Map(
                 levels.map(level => [
@@ -541,8 +584,8 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
 
                 return {
                     levelId: item._id.toString(),
-                    levelName: `Level ${level?.levelNumber ?? ""}`,
-                    difficulty: level?.difficulty ?? "Unknown",
+                    levelName: `Level ${level?.levelNumber ?? ''}`,
+                    difficulty: level?.difficulty ?? 'Unknown',
                     completedPlayers: item.completedPlayers,
                     completionRate: Math.round(item.completionRate),
                     averageScore: Math.round(item.averageScore),

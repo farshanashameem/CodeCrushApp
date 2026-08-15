@@ -12,7 +12,6 @@ interface ChildHeaderProps {
     avatar: string;
     age?: number;
   } | null;
-
   logo?: string;
   title?: string;
   isPremium?: boolean;
@@ -39,100 +38,95 @@ const ChildHeader = ({
   };
 
   return (
-    <header className="flex justify-between items-center px-6 md:px-10 py-5 bg-white/30 backdrop-blur-md border-b border-white/30">
-      {/* Left */}
-      <div className="flex items-center gap-4">
+    <header className="flex justify-between items-center px-6 md:px-12 py-6 bg-white/40 backdrop-blur-md border-b-4 border-dashed border-indigo-200 sticky top-0 z-40">
+
+      {/* Logo / Title */}
+      <div className="flex items-center gap-3">
         {logo && (
           <img
             src={logo}
-            alt="game-logo"
-            className="w-24 h-24 md:w-28 md:h-28 object-contain shrink-0"
+            alt="logo"
+            className="w-20 h-20 object-contain"
           />
         )}
 
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-mochiy text-2xl md:text-4xl text-indigo-600">
-              {title || "🌈 Skill Quest"}
-            </h1>
+          <h1 className="font-mochiy text-3xl md:text-5xl text-indigo-600">
+            {title || "🌈 Skill Quest"}
+          </h1>
 
-            {isPremium && (
-              <span className="hidden lg:flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                👑 PREMIUM
-              </span>
-            )}
-          </div>
-
-          <p className="text-xs text-indigo-500 font-bold mt-1">
+          <p className="text-purple-700 font-black tracking-widest uppercase text-xs mt-1">
             Learn • Play • Grow
           </p>
         </div>
+
+        {isPremium && (
+          <span className="hidden lg:block bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+            👑 PREMIUM
+          </span>
+        )}
       </div>
 
-      {/* Right */}
+      {/* Child Menu */}
       <div className="relative">
-        <div
-          onClick={() => setShowMenu((prev) => !prev)}
-          className="flex items-center gap-3 bg-white px-3 py-2 rounded-full shadow-lg border-2 border-indigo-200 cursor-pointer hover:bg-amber-50 transition"
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="flex items-center gap-3 bg-white border-4 border-indigo-400 px-4 py-2 rounded-full shadow-[0_6px_0_#818cf8]"
         >
           <div className="relative">
             <img
               src={avatarMap[child?.avatar as keyof typeof avatarMap]}
-              alt="avatar"
-              className="w-12 h-12 rounded-full object-cover"
+              alt="Avatar"
+              className="w-12 h-12 rounded-full object-cover border-2 border-amber-400"
             />
 
             {isPremium && (
-              <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white flex items-center justify-center shadow-md">
+              <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-yellow-400 border-2 border-white flex items-center justify-center">
                 👑
-              </div>
+              </span>
             )}
           </div>
 
-          <div className="hidden sm:block">
+          <div className="hidden sm:block text-left">
             <p className="font-mochiy text-sm text-slate-700">
-              {child?.name}
+              {child?.name || "Explorer"}
             </p>
 
-            <p className="text-xs text-slate-500">
-              Age {child?.age}
+            <p className="text-[10px] text-slate-400">
+              Age {child?.age || "?"}
             </p>
           </div>
 
           <span className="text-indigo-400 text-xs">
             {showMenu ? "▲" : "▼"}
           </span>
-        </div>
+        </button>
 
         {showMenu && (
-          <div className="absolute right-0 top-20 bg-white border-4 border-indigo-400 rounded-3xl shadow-2xl p-2 w-48 z-50 animate-fade-in-down">
+          <div className="absolute right-0 top-20 bg-white border-4 border-indigo-400 rounded-3xl shadow-2xl p-2 w-52 z-50">
+
+            {/* Contest */}
+            <button
+              onClick={() => {
+                setShowMenu(false);
+                navigate("/child/contests");
+              }}
+              className="w-full text-left font-mochiy text-sm text-indigo-600 px-4 py-3 hover:bg-indigo-50 rounded-2xl flex items-center gap-2"
+            >
+              🏆 Contests
+            </button>
+
+            {/* Exit */}
             <button
               onClick={handleExit}
               className="w-full text-left font-mochiy text-sm text-red-500 px-4 py-3 hover:bg-red-50 rounded-2xl flex items-center gap-2"
             >
-              <span>🚪</span>
-              Exit Session
+              🚪 Exit Session
             </button>
+
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes fadeInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in-down {
-          animation: fadeInDown .2s ease-out forwards;
-        }
-      `}</style>
     </header>
   );
 };

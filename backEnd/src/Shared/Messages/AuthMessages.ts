@@ -56,7 +56,17 @@ export const authMessages = {
         ORDER_CREATED_SUCCESSFULLY: 'Order created successfully',
         PAYMENT_SUCCESS: 'Payment successfully completed',
     
-    },
+        //CONTEST
+        CONTEST_JOINED: ' Successfully joined the contest',
+        CONTEST_CREATED_SUCCESSFULLY: 'Contest created successfully',
+        CONTESTS_FETCHED_SUCCESSFULLY: 'Contests fetched successfully',
+        CONTEST_FETCHED_SUCCESSFULLY: 'Contest fetched successfully',
+        CONTEST_UPDATED_SUCCESSFULLY: 'Contest updated successfully',
+        JOINED_CONTESTS_FETCHED_SUCCESSFULLY: 'joined contest fetched successfully',
+        CONTEST_PROGRESS_UPDATED_SUCCESSFULLY: 'Contest progress updated successfully',
+        CONTEST_LEADERBOARD_FETCHED_SUCCESSFULLY: ' Contest leaderboard fetched successfully',
+        COMPLETED_PARTICIPANTS_FETCHED_SUCCESSFULLY: 'Completed participants fetched',
+    }, 
 
     error: {
         //  AUTH
@@ -155,8 +165,15 @@ export const authMessages = {
     
     
         //DATE VALIDATION
-        FROM_AND_TO_DATE_NOT_MATCH: "From date cannot be after To date.",
-        INVALID_REPORT_RANGE: "Invalid report range",
+        FROM_AND_TO_DATE_NOT_MATCH: 'From date cannot be after To date.',
+        INVALID_REPORT_RANGE: 'Invalid report range',
         
+
+        //CONTEST
+        CONTEST_NOT_FOUND: 'Contest not found',
+        CONTEST_UPDATE_FAILED: 'Contest updation failed',
+        ALREADY_JOINED_CONTEST: 'Already joined in this contast',
+        CONTEST_NOT_ACTIVE: 'Contest is not active',
+        CONTEST_PROGRESS_NOT_FOUND: 'Contest progress not found',
     }
 };

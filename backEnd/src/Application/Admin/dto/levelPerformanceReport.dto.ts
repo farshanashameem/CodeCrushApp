@@ -1,4 +1,4 @@
-import { ReportRange } from "./getUserReport.dto";
+import { ReportRange } from './getUserReport.dto';
 
 export interface LevelPerformanceDTO {
       range: ReportRange;

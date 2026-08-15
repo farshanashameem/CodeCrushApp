@@ -1,4 +1,4 @@
-import { ReportRange } from "@/Domain/Types/UserReport";
+import { ReportRange } from '@/Domain/Types/UserReport';
 
 export interface GetGameReportDTO {
   range: ReportRange;

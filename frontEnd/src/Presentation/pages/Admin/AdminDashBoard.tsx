@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ROUTES } from '../../../Constants/Routes';
 import { useAuth } from "../../../Hooks/useAuth";
+import { Trophy } from "lucide-react";
 
 // Import Polished Lucide Icons
 import { 
@@ -253,26 +254,33 @@ export default function AdminDashboard() {
               </div>
             </button>
 
-            {/* Security Card (Point 9 - Disabled State & Coming Soon Badge) */}
-            <div
-              className="relative overflow-hidden bg-white/60 border border-white/40 rounded-2xl p-5 text-left shadow-sm cursor-not-allowed opacity-80"
-            >
-              <span className="absolute top-4 right-4 bg-slate-250 border border-slate-350 text-slate-600 text-[9px] font-extrabold px-2 py-0.5 rounded-full tracking-wider uppercase">
-                Soon
-              </span>
 
-              {/* Point 6 - Shield Icon used instead of ShieldAlert */}
-              <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center text-slate-400 mb-4 border border-slate-500/20">
-                <Shield className="w-6 h-6" />
+            {/* Contests Card */}
+            <div
+              onClick={() => navigate(ROUTES.ADMIN.CONTESTS)}
+              className="relative overflow-hidden bg-white/90 border border-white/40 rounded-2xl p-5 text-left shadow-sm cursor-pointer hover:bg-white/80 hover:shadow-md hover:-translate-y-0.5 transition-all"
+            >
+
+
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 mb-4 border border-amber-500/20">
+                <Trophy className="w-6 h-6" />
               </div>
-              <h4 className="font-extrabold text-slate-400 text-base">Security</h4>
-              <p className="text-xs text-slate-400 mt-2 line-clamp-2">
-                Configure roles, API access points, and system credentials safely.
+
+              <h4 className="font-extrabold text-slate-700 text-base">
+                Contests
+              </h4>
+
+              <p className="text-xs text-slate-500 mt-2 line-clamp-2">
+                Create and manage contests, set winning criteria, and track contest activities.
               </p>
-              <div className="mt-4 flex items-center font-bold text-xs text-slate-300 gap-1 select-none">
-                Locked <Shield className="w-3.5 h-3.5" />
+
+              <div className="mt-4 flex items-center font-bold text-xs text-amber-600 gap-1 select-none">
+                Manage Contests
+                <Trophy className="w-3.5 h-3.5" />
               </div>
             </div>
+
+
 
           </div>
         </section>

@@ -1,10 +1,10 @@
-import { IExportChildReportUseCase } from "@/Application/Admin/Interfaces/Export/IExportChildReport.usecase";
-import { IExportGameReportUseCase } from "@/Application/Admin/Interfaces/Export/IExportGameReport.usecase";
-import { IExportLevelReportUseCase } from "@/Application/Admin/Interfaces/Export/IExportLevelReport.usecase";
-import { IExportRevenueReportUseCase } from "@/Application/Admin/Interfaces/Export/IExportRevenueReport.usecase";
-import { IExportUserReportUseCase } from "@/Application/Admin/Interfaces/Export/IExportUserReport.usecase";
-import { getReportSchema } from "@/Presentation/Validators/ReportValidator";
-import { NextFunction, Request, Response } from "express";
+import { IExportChildReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportChildReport.usecase';
+import { IExportGameReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportGameReport.usecase';
+import { IExportLevelReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportLevelReport.usecase';
+import { IExportRevenueReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportRevenueReport.usecase';
+import { IExportUserReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportUserReport.usecase';
+import { getReportSchema } from '@/Presentation/Validators/ReportValidator';
+import { NextFunction, Request, Response } from 'express';
 
 export class ExportReportController {
     constructor(
@@ -21,34 +21,34 @@ export class ExportReportController {
             const dto = getReportSchema.parse( req.query);
             const buffer = await this._exportUserReport.execute( dto );
             
-            return this.sendExcelFile( res, buffer, "user-report.xlsx");
+            return this.sendExcelFile( res, buffer, 'user-report.xlsx');
         } catch( error) {
-            next( error )
+            next( error );
         }
-    }
+    };
 
     exportChildReport = async( req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
         try{
 
             const dto = getReportSchema.parse( req.query);
             const buffer = await this._exportChildReport.execute(dto);
-             return this.sendExcelFile( res, buffer, "child-report.xlsx");
+             return this.sendExcelFile( res, buffer, 'child-report.xlsx');
         } catch( error) {
-            next( error )
+            next( error );
         }
-    }
+    };
 
     exportGameReport = async( req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
         try{
 
             const dto = getReportSchema.parse( req.query);
             const buffer = await this._exportGameReport.execute(dto);
-             return this.sendExcelFile( res, buffer, "game-report.xlsx");
+             return this.sendExcelFile( res, buffer, 'game-report.xlsx');
 
         } catch( error) {
-            next( error )
+            next( error );
         }
-    }
+    };
 
     exportLevelReport = async( req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
         try{
@@ -56,33 +56,33 @@ export class ExportReportController {
             const dto = getReportSchema.parse( req.query);
             const buffer = await this._exportLevelReport.execute(dto);
             
-            return this.sendExcelFile( res, buffer, "level-report.xlsx");
+            return this.sendExcelFile( res, buffer, 'level-report.xlsx');
 
         } catch( error) {
-            next( error )
+            next( error );
         }
-    }
+    };
 
     exportRevenueReport = async( req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
         try{
 
             const dto = getReportSchema.parse( req.query);
             const buffer = await this._exportRevenueReport.execute(dto);
-             return this.sendExcelFile( res, buffer, "revenue-report.xlsx");
+             return this.sendExcelFile( res, buffer, 'revenue-report.xlsx');
 
         } catch( error) {
-            next( error )
+            next( error );
         }
-    }
+    };
 
     private sendExcelFile( res: Response, buffer: Buffer, fileName: string ): Response {
         res.setHeader(
-            "Content-Type",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         );
 
         res.setHeader(
-            "Content-Disposition",
+            'Content-Disposition',
             `attachment; filename="${fileName}"`
         );
 

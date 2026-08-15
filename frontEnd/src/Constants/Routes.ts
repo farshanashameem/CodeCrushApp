@@ -19,6 +19,7 @@ export const ROUTES = {
         LOGIN: '/admin/login',
         DASHBOARD: '/admin/dashboard',
         USERS: '/admin/users',
+        CONTESTS: '/admin/contests',
         REPORTS: '/admin/reports',
         USER_DETAILS: '/admin/users/:id',
         CHILD_DETAILS: '/admin/children/:id',
@@ -41,7 +42,7 @@ export const ROUTES = {
 
     CHILD: {
     HOME: "/play/:childId",
-
+    CONTESTS: "/child/contests",
     GAMES: "/play/:childId/games",
 
     GAME_DETAILS: "/play/:childId/games/:gameId",

@@ -1,6 +1,6 @@
-import { IParentRepository } from "@/Domain/RepositoryInterface/IParent.repository";
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { ICleanupDeletedRecordsUseCase } from "../Interfaces/ICleanupDeletedRecods.usecase";
+import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { ICleanupDeletedRecordsUseCase } from '../Interfaces/ICleanupDeletedRecods.usecase';
 
 export class CleanupDeletedRecordsUseCase implements ICleanupDeletedRecordsUseCase
 {

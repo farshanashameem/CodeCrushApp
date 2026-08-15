@@ -1,6 +1,6 @@
 import Express from 'express';
 import { ROUTES } from '@/Shared/Routes';
-import { startChildSessionController, endChildSessionController,  verifyChildSessionMiddleware, getLevelProgressController } from '@/Presentation/Factory/ChildFactory';
+import { startChildSessionController, endChildSessionController,  verifyChildSessionMiddleware, getLevelProgressController, childContestController } from '@/Presentation/Factory/ChildFactory';
 import { childGameController } from '@/Presentation/Factory/ChildFactory';
 import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
@@ -31,5 +31,15 @@ router.post( ROUTES.CHILD.GAME.SUBMIT_LEVEL, childProgressController.submitProgr
 router.get( ROUTES.CHILD.PROGRESS.BY_GAME, childProgressController.getProgressData );
 router.get( ROUTES.CHILD.SESSION.CURRENT, getCurrentChildSessionController.getCurrentChildSession);
 router.get( ROUTES.CHILD.PROGRESS.BY_LEVEL, getLevelProgressController.getLevelProgress);
+
+// Contest routes
+
+router.get( ROUTES.CHILD.CONTEST.BASE, childContestController.getAvailableContests );
+router.get( ROUTES.CHILD.CONTEST.JOINED, childContestController.getJoinedContests );
+router.post( ROUTES.CHILD.CONTEST.JOIN, childContestController.joinContest);
+router.get( ROUTES.CHILD.CONTEST.PROGRESS, childContestController.getContestProgress );
+router.patch( ROUTES.CHILD.CONTEST.PROGRESS, childContestController.updateContestProgress);
+router.get( ROUTES.CHILD.CONTEST.LEADERBOARD, childContestController.getContestLeaderboard );
+router.get( ROUTES.CHILD.CONTEST.COMPLETED_PARTICIPANTS, childContestController.getCompletedParticipants );
 
 export default router;

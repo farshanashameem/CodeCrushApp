@@ -32,7 +32,7 @@ export class MailService implements IEmailService {
          await mailTransporter.sendMail({
             from: `"CodeCrush" <${env.EMAIL_USER}>`,
             to: dto.parentEmail,
-            subject: "⏰ Your CodeCrush Premium Subscription Expires Tomorrow",
+            subject: '⏰ Your CodeCrush Premium Subscription Expires Tomorrow',
             html: SubscriptionExpiryReminderTemplate(dto),
         });
 
@@ -44,7 +44,7 @@ export class MailService implements IEmailService {
     await mailTransporter.sendMail({
         from: `"CodeCrush" <${env.EMAIL_USER}>`,
         to: dto.parentEmail,
-        subject: "❌ Your CodeCrush Premium Subscription Has Expired",
+        subject: '❌ Your CodeCrush Premium Subscription Has Expired',
         html: SubscriptionExpiredTemplate(dto),
     });
 

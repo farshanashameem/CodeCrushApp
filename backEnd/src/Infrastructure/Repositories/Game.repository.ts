@@ -8,6 +8,37 @@ import { ReportFilter } from '@/Domain/Types/UserReport';
 import { LevelModel } from '../Database/Model/LevelModel';
 import { ProgressModel } from '../Database/Model/ProgressModal';
 
+interface GameMetricsAggregation {
+    totalPlays: number;
+    averageScore: number;
+    averageAttempts: number;
+    completedLevels: number;
+}
+
+interface GamePlaysAggregation {
+    _id: Types.ObjectId;
+    plays: number;
+}
+
+interface CompletionRateAggregation {
+    _id: Types.ObjectId;
+    totalPlays: number;
+    completionRate: number;
+}
+
+interface ScoreByGameAggregation {
+    _id: Types.ObjectId;
+    averageScore: number;
+}
+
+interface TopGamesAggregation {
+    _id: Types.ObjectId;
+    totalPlays: number;
+    averageScore: number;
+    averageAttempts: number;
+    completionRate: number;
+}
+
 export class GameRepository implements IGameRepository {
     
 
@@ -43,7 +74,7 @@ export class GameRepository implements IGameRepository {
    private async getGameMetrics( filter: ReportFilter ): Promise<GameReportMetrics> {
         const totalGames = await GameModel.countDocuments();
         const totalLevels = await LevelModel.countDocuments();
-        const progress = await ProgressModel.aggregate([
+        const progress = await ProgressModel.aggregate<GameMetricsAggregation>([
         {
             $match: {
             lastPlayedAt: {
@@ -57,13 +88,13 @@ export class GameRepository implements IGameRepository {
             _id: null,
             totalPlays: { $sum: 1 },
 
-            averageScore: { $avg: "$highScore" },
+            averageScore: { $avg: '$highScore' },
 
-            averageAttempts: { $avg: "$totalAttempts" },
+            averageAttempts: { $avg: '$totalAttempts' },
 
             completedLevels: {
                 $sum: {
-                $cond: ["$completed", 1, 0],
+                $cond: ['$completed', 1, 0],
                 },
             },
             },
@@ -73,7 +104,8 @@ export class GameRepository implements IGameRepository {
         const totalPlays = stats?.totalPlays??0;
         const averageScore = stats?.averageScore?? 0;
         const averageAttempts = stats?.averageAttempts ?? 0;
-        const averageCompletionRate = totalPlays === 0? 0: (stats.completedLevels/ totalPlays) *100;
+        const completedLevels = stats?.completedLevels ?? 0;
+        const averageCompletionRate = totalPlays === 0? 0: (completedLevels/ totalPlays) *100;
         return {
             totalGames,
             totalLevels,
@@ -81,11 +113,11 @@ export class GameRepository implements IGameRepository {
             averageScore,
             averageCompletionRate,
             averageAttempts
-        }
+        };
    }
 
    private async getGamePlays ( filter: ReportFilter ): Promise< GamePlayPoint[]> {
-        const result = await ProgressModel.aggregate([
+        const result = await ProgressModel.aggregate<GamePlaysAggregation>([
             {
                 $match: {
                     lastPlayedAt: {
@@ -96,7 +128,7 @@ export class GameRepository implements IGameRepository {
             },
             {
                 $group : {
-                _id: "$gameId",
+                _id: '$gameId',
                 plays: { $sum: 1},  
                 }
             },
@@ -109,20 +141,20 @@ export class GameRepository implements IGameRepository {
 
         const games = await GameModel.find ({
             _id: { $in: result.map( item=> item._id)}
-        }).select( "name");
+        }).select( 'name');
 
         const gameMap = new Map(
             games.map( game => [game._id.toString(), game.name])
         );
 
         return result.map( item => ({
-            game: gameMap.get( item._id.toString()) ?? "Unknown",
+            game: gameMap.get( item._id.toString()) ?? 'Unknown',
             plays: item.plays
         }));
    }
 
     private async getCompletionRate( filter: ReportFilter ): Promise<CompletionRatePoint[]> {
-        const result = await ProgressModel.aggregate([
+        const result = await ProgressModel.aggregate<CompletionRateAggregation>([
             {
             $match: {
                 lastPlayedAt: {
@@ -133,11 +165,11 @@ export class GameRepository implements IGameRepository {
             },
             {
             $group: {
-                _id: "$gameId",
+                _id: '$gameId',
                 totalPlays: { $sum: 1 },
                 completedPlays: {
                 $sum: {
-                    $cond: ["$completed", 1, 0],
+                    $cond: ['$completed', 1, 0],
                 },
                 },
             },
@@ -147,14 +179,14 @@ export class GameRepository implements IGameRepository {
                 totalPlays: 1,
                 completionRate: {
                 $cond: [
-                    { $eq: ["$totalPlays", 0] },
+                    { $eq: ['$totalPlays', 0] },
                     0,
                     {
                     $multiply: [
                         {
                         $divide: [
-                            "$completedPlays",
-                            "$totalPlays",
+                            '$completedPlays',
+                            '$totalPlays',
                         ],
                         },
                         100,
@@ -175,7 +207,7 @@ export class GameRepository implements IGameRepository {
             _id: {
             $in: result.map(item => item._id),
             },
-        }).select("name");
+        }).select('name');
 
         const gameMap = new Map(
             games.map(game => [
@@ -185,13 +217,13 @@ export class GameRepository implements IGameRepository {
         );
 
         return result.map(item => ({
-            game: gameMap.get(item._id.toString()) ?? "Unknown",
+            game: gameMap.get(item._id.toString()) ?? 'Unknown',
             completionRate: Math.round(item.completionRate),
         }));
     }  
 
     private async getScoreByGame( filter: ReportFilter ): Promise<ScoreByGamePoint[]> {
-        const result = await ProgressModel.aggregate([
+        const result = await ProgressModel.aggregate<ScoreByGameAggregation>([
             {
             $match: {
                 lastPlayedAt: {
@@ -202,9 +234,9 @@ export class GameRepository implements IGameRepository {
             },
             {
             $group: {
-                _id: "$gameId",
+                _id: '$gameId',
                 averageScore: {
-                $avg: "$highScore",
+                $avg: '$highScore',
                 },
             },
             },
@@ -219,7 +251,7 @@ export class GameRepository implements IGameRepository {
             _id: {
             $in: result.map(item => item._id),
             },
-        }).select("name");
+        }).select('name');
 
         const gameMap = new Map(
             games.map(game => [
@@ -229,13 +261,13 @@ export class GameRepository implements IGameRepository {
         );
 
         return result.map(item => ({
-            game: gameMap.get(item._id.toString()) ?? "Unknown",
+            game: gameMap.get(item._id.toString()) ?? 'Unknown',
             averageScore: Math.round(item.averageScore),
         }));
     }
 
     private async getTopGames( filter: ReportFilter ): Promise<TopPerformingGame[]> {
-        const result = await ProgressModel.aggregate([
+        const result = await ProgressModel.aggregate<TopGamesAggregation>([
             {
             $match: {
                 lastPlayedAt: {
@@ -246,17 +278,17 @@ export class GameRepository implements IGameRepository {
             },
             {
             $group: {
-                _id: "$gameId",
+                _id: '$gameId',
 
                 totalPlays: { $sum: 1 },
 
-                averageScore: { $avg: "$highScore" },
+                averageScore: { $avg: '$highScore' },
 
-                averageAttempts: { $avg: "$totalAttempts" },
+                averageAttempts: { $avg: '$totalAttempts' },
 
                 completedPlays: {
                 $sum: {
-                    $cond: ["$completed", 1, 0],
+                    $cond: ['$completed', 1, 0],
                 },
                 },
             },
@@ -268,14 +300,14 @@ export class GameRepository implements IGameRepository {
                 averageAttempts: 1,
                 completionRate: {
                 $cond: [
-                    { $eq: ["$totalPlays", 0] },
+                    { $eq: ['$totalPlays', 0] },
                     0,
                     {
                     $multiply: [
                         {
                         $divide: [
-                            "$completedPlays",
-                            "$totalPlays",
+                            '$completedPlays',
+                            '$totalPlays',
                         ],
                         },
                         100,
@@ -299,7 +331,7 @@ export class GameRepository implements IGameRepository {
             _id: {
             $in: result.map(item => item._id),
             },
-        }).select("name image");
+        }).select('name image');
 
         const gameMap = new Map(
             games.map(game => [
@@ -313,8 +345,8 @@ export class GameRepository implements IGameRepository {
 
             return {
             gameId: item._id.toString(),
-            gameName: game?.name ?? "Unknown",
-            image: game?.image ?? "",
+            gameName: game?.name ?? 'Unknown',
+            image: game?.image ?? '',
             totalPlays: item.totalPlays,
             averageScore: Math.round(item.averageScore),
             completionRate: Math.round(item.completionRate),

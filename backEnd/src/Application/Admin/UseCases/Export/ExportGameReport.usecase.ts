@@ -1,8 +1,8 @@
-import { IGameRepository } from "@/Domain/RepositoryInterface/IGame.repository";
-import { IExportGameReportUseCase } from "../../Interfaces/Export/IExportGameReport.usecase";
-import { IExcelExportService } from "@/Application/Interfaces/Services/IExcelExportService";
-import { GetGameReportDTO } from "../../dto/getGameReport.dto";
-import { buildReportFilter } from "@/Application/Helpers/reportFilter.helper";
+import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
+import { IExportGameReportUseCase } from '../../Interfaces/Export/IExportGameReport.usecase';
+import { IExcelExportService } from '@/Application/Interfaces/Services/IExcelExportService';
+import { GetGameReportDTO } from '../../dto/getGameReport.dto';
+import { buildReportFilter } from '@/Application/Helpers/reportFilter.helper';
 
 export class ExportGameReportUseCase implements IExportGameReportUseCase {
     constructor(

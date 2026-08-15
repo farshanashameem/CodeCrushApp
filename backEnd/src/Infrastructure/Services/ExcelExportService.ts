@@ -1,13 +1,12 @@
-import ExcelJS from "exceljs";
+import ExcelJS from 'exceljs';
 
-import { RevenueReportData } from "@/Domain/Types/RevenueReport";
-import { IExcelExportService } from "@/Application/Interfaces/Services/IExcelExportService";
-import { UserReportData } from "@/Domain/Types/UserReport";
-import { ChildProgressReportData } from "@/Domain/Types/ChildReports";
-import { GamePerformanceReportData } from "@/Domain/Types/GameReport";
-import { LevelPerformanceReportData } from "@/Domain/Types/LevelReport";
-import { LevelPerformanceDTO } from "@/Application/Admin/dto/levelPerformanceReport.dto";
-import { ReportExportDTO } from "@/Application/Admin/dto/exportReport.dto";
+import { RevenueReportData } from '@/Domain/Types/RevenueReport';
+import { IExcelExportService } from '@/Application/Interfaces/Services/IExcelExportService';
+import { UserReportData } from '@/Domain/Types/UserReport';
+import { ChildProgressReportData } from '@/Domain/Types/ChildReports';
+import { GamePerformanceReportData } from '@/Domain/Types/GameReport';
+import { LevelPerformanceReportData } from '@/Domain/Types/LevelReport';
+import { ReportExportDTO } from '@/Application/Admin/dto/exportReport.dto';
 
 export class ExcelExportService implements IExcelExportService {
 
@@ -15,78 +14,78 @@ export class ExcelExportService implements IExcelExportService {
 
         const workbook = new ExcelJS.Workbook();
 
-        workbook.creator = "CodeCrush";
+        workbook.creator = 'CodeCrush';
         workbook.created = new Date();
 
         const summarySheet = this.createReportSheet(
             workbook,
-            "Summary",
-            "User Report",
+            'Summary',
+            'User Report',
             input
         );
 
         this.addSectionTitle(
             summarySheet,
-            "Summary"
+            'Summary'
         );
 
         this.setColumnWidths(summarySheet, [
-            { key: "metric", width: 35 },
-            { key: "value", width: 20 },
+            { key: 'metric', width: 35 },
+            { key: 'value', width: 20 },
         ]);
 
         this.addTableHeader(summarySheet, [
-            "Metric",
-            "Value",
+            'Metric',
+            'Value',
         ]);
 
         summarySheet.addRows([
             {
-                metric: "Total Parents",
+                metric: 'Total Parents',
                 value: report.metrics.totalParents,
             },
             {
-                metric: "Active Parents",
+                metric: 'Active Parents',
                 value: report.metrics.activeParents,
             },
             {
-                metric: "New Registrations",
+                metric: 'New Registrations',
                 value: report.metrics.newRegistrations,
             },
             {
-                metric: "Blocked Parents",
+                metric: 'Blocked Parents',
                 value: report.metrics.blockedParents,
             },
             {
-                metric: "Premium Parents",
+                metric: 'Premium Parents',
                 value: report.metrics.premiumParents,
             },
             {
-                metric: "Free Parents",
+                metric: 'Free Parents',
                 value: report.metrics.freeParents,
             },
         ]);
 
         const analyticsSheet = this.createReportSheet(
             workbook,
-            "Analytics",
-            "User Report",
+            'Analytics',
+            'User Report',
             input
         );
 
         this.addSectionTitle(
             analyticsSheet,
-            "User Growth"
+            'User Growth'
         );
 
         this.setColumnWidths(analyticsSheet, [
-            { key: "label", width: 25 },
-            { key: "count", width: 20 },
+            { key: 'label', width: 25 },
+            { key: 'count', width: 20 },
         ]);
 
         this.addTableHeader(analyticsSheet, [
-            "Label",
-            "Users",
+            'Label',
+            'Users',
         ]);
 
         report.userGrowth.forEach(item => {
@@ -100,21 +99,21 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Subscription Distribution"
+            'Subscription Distribution'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Subscription",
-            "Users",
+            'Subscription',
+            'Users',
         ]);
 
         analyticsSheet.addRow([
-            "Premium",
+            'Premium',
             report.subscriptionDistribution.premium,
         ]);
 
         analyticsSheet.addRow([
-            "Free",
+            'Free',
             report.subscriptionDistribution.free,
         ]);
 
@@ -127,7 +126,7 @@ export class ExcelExportService implements IExcelExportService {
 
         const workbook = new ExcelJS.Workbook();
 
-        workbook.creator = "CodeCrush";
+        workbook.creator = 'CodeCrush';
         workbook.created = new Date();
 
         /* ==========================================================
@@ -136,42 +135,42 @@ export class ExcelExportService implements IExcelExportService {
 
         const summarySheet = this.createReportSheet(
             workbook,
-            "Summary",
-            "Child Progress Report",
+            'Summary',
+            'Child Progress Report',
             input
         );
 
-        this.addSectionTitle(summarySheet, "Summary");
+        this.addSectionTitle(summarySheet, 'Summary');
 
         this.setColumnWidths(summarySheet, [
-            { key: "metric", width: 35 },
-            { key: "value", width: 20 },
+            { key: 'metric', width: 35 },
+            { key: 'value', width: 20 },
         ]);
 
         this.addTableHeader(summarySheet, [
-            "Metric",
-            "Value",
+            'Metric',
+            'Value',
         ]);
 
         summarySheet.addRows([
             {
-                metric: "Total Children",
+                metric: 'Total Children',
                 value: report.metrics.totalChildren,
             },
             {
-                metric: "Active Children",
+                metric: 'Active Children',
                 value: report.metrics.activeChildren,
             },
             {
-                metric: "Average Best Time (sec)",
+                metric: 'Average Best Time (sec)',
                 value: report.metrics.averageBestTime,
             },
             {
-                metric: "Average Score",
+                metric: 'Average Score',
                 value: report.metrics.averageScore,
             },
             {
-                metric: "Average Completed Levels",
+                metric: 'Average Completed Levels',
                 value: report.metrics.averageCompletedLevels,
             },
         ]);
@@ -182,26 +181,26 @@ export class ExcelExportService implements IExcelExportService {
 
         const analyticsSheet = this.createReportSheet(
             workbook,
-            "Analytics",
-            "Child Progress Report",
+            'Analytics',
+            'Child Progress Report',
             input
         );
 
         this.setColumnWidths(analyticsSheet, [
-            { key: "label", width: 25 },
-            { key: "value", width: 20 },
+            { key: 'label', width: 25 },
+            { key: 'value', width: 20 },
         ]);
 
         /* ---------- Daily Activity ---------- */
 
         this.addSectionTitle(
             analyticsSheet,
-            "Daily Activity"
+            'Daily Activity'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Label",
-            "Active Children",
+            'Label',
+            'Active Children',
         ]);
 
         report.dailyActivity.forEach(item => {
@@ -217,12 +216,12 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Score Trend"
+            'Score Trend'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Label",
-            "Average Score",
+            'Label',
+            'Average Score',
         ]);
 
         report.scoreTrend.forEach(item => {
@@ -238,12 +237,12 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Game Popularity"
+            'Game Popularity'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Game",
-            "Plays",
+            'Game',
+            'Plays',
         ]);
 
         report.gamePopularity.forEach(item => {
@@ -259,30 +258,30 @@ export class ExcelExportService implements IExcelExportService {
 
         const topChildrenSheet = this.createReportSheet(
             workbook,
-            "Top Children",
-            "Child Progress Report",
+            'Top Children',
+            'Child Progress Report',
             input
         );
 
         this.addSectionTitle(
             topChildrenSheet,
-            "Top Performing Children"
+            'Top Performing Children'
         );
 
         this.setColumnWidths(topChildrenSheet, [
-            { key: "child", width: 25 },
-            { key: "parent", width: 25 },
-            { key: "score", width: 18 },
-            { key: "levels", width: 20 },
-            { key: "playTime", width: 18 },
+            { key: 'child', width: 25 },
+            { key: 'parent', width: 25 },
+            { key: 'score', width: 18 },
+            { key: 'levels', width: 20 },
+            { key: 'playTime', width: 18 },
         ]);
 
         this.addTableHeader(topChildrenSheet, [
-            "Child",
-            "Parent",
-            "Average Score",
-            "Completed Levels",
-            "Play Time",
+            'Child',
+            'Parent',
+            'Average Score',
+            'Completed Levels',
+            'Play Time',
         ]);
 
         report.topChildren.forEach(child => {
@@ -304,7 +303,7 @@ export class ExcelExportService implements IExcelExportService {
 
         const workbook = new ExcelJS.Workbook();
 
-        workbook.creator = "CodeCrush";
+        workbook.creator = 'CodeCrush';
         workbook.created = new Date();
 
         /* ==========================================================
@@ -313,46 +312,46 @@ export class ExcelExportService implements IExcelExportService {
 
         const summarySheet = this.createReportSheet(
             workbook,
-            "Summary",
-            "Game Performance Report",
+            'Summary',
+            'Game Performance Report',
             input
         );
 
-        this.addSectionTitle(summarySheet, "Summary");
+        this.addSectionTitle(summarySheet, 'Summary');
 
         this.setColumnWidths(summarySheet, [
-            { key: "metric", width: 35 },
-            { key: "value", width: 20 },
+            { key: 'metric', width: 35 },
+            { key: 'value', width: 20 },
         ]);
 
         this.addTableHeader(summarySheet, [
-            "Metric",
-            "Value",
+            'Metric',
+            'Value',
         ]);
 
         summarySheet.addRows([
             {
-                metric: "Total Games",
+                metric: 'Total Games',
                 value: report.metrics.totalGames,
             },
             {
-                metric: "Total Levels",
+                metric: 'Total Levels',
                 value: report.metrics.totalLevels,
             },
             {
-                metric: "Total Plays",
+                metric: 'Total Plays',
                 value: report.metrics.totalPlays,
             },
             {
-                metric: "Average Score",
+                metric: 'Average Score',
                 value: report.metrics.averageScore,
             },
             {
-                metric: "Average Completion Rate (%)",
+                metric: 'Average Completion Rate (%)',
                 value: report.metrics.averageCompletionRate,
             },
             {
-                metric: "Average Attempts",
+                metric: 'Average Attempts',
                 value: report.metrics.averageAttempts,
             },
         ]);
@@ -363,26 +362,26 @@ export class ExcelExportService implements IExcelExportService {
 
         const analyticsSheet = this.createReportSheet(
             workbook,
-            "Analytics",
-            "Game Performance Report",
+            'Analytics',
+            'Game Performance Report',
             input
         );
 
         this.setColumnWidths(analyticsSheet, [
-            { key: "label", width: 30 },
-            { key: "value", width: 20 },
+            { key: 'label', width: 30 },
+            { key: 'value', width: 20 },
         ]);
 
         /* ---------- Game Plays ---------- */
 
         this.addSectionTitle(
             analyticsSheet,
-            "Game Plays"
+            'Game Plays'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Game",
-            "Plays",
+            'Game',
+            'Plays',
         ]);
 
         report.gamePlays.forEach(item => {
@@ -398,12 +397,12 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Completion Rate"
+            'Completion Rate'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Game",
-            "Completion Rate (%)",
+            'Game',
+            'Completion Rate (%)',
         ]);
 
         report.completionRate.forEach(item => {
@@ -419,12 +418,12 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Average Score By Game"
+            'Average Score By Game'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Game",
-            "Average Score",
+            'Game',
+            'Average Score',
         ]);
 
         report.scoreByGame.forEach(item => {
@@ -440,30 +439,30 @@ export class ExcelExportService implements IExcelExportService {
 
         const topGamesSheet = this.createReportSheet(
             workbook,
-            "Top Games",
-            "Game Performance Report",
+            'Top Games',
+            'Game Performance Report',
             input
         );
 
         this.addSectionTitle(
             topGamesSheet,
-            "Top Performing Games"
+            'Top Performing Games'
         );
 
         this.setColumnWidths(topGamesSheet, [
-            { key: "game", width: 30 },
-            { key: "plays", width: 18 },
-            { key: "score", width: 18 },
-            { key: "completion", width: 22 },
-            { key: "attempts", width: 20 },
+            { key: 'game', width: 30 },
+            { key: 'plays', width: 18 },
+            { key: 'score', width: 18 },
+            { key: 'completion', width: 22 },
+            { key: 'attempts', width: 20 },
         ]);
 
         this.addTableHeader(topGamesSheet, [
-            "Game",
-            "Total Plays",
-            "Average Score",
-            "Completion Rate (%)",
-            "Average Attempts",
+            'Game',
+            'Total Plays',
+            'Average Score',
+            'Completion Rate (%)',
+            'Average Attempts',
         ]);
 
         report.topGames.forEach(game => {
@@ -485,7 +484,7 @@ export class ExcelExportService implements IExcelExportService {
 
         const workbook = new ExcelJS.Workbook();
 
-        workbook.creator = "CodeCrush";
+        workbook.creator = 'CodeCrush';
         workbook.created = new Date();
 
         /* ==========================================================
@@ -494,45 +493,45 @@ export class ExcelExportService implements IExcelExportService {
 
           const summarySheet = this.createReportSheet(
               workbook,
-              "Summary",
-              "Level Performance Report",
+              'Summary',
+              'Level Performance Report',
               input,
               {
-                  Game: input.gameName ?? "-",
+                  Game: input.gameName ?? '-',
               }
           );
 
-        this.addSectionTitle(summarySheet, "Summary");
+        this.addSectionTitle(summarySheet, 'Summary');
 
         this.setColumnWidths(summarySheet, [
-            { key: "metric", width: 35 },
-            { key: "value", width: 20 },
+            { key: 'metric', width: 35 },
+            { key: 'value', width: 20 },
         ]);
 
         this.addTableHeader(summarySheet, [
-            "Metric",
-            "Value",
+            'Metric',
+            'Value',
         ]);
 
         summarySheet.addRows([
             {
-                metric: "Total Levels",
+                metric: 'Total Levels',
                 value: report.metrics.totalLevels,
             },
             {
-                metric: "Total Attempts",
+                metric: 'Total Attempts',
                 value: report.metrics.totalAttempts,
             },
             {
-                metric: "Total Completions",
+                metric: 'Total Completions',
                 value: report.metrics.totalCompletions,
             },
             {
-                metric: "Average Success Rate (%)",
+                metric: 'Average Success Rate (%)',
                 value: report.metrics.averageSuccessRate,
             },
             {
-                metric: "Average Score",
+                metric: 'Average Score',
                 value: report.metrics.averageScore,
             },
         ]);
@@ -542,26 +541,26 @@ export class ExcelExportService implements IExcelExportService {
         ========================================================== */
           const analyticsSheet = this.createReportSheet(
               workbook,
-              "Analytics",
-              "Level Performance Report",
+              'Analytics',
+              'Level Performance Report',
               input,
               {
-                  Game: input.gameName ?? "-",
+                  Game: input.gameName ?? '-',
               }
           );
 
         this.setColumnWidths(analyticsSheet, [
-            { key: "label", width: 30 },
-            { key: "value", width: 20 },
+            { key: 'label', width: 30 },
+            { key: 'value', width: 20 },
         ]);
 
         /* ---------- Attempts ---------- */
 
-        this.addSectionTitle(analyticsSheet, "Attempts");
+        this.addSectionTitle(analyticsSheet, 'Attempts');
 
         this.addTableHeader(analyticsSheet, [
-            "Level",
-            "Attempts",
+            'Level',
+            'Attempts',
         ]);
 
         report.attemptsChart.forEach(item => {
@@ -575,11 +574,11 @@ export class ExcelExportService implements IExcelExportService {
 
         /* ---------- Success Rate ---------- */
 
-        this.addSectionTitle(analyticsSheet, "Success Rate");
+        this.addSectionTitle(analyticsSheet, 'Success Rate');
 
         this.addTableHeader(analyticsSheet, [
-            "Level",
-            "Success Rate (%)",
+            'Level',
+            'Success Rate (%)',
         ]);
 
         report.successRateChart.forEach(item => {
@@ -593,11 +592,11 @@ export class ExcelExportService implements IExcelExportService {
 
         /* ---------- Average Score ---------- */
 
-        this.addSectionTitle(analyticsSheet, "Average Score");
+        this.addSectionTitle(analyticsSheet, 'Average Score');
 
         this.addTableHeader(analyticsSheet, [
-            "Level",
-            "Average Score",
+            'Level',
+            'Average Score',
         ]);
 
         report.averageScoreChart.forEach(item => {
@@ -613,28 +612,28 @@ export class ExcelExportService implements IExcelExportService {
 
           const hardestSheet = this.createReportSheet(
               workbook,
-              "Hardest Levels",
-              "Level Performance Report",
+              'Hardest Levels',
+              'Level Performance Report',
               input,
               {
-                  Game: input.gameName ?? "-",
+                  Game: input.gameName ?? '-',
               }
           );
 
-        this.addSectionTitle(hardestSheet, "Hardest Levels");
+        this.addSectionTitle(hardestSheet, 'Hardest Levels');
 
         this.setColumnWidths(hardestSheet, [
-            { key: "level", width: 30 },
-            { key: "difficulty", width: 18 },
-            { key: "attempts", width: 20 },
-            { key: "success", width: 20 },
+            { key: 'level', width: 30 },
+            { key: 'difficulty', width: 18 },
+            { key: 'attempts', width: 20 },
+            { key: 'success', width: 20 },
         ]);
 
         this.addTableHeader(hardestSheet, [
-            "Level",
-            "Difficulty",
-            "Average Attempts",
-            "Success Rate (%)",
+            'Level',
+            'Difficulty',
+            'Average Attempts',
+            'Success Rate (%)',
         ]);
 
         report.hardestLevels.forEach(level => {
@@ -652,30 +651,30 @@ export class ExcelExportService implements IExcelExportService {
 
           const completedSheet = this.createReportSheet(
               workbook,
-              "Most Completed Levels",
-              "Level Performance Report",
+              'Most Completed Levels',
+              'Level Performance Report',
               input,
               {
-                  Game: input.gameName ?? "-",
+                  Game: input.gameName ?? '-',
               }
           );
 
-        this.addSectionTitle(completedSheet, "Most Completed Levels");
+        this.addSectionTitle(completedSheet, 'Most Completed Levels');
 
         this.setColumnWidths(completedSheet, [
-            { key: "level", width: 30 },
-            { key: "difficulty", width: 18 },
-            { key: "players", width: 22 },
-            { key: "completion", width: 22 },
-            { key: "score", width: 18 },
+            { key: 'level', width: 30 },
+            { key: 'difficulty', width: 18 },
+            { key: 'players', width: 22 },
+            { key: 'completion', width: 22 },
+            { key: 'score', width: 18 },
         ]);
 
         this.addTableHeader(completedSheet, [
-            "Level",
-            "Difficulty",
-            "Completed Players",
-            "Completion Rate (%)",
-            "Average Score",
+            'Level',
+            'Difficulty',
+            'Completed Players',
+            'Completion Rate (%)',
+            'Average Score',
         ]);
 
         report.mostCompletedLevels.forEach(level => {
@@ -700,7 +699,7 @@ export class ExcelExportService implements IExcelExportService {
 
         const workbook = new ExcelJS.Workbook();
 
-        workbook.creator = "CodeCrush";
+        workbook.creator = 'CodeCrush';
         workbook.created = new Date();
 
         /* ==========================================================
@@ -709,38 +708,38 @@ export class ExcelExportService implements IExcelExportService {
 
         const summarySheet = this.createReportSheet(
             workbook,
-            "Summary",
-            "Revenue Report",
+            'Summary',
+            'Revenue Report',
             input
         );
 
-        this.addSectionTitle(summarySheet, "Summary");
+        this.addSectionTitle(summarySheet, 'Summary');
 
         this.setColumnWidths(summarySheet, [
-            { key: "metric", width: 35 },
-            { key: "value", width: 20 },
+            { key: 'metric', width: 35 },
+            { key: 'value', width: 20 },
         ]);
 
         this.addTableHeader(summarySheet, [
-            "Metric",
-            "Value",
+            'Metric',
+            'Value',
         ]);
 
         summarySheet.addRows([
             {
-                metric: "Total Revenue",
+                metric: 'Total Revenue',
                 value: report.metrics.totalRevenue,
             },
             {
-                metric: "Total Purchases",
+                metric: 'Total Purchases',
                 value: report.metrics.totalPurchases,
             },
             {
-                metric: "Premium Subscribers",
+                metric: 'Premium Subscribers',
                 value: report.metrics.premiumSubscribers,
             },
             {
-                metric: "Average Purchase Value",
+                metric: 'Average Purchase Value',
                 value: report.metrics.averagePurchaseValue,
             },
         ]);
@@ -751,26 +750,26 @@ export class ExcelExportService implements IExcelExportService {
 
         const analyticsSheet = this.createReportSheet(
             workbook,
-            "Analytics",
-            "Revenue Report",
+            'Analytics',
+            'Revenue Report',
             input
         );
 
         this.setColumnWidths(analyticsSheet, [
-            { key: "label", width: 30 },
-            { key: "value", width: 20 },
+            { key: 'label', width: 30 },
+            { key: 'value', width: 20 },
         ]);
 
         /* ---------- Revenue Trend ---------- */
 
         this.addSectionTitle(
             analyticsSheet,
-            "Revenue Trend"
+            'Revenue Trend'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Date",
-            "Revenue",
+            'Date',
+            'Revenue',
         ]);
 
         report.revenueTrend.forEach(item => {
@@ -786,12 +785,12 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Revenue By Plan"
+            'Revenue By Plan'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Plan",
-            "Revenue",
+            'Plan',
+            'Revenue',
         ]);
 
         report.revenueByPlan.forEach(item => {
@@ -807,12 +806,12 @@ export class ExcelExportService implements IExcelExportService {
 
         this.addSectionTitle(
             analyticsSheet,
-            "Plan Distribution"
+            'Plan Distribution'
         );
 
         this.addTableHeader(analyticsSheet, [
-            "Plan",
-            "Purchases",
+            'Plan',
+            'Purchases',
         ]);
 
         report.planDistribution.forEach(item => {
@@ -828,28 +827,28 @@ export class ExcelExportService implements IExcelExportService {
 
         const transactionSheet = this.createReportSheet(
             workbook,
-            "Recent Transactions",
-            "Revenue Report",
+            'Recent Transactions',
+            'Revenue Report',
             input
         );
 
         this.addSectionTitle(
             transactionSheet,
-            "Recent Transactions"
+            'Recent Transactions'
         );
 
         this.setColumnWidths(transactionSheet, [
-            { key: "parent", width: 25 },
-            { key: "plan", width: 20 },
-            { key: "amount", width: 18 },
-            { key: "date", width: 25 },
+            { key: 'parent', width: 25 },
+            { key: 'plan', width: 20 },
+            { key: 'amount', width: 18 },
+            { key: 'date', width: 25 },
         ]);
 
         this.addTableHeader(transactionSheet, [
-            "Parent",
-            "Plan",
-            "Amount",
-            "Purchased At",
+            'Parent',
+            'Plan',
+            'Amount',
+            'Purchased At',
         ]);
 
         report.recentTransactions.forEach(item => {
@@ -861,7 +860,7 @@ export class ExcelExportService implements IExcelExportService {
             });
         });
 
-        transactionSheet.getColumn("date").numFmt = "dd/mm/yyyy hh:mm";
+        transactionSheet.getColumn('date').numFmt = 'dd/mm/yyyy hh:mm';
 
         /* ==========================================================
           Top Paying Parents
@@ -869,26 +868,26 @@ export class ExcelExportService implements IExcelExportService {
 
         const topParentsSheet = this.createReportSheet(
             workbook,
-            "Top Paying Parents",
-            "Revenue Report",
+            'Top Paying Parents',
+            'Revenue Report',
             input
         );
 
         this.addSectionTitle(
             topParentsSheet,
-            "Top Paying Parents"
+            'Top Paying Parents'
         );
 
         this.setColumnWidths(topParentsSheet, [
-            { key: "parent", width: 25 },
-            { key: "purchases", width: 18 },
-            { key: "spent", width: 20 },
+            { key: 'parent', width: 25 },
+            { key: 'purchases', width: 18 },
+            { key: 'spent', width: 20 },
         ]);
 
         this.addTableHeader(topParentsSheet, [
-            "Parent",
-            "Purchases",
-            "Total Spent",
+            'Parent',
+            'Purchases',
+            'Total Spent',
         ]);
 
         report.topPayingParents.forEach(item => {
@@ -917,8 +916,8 @@ export class ExcelExportService implements IExcelExportService {
             minutes,
             remainingSeconds,
         ]
-            .map(value => String(value).padStart(2, "0"))
-            .join(":");
+            .map(value => String(value).padStart(2, '0'))
+            .join(':');
     }
 
     private createWorksheet( workbook: ExcelJS.Workbook, name: string ): ExcelJS.Worksheet {
@@ -933,13 +932,13 @@ export class ExcelExportService implements IExcelExportService {
             size: 18,
         };
         titleRow.alignment = {
-            horizontal: "center",
+            horizontal: 'center',
         };
         sheet.mergeCells(
             `A${titleRow.number}:B${titleRow.number}`
         );
         sheet.addRow([
-            "Date Range",
+            'Date Range',
             this.getRangeText(dto),
         ]);
         if (extra) {
@@ -949,7 +948,7 @@ export class ExcelExportService implements IExcelExportService {
         }
 
         sheet.addRow([
-            "Generated On",
+            'Generated On',
             new Date().toLocaleString(),
         ]);
 
@@ -958,7 +957,7 @@ export class ExcelExportService implements IExcelExportService {
 
     private getRangeText( dto: ReportExportDTO ): string {
 
-        if (dto.range === "custom") {
+        if (dto.range === 'custom') {
             return `${dto.from} to ${dto.to}`;
         }
 

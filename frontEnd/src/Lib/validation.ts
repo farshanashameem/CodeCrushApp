@@ -271,5 +271,230 @@ export const reportDateSchema = z
     }
   });
 
+
+
+
+
+export const contestSchema = z
+  .object({
+    // ==========================================================
+    // TITLE
+    // ==========================================================
+
+    title: z
+      .string()
+      .trim()
+      .min(
+        2,
+        "Contest title must be at least 2 characters",
+      )
+      .max(
+        100,
+        "Contest title must be at most 100 characters",
+      ),
+
+    // ==========================================================
+    // DESCRIPTION
+    // ==========================================================
+
+    description: z
+      .string()
+      .trim()
+      .min(
+        5,
+        "Description must be at least 5 characters",
+      )
+      .max(
+        500,
+        "Description must be at most 500 characters",
+      ),
+
+    // ==========================================================
+    // CONTEST TYPE
+    // ==========================================================
+
+    type: z.enum(
+      ["CHALLENGE", "PARTICIPATION"],
+      {
+        message: "Please select a contest type",
+      },
+    ),
+
+    // ==========================================================
+    // GAMES
+    // ==========================================================
+
+    gameIds: z
+      .array(
+        z.string().min(1),
+      )
+      .optional(),
+
+    // ==========================================================
+    // WINNER CRITERIA
+    // ==========================================================
+
+    winnerCriteria: z.enum(
+      ["SCORE", "STARS", "LEVELS"],
+      {
+        message: "Please select winner criteria",
+      },
+    ),
+
+    // ==========================================================
+    // TARGET VALUE
+    // ==========================================================
+
+    targetValue: z
+      .union([
+        z.coerce
+          .number()
+          .positive(
+            "Target value must be greater than 0",
+          ),
+
+        z.literal(""),
+
+        z.undefined(),
+      ])
+      .optional(),
+
+    // ==========================================================
+    // START DATE
+    // ==========================================================
+
+    startDate: z
+      .string()
+      .min(
+        1,
+        "Start date is required",
+      ),
+
+    // ==========================================================
+    // END DATE
+    // ==========================================================
+
+    endDate: z
+      .string()
+      .min(
+        1,
+        "End date is required",
+      ),
+  })
+
+  // ==========================================================
+  // CROSS-FIELD VALIDATION
+  // ==========================================================
+
+  .superRefine((data, ctx) => {
+    // ========================================================
+    // PARTICIPATION CONTEST
+    // Target value IS required
+    // ========================================================
+
+    if (data.type === "PARTICIPATION") {
+      if (
+        data.targetValue === undefined ||
+        data.targetValue === ""
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["targetValue"],
+          message:
+            "Target value is required for participation contests",
+        });
+      }
+    }
+
+    // ========================================================
+    // CHALLENGE CONTEST
+    // Target value is NOT allowed
+    // ========================================================
+
+    if (data.type === "CHALLENGE") {
+      if (
+        data.targetValue !== undefined &&
+        data.targetValue !== ""
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["targetValue"],
+          message:
+            "Target value is not allowed for challenge contests",
+        });
+      }
+    }
+
+    // ========================================================
+    // DATE VALIDATION
+    // ========================================================
+
+    const start = new Date(data.startDate);
+    const end = new Date(data.endDate);
+
+    // --------------------------------------------------------
+    // Invalid start date
+    // --------------------------------------------------------
+
+    if (isNaN(start.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["startDate"],
+        message: "Invalid start date",
+      });
+    }
+
+    // --------------------------------------------------------
+    // Invalid end date
+    // --------------------------------------------------------
+
+    if (isNaN(end.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["endDate"],
+        message: "Invalid end date",
+      });
+    }
+
+    // --------------------------------------------------------
+    // End date must be after start date
+    // --------------------------------------------------------
+
+    if (
+      !isNaN(start.getTime()) &&
+      !isNaN(end.getTime()) &&
+      end <= start
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["endDate"],
+        message:
+          "End date must be after start date",
+      });
+    }
+  });
+
+// ============================================================
+// CREATE
+// ============================================================
+
+export const createContestSchema =
+  contestSchema;
+
+
+// ============================================================
+// UPDATE
+// ============================================================
+
+export const updateContestSchema =
+  contestSchema.extend({
+    id: z
+      .string()
+      .min(
+        1,
+        "Contest ID is required",
+      ),
+  });
+
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>

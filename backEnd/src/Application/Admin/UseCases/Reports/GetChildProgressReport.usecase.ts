@@ -1,8 +1,8 @@
-import { IChildRepository } from "@/Domain/RepositoryInterface/IChild.repository";
-import { IGetChildProgressReportUseCase } from "../../Interfaces/Report/IGetChildProgressReport.usecase";
-import { ChildProgressReportData } from "@/Domain/Types/ChildReports";
-import { GetChildProgressReportDTO } from "../../dto/getChildProgressReport.dto";
-import { buildReportFilter } from "@/Application/Helpers/reportFilter.helper";
+import { IChildRepository } from '@/Domain/RepositoryInterface/IChild.repository';
+import { IGetChildProgressReportUseCase } from '../../Interfaces/Report/IGetChildProgressReport.usecase';
+import { ChildProgressReportData } from '@/Domain/Types/ChildReports';
+import { GetChildProgressReportDTO } from '../../dto/getChildProgressReport.dto';
+import { buildReportFilter } from '@/Application/Helpers/reportFilter.helper';
 
 export class GetChildProgressReport implements IGetChildProgressReportUseCase {
     constructor (

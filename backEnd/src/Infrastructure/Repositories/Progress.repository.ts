@@ -4,7 +4,7 @@ import { IProgress, ProgressModel } from '../Database/Model/ProgressModal';
 import ProgressEntity from '@/Domain/Entities/Progress.entity';
 import { ProgressMapper } from '@/Application/Mappers/Progress.mapper';
 import { Types } from 'mongoose';
-import { WeeklyProgressReportDTO, WeeklyProgressStatistics } from '@/Application/Cron/dto/WeeklyProgressReport.dto';
+import { WeeklyProgressStatistics } from '@/Application/Cron/dto/WeeklyProgressReport.dto';
 
 export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress> implements IProgressRepository {
     constructor() {
@@ -41,11 +41,11 @@ export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress
                     _id: null,
                     levelsPlayedThisWeek: { $sum: 1},
                     levelsCompletedThisWeek: {
-                        $sum: { $cond: ["$completed", 1, 0]}
+                        $sum: { $cond: ['$completed', 1, 0]}
                     },
-                    highestScoreThisWeek: { $max: "$highScore"},
-                    bestTimeThisWeek: { $min: "$bestTime"},
-                    averageStarsThisWeek: { $avg: "$stars"}
+                    highestScoreThisWeek: { $max: '$highScore'},
+                    bestTimeThisWeek: { $min: '$bestTime'},
+                    averageStarsThisWeek: { $avg: '$stars'}
                 }
             }
         ]);
@@ -59,7 +59,7 @@ export class ProgressRepository extends BaseRepository<ProgressEntity, IProgress
                 bestTimeThisWeek: 0,
                 averageStarsThisWeek: 0,
               
-                }
+                };
         }
 
        return {

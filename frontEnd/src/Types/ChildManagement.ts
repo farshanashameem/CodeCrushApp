@@ -8,7 +8,7 @@ export interface ChildGame {
   playTime: number;
   totalScore: number;
   totalAttempts: number;
-  lastPlayedAt?: string;
+  lastPlayed?: string;
 }
 
 export interface Child {

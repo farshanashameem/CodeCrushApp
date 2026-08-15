@@ -83,7 +83,7 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
         userGrowth,
         ] = await Promise.all([
         this._model.countDocuments({ status: { $ne: UserStatus.DELETED } }),
-        ChildModel.distinct("parentId", {
+        ChildModel.distinct('parentId', {
             lastPlayed: {
             $gte: filter.from,
             $lte: filter.to,
@@ -132,7 +132,7 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
 
     async findPremiumParents(): Promise<ParentEntity[]> {
         const parents = await this._model.find( { isPremium: true, status:UserStatus.ACTIVE });
-        return parents.map( parent => this.mapToEntity( parent))
+        return parents.map( parent => this.mapToEntity( parent));
     }
 
     async findPremiumParentsExpiringBetween(from: Date, to: Date): Promise<ParentEntity[]> {
@@ -180,9 +180,9 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
                 isPremium: false
             },
             $unset: {
-                subscriptionPlan: "",
-                subscriptionStartDate: "",
-                subscriptionExpiryDate: ""
+                subscriptionPlan: '',
+                subscriptionStartDate: '',
+                subscriptionExpiryDate: ''
             }
         }
     );
@@ -192,22 +192,22 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
         let groupFormat: string;
 
         switch (filter.range) {
-            case "today":
-            groupFormat = "%H:00";
+            case 'today':
+            groupFormat = '%H:00';
             break;
 
-            case "week":
-            case "month":
-            case "custom":
-            groupFormat = "%Y-%m-%d";
+            case 'week':
+            case 'month':
+            case 'custom':
+            groupFormat = '%Y-%m-%d';
             break;
 
-            case "year":
-            groupFormat = "%Y-%m";
+            case 'year':
+            groupFormat = '%Y-%m';
             break;
 
             default:
-            groupFormat = "%Y-%m-%d";
+            groupFormat = '%Y-%m-%d';
         }
 
         const result = await this._model.aggregate([
@@ -225,7 +225,7 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
                 _id: {
                 $dateToString: {
                     format: groupFormat,
-                    date: "$createdAt",
+                    date: '$createdAt',
                 },
                 },
                 count: { $sum: 1 },
