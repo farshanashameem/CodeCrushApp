@@ -54,14 +54,16 @@ export const ROUTES = {
             CHILD_REPORT: '/reports/children',
             GAME_REPORT: '/reports/games',
             LEVEL_REPORT: '/reports/levels',
-            REVENUE_REPORT: '/reports/revenue'
+            REVENUE_REPORT: '/reports/revenue',
+            AI_GAME_POPULARITY_REPORT: '/reports/ai-games/popularity',
         },
         EXPORT_REPORTS : {
             USER_REPORT: '/reports/users/export',
             CHILD_REPORT: '/reports/children/export',
             GAME_REPORT: '/reports/games/export',
             LEVEL_REPORT: '/reports/levels/export',
-            REVENUE_REPORT: '/reports/revenue/export'
+            REVENUE_REPORT: '/reports/revenue/export',
+            AI_GAME_POPULARITY_REPORT: '/reports/ai-games/popularity/export',
         },
         CONTEST_MANAGEMENT: {
             BASE: '/contests',
@@ -120,6 +122,10 @@ export const ROUTES = {
             LEADERBOARD: '/contests/:contestId/leaderboard',
             COMPLETED_PARTICIPANTS: '/contests/:contestId/participants/completed',
         },   
+    },
+    AI_GAME: {
+        BASE: '/ai-game',
+        GENERATE: '/generate'
     },
    
 };

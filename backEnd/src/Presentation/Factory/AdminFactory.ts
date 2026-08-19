@@ -48,6 +48,9 @@ import { CreateContestUseCase } from '@/Application/Admin/UseCases/Contest/Creat
 import { GetAllContestsUseCase } from '@/Application/Admin/UseCases/Contest/GetAllContests.usecase';
 import { GetContestUseCase } from '@/Application/Admin/UseCases/Contest/GetContest.usecase';
 import { UpdateContestUseCase } from '@/Application/Admin/UseCases/Contest/UpdateContest.usecase';
+import { GetAIGamePopularityReport } from '@/Application/Admin/UseCases/Reports/AIGamePopularityReport.usecase';
+import { ExportAIGamePopularityReportUseCase } from '@/Application/Admin/UseCases/Export/ExportAiGamePopularityReport.usecase';
+
 
 //Repositories
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
@@ -59,12 +62,14 @@ import { ImageRepository } from '@/Infrastructure/Repositories/Image.repository'
 import { GameRepository } from '@/Infrastructure/Repositories/Game.repository';
 import { PaymentRepository } from '@/Infrastructure/Repositories/Payment.repository';
 import { ContestRepository } from '@/Infrastructure/Repositories/Contest.repository';
+import { AIGamePopularityRepository } from '@/Infrastructure/Repositories/AIGamePopularity.repository';
 
 //Services
 import { HashService } from '@/Infrastructure/Services/HashService';
 import { TokenService } from '@/Infrastructure/Services/TokenService';
 import { CloudinaryService } from '@/Infrastructure/Services/CloudinaryService';
 import { ExcelExportService } from '@/Infrastructure/Services/ExcelExportService';
+
 
 const adminRepository = new AdminRepository();
 const parentRepository = new ParentRepository();
@@ -75,6 +80,7 @@ const imageRepository = new ImageRepository();
 const gameRepository = new GameRepository();
 const paymentRepository = new PaymentRepository();
 const contestRepository = new ContestRepository();
+const aiGamePopularityRepository = new AIGamePopularityRepository();
 
 const hashService = new HashService();
 const tokenService = new TokenService();
@@ -240,6 +246,16 @@ const getContestUseCase = new GetContestUseCase(
     contestRepository
 );
 
+const aiGamePopularityReportUseCase = new GetAIGamePopularityReport(
+    aiGamePopularityRepository
+);
+
+const exportAIGamePopularityReportUsecase = new ExportAIGamePopularityReportUseCase(
+    aiGamePopularityRepository,
+    excelExportService
+);
+
+
 
 //Controllers
 export const adminLoginController = new AdminAuthController(
@@ -292,7 +308,8 @@ export const reportController = new ReportDataController(
     getChildReportUseCase,
     getGameReportUseCase,
     getLevelReportUseCase,
-    getRevenueReportUseCase
+    getRevenueReportUseCase,
+    aiGamePopularityReportUseCase
 );
 
 export const exportReportController = new ExportReportController (
@@ -300,7 +317,8 @@ export const exportReportController = new ExportReportController (
     exportChildReportUseCase,
     exportGameReportUseCase,
     exportLevelReportUseCase,
-    exportRevenueReportUseCase
+    exportRevenueReportUseCase,
+    exportAIGamePopularityReportUsecase,
 );
 
 export const contestController = new ContestManagementController(

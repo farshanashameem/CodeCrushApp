@@ -22,5 +22,5 @@ export const envSchema = z.object({
     RAZORPAY_API_SECRET: z.string().min(1),
     CHILD_SESSION_TOKEN_MAX_AGE:z.coerce.number(),
     CHILD_SESSION_TTL:z.coerce.number(),
-
+    OPENAI_API_KEY: z.string().min(1),
 });

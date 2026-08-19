@@ -1,3 +1,5 @@
+import type { AIGameDifficulty, AIGameType } from "./aiGame";
+
 export type ReportRange =
   | "today"
   | "week"
@@ -122,6 +124,7 @@ export interface GamePerformanceReportData {
   completionRate: CompletionRatePoint[];
   scoreByGame: ScoreByGamePoint[];
   topGames: TopPerformingGame[];
+  
 }
 
 //Level Report
@@ -223,13 +226,21 @@ export interface RevenueReportData {
   topPayingParents: TopPayingParent[];
 }
 
+export interface AIGamePopularityReportData {
+  gameType: AIGameType;
+  difficulty: AIGameDifficulty;
+  creationCount: number;
+}
+
 export interface ReportState {
   userReport: UserReportData | null;
   childReport: ChildProgressReportData | null;
   gameReport: GamePerformanceReportData | null;
   levelReport: LevelPerformanceReport | null;
   revenueReport: RevenueReportData | null;
+  aiGamePopularityReport: AIGamePopularityReportData[] | null;
   loading: boolean;
   exportLoading: boolean;
   error: string | null;
 }
+
