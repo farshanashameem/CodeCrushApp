@@ -18,7 +18,9 @@ import ForgotPasswordPage from "./Presentation/pages/Auth/ForgotPasswordPage";
 import ResetPasswordPage from "./Presentation/pages/Auth/ResetPasswordPage";
 import ReportPage from "./Presentation/pages/Admin/Reports/ReportPage";
 import Contests from "./Presentation/pages/Admin/Contests";
-import ChildContestsPage from "./Presentation/pages/Child/Contest/ChildcontestPage";
+import ChildContestsPage from "./Presentation/pages/Child/Contest/ChildContestPage";
+import AIGameCreatorPage from "./Presentation/pages/Child/AIGame/AIGameCreaterPage";
+import AIGamePlayPage from "./Presentation/pages/Child/AIGame/AIGamePlayPage/AIGamePlayPage";
 
 
 
@@ -320,6 +322,16 @@ function App() {
           <Route
             path={ROUTES.CHILD.CONTESTS}
             element={<ChildContestsPage />}
+          />
+
+          <Route
+            path="/child/ai-game"
+            element={<AIGameCreatorPage />}
+          />
+
+          <Route
+            path="/child/ai-game/play"
+            element={<AIGamePlayPage />}
           />
     
     

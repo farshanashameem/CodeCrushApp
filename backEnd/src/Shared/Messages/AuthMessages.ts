@@ -66,6 +66,10 @@ export const authMessages = {
         CONTEST_PROGRESS_UPDATED_SUCCESSFULLY: 'Contest progress updated successfully',
         CONTEST_LEADERBOARD_FETCHED_SUCCESSFULLY: ' Contest leaderboard fetched successfully',
         COMPLETED_PARTICIPANTS_FETCHED_SUCCESSFULLY: 'Completed participants fetched',
+
+        // AI GAME
+        AI_GAME_GENERATED_SUCCESSFULLY: 'AI game generated successfully',
+    
     }, 
 
     error: {
@@ -175,5 +179,10 @@ export const authMessages = {
         ALREADY_JOINED_CONTEST: 'Already joined in this contast',
         CONTEST_NOT_ACTIVE: 'Contest is not active',
         CONTEST_PROGRESS_NOT_FOUND: 'Contest progress not found',
+
+        // AI GAME
+        INVALID_AI_GAME_REQUEST: 'Invalid AI game request',
+        AI_GAME_GENERATION_FAILED: 'AI game generation failed',
+
     }
 };

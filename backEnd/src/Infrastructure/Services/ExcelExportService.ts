@@ -7,6 +7,7 @@ import { ChildProgressReportData } from '@/Domain/Types/ChildReports';
 import { GamePerformanceReportData } from '@/Domain/Types/GameReport';
 import { LevelPerformanceReportData } from '@/Domain/Types/LevelReport';
 import { ReportExportDTO } from '@/Application/Admin/dto/exportReport.dto';
+import { AIGamePopularityReportData } from '@/Application/Admin/dto/AIGamePopularityReport.dto';
 
 export class ExcelExportService implements IExcelExportService {
 
@@ -692,10 +693,7 @@ export class ExcelExportService implements IExcelExportService {
         return Buffer.from(buffer);
     }
 
-    async exportRevenueReport(
-        report: RevenueReportData,
-        input: ReportExportDTO
-    ): Promise<Buffer> {
+    async exportRevenueReport(  report: RevenueReportData, input: ReportExportDTO ): Promise<Buffer> {
 
         const workbook = new ExcelJS.Workbook();
 
@@ -895,6 +893,79 @@ export class ExcelExportService implements IExcelExportService {
                 parent: item.parentName,
                 purchases: item.purchases,
                 spent: item.totalSpent,
+            });
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        return Buffer.from(buffer);
+    }
+
+    async exportAIGamePopularityReport( report: AIGamePopularityReportData[] ): Promise<Buffer> {
+
+        const workbook = new ExcelJS.Workbook();
+
+        workbook.creator = 'CodeCrush';
+        workbook.created = new Date();
+
+        const sheet = workbook.addWorksheet(
+            'AI Game Popularity'
+        );
+
+        /* ==========================================================
+        Header
+        ========================================================== */
+
+        const titleRow = sheet.addRow([
+            'AI Game Popularity Report'
+        ]);
+
+        titleRow.font = {
+            bold: true,
+            size: 18,
+        };
+
+        titleRow.alignment = {
+            horizontal: 'center',
+        };
+
+        sheet.mergeCells(
+            `A${titleRow.number}:C${titleRow.number}`
+        );
+
+        sheet.addRow([
+            'Generated On',
+            new Date().toLocaleString(),
+        ]);
+
+        sheet.addRow([]);
+
+        /* ==========================================================
+        Report
+        ========================================================== */
+
+        this.addSectionTitle(
+            sheet,
+            'AI Game Creation Popularity'
+        );
+
+        this.setColumnWidths(sheet, [
+            { key: 'gameType', width: 25 },
+            { key: 'difficulty', width: 20 },
+            { key: 'creationCount', width: 20 },
+        ]);
+
+        this.addTableHeader(sheet, [
+            'Game Type',
+            'Difficulty',
+            'Creations',
+        ]);
+
+        report.forEach(item => {
+            sheet.addRow({
+                gameType: item.gameType,
+                difficulty: item.difficulty,
+                creationCount: item.creationCount,
             });
         });
 

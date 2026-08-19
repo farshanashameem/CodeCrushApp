@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../Lib/axios";
 import { API_ROUTES } from "../../Constants/api.routes";
-import type { ChildProgressReportData, GamePerformanceReportData, LevelPerformanceReport, ReportState, RevenueReportData, UserReportData } from "../../Types/reports";
+import type { ChildProgressReportData, GamePerformanceReportData, LevelPerformanceReport, ReportState, RevenueReportData, UserReportData, AIGamePopularityReportData } from "../../Types/reports";
 import { downloadExcel } from "../../Utils/downloadExcel";
 
 
@@ -12,6 +12,7 @@ const initialState: ReportState = {
   gameReport: null,
   levelReport: null,
   revenueReport: null,
+  aiGamePopularityReport: null,
   loading: false,
   exportLoading: false,
   error: null,
@@ -318,6 +319,33 @@ export const exportRevenueReport = createAsyncThunk<
     }
 );
 
+export const fetchAIGamePopularityReport = createAsyncThunk<
+  AIGamePopularityReportData[],
+  void,
+  { rejectValue: string }
+>(
+  "report/fetchAIGamePopularityReport",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get( API_ROUTES.ADMIN.REPORTS.AI_GAME_POPULARITY );
+
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message ??
+          "Failed to fetch AI game popularity report."
+      );
+    }
+  }
+);
+
+export const exportAIGamePopularityReport = createAsyncThunk< void, void, { rejectValue: string } >( "report/exportAIGamePopularityReport", async (_, { rejectWithValue }) => 
+  { 
+    try 
+    { const response = await api.get( API_ROUTES.ADMIN.EXPORT_REPORTS.AI_GAME_POPULARITY_REPORT, { responseType: "blob", } ); downloadExcel( response.data, "AI-game-popularity-report.xlsx" ); } catch (error: any) { return rejectWithValue( error.response?.data?.message ?? "Failed to export AI game popularity report." ); 
+      
+    } } );
+
 
 const reportSlice = createSlice({
   name: "report",
@@ -342,7 +370,10 @@ const reportSlice = createSlice({
 
     clearRevenueReport( state) {
       state.revenueReport = null;
-    }
+    },
+    clearAIGamePopularityReport(state) {
+      state.aiGamePopularityReport = null;
+    },
   },
 
   extraReducers: (builder) => {
@@ -486,6 +517,39 @@ const reportSlice = createSlice({
           state.exportLoading = false;
           state.error = action.payload ?? "Failed to export report.";
       })
+
+      .addCase(fetchAIGamePopularityReport.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(fetchAIGamePopularityReport.fulfilled, (state, action) => {
+        state.loading = false;
+        state.aiGamePopularityReport = action.payload;
+      })
+
+      .addCase(fetchAIGamePopularityReport.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload ?? "Failed to fetch AI game popularity report.";
+      })
+
+      
+      .addCase(exportAIGamePopularityReport.pending, (state) => {
+        state.exportLoading = true;
+        state.error = null;
+      })
+
+      .addCase(exportAIGamePopularityReport.fulfilled, (state) => {
+        state.exportLoading = false;
+      })
+
+      .addCase(exportAIGamePopularityReport.rejected, (state, action) => {
+        state.exportLoading = false;
+        state.error =
+          action.payload ?? "Failed to export AI game popularity report.";
+      })
+
 
   },
       });

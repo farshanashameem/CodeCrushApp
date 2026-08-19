@@ -1,3 +1,4 @@
+import { IExportAIGamePopularityReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportAIGamePopularityReport.usecase';
 import { IExportChildReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportChildReport.usecase';
 import { IExportGameReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportGameReport.usecase';
 import { IExportLevelReportUseCase } from '@/Application/Admin/Interfaces/Export/IExportLevelReport.usecase';
@@ -12,7 +13,8 @@ export class ExportReportController {
         private _exportChildReport: IExportChildReportUseCase,
         private _exportGameReport: IExportGameReportUseCase,
         private _exportLevelReport: IExportLevelReportUseCase,
-        private _exportRevenueReport: IExportRevenueReportUseCase
+        private _exportRevenueReport: IExportRevenueReportUseCase,
+        private _exportAIGamePopularityReport: IExportAIGamePopularityReportUseCase,
     ) {}
 
     exportUserReport = async( req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
@@ -71,6 +73,21 @@ export class ExportReportController {
              return this.sendExcelFile( res, buffer, 'revenue-report.xlsx');
 
         } catch( error) {
+            next( error );
+        }
+    };
+
+    exportAIGamePopularityReport = async ( req: Request, res:Response, next: NextFunction ): Promise< Response | void > => {
+        try{
+            const buffer = await this._exportAIGamePopularityReport.execute();
+
+            return this.sendExcelFile(
+                res,
+                buffer,
+                'ai-game-popularity-report.xlsx'
+            );
+
+        }catch( error) {
             next( error );
         }
     };

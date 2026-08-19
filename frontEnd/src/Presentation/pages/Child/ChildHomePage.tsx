@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import type { AppDispatch, RootState } from "../../../redux/store";
-
 import {
   fetchGames,
   endChildSession,
@@ -12,7 +10,6 @@ import {
 
 import { avatarMap } from "../../../Constants/avatarMap";
 import { gameImages } from "../../../Constants/gameImages";
-
 import background from "../../../assets/kids-bg.png";
 import BirthdayCelebration from "./BirthdayCelebration";
 import BackgroundMusic from "../../SharedComponents/Games/BackgroundMusic";
@@ -243,6 +240,102 @@ const ChildHomePage = () => {
           </span>
         </div>
       </div>
+
+      {/* ================= AI GAME CREATOR ================= */}
+      <section className="max-w-6xl mx-auto px-6 mb-12">
+        <button
+          onClick={() => navigate("/child/ai-game")}
+          className="
+            w-full relative overflow-hidden
+            bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500
+            border-4 border-white
+            rounded-[2.5rem]
+            p-6 md:p-8
+            shadow-[0_12px_0_#c026d3]
+            hover:-translate-y-2
+            hover:scale-[1.01]
+            active:translate-y-1
+            active:shadow-[0_5px_0_#c026d3]
+            transition-all duration-300
+            group
+          "
+        >
+          {/* Decorative stars */}
+          <div className="absolute top-3 left-6 text-2xl animate-pulse">
+            ✨
+          </div>
+
+          <div className="absolute top-5 right-8 text-3xl animate-bounce-slow">
+            ⭐
+          </div>
+
+          <div className="absolute bottom-3 left-1/4 text-xl animate-pulse">
+            🌟
+          </div>
+
+          {/* Decorative blobs */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full" />
+          <div className="absolute -bottom-12 -left-8 w-40 h-40 bg-white/10 rounded-full" />
+
+          <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+            
+            {/* Left */}
+            <div className="flex items-center gap-5 text-center md:text-left">
+              <div className="
+                w-20 h-20 md:w-24 md:h-24
+                bg-white
+                rounded-3xl
+                flex items-center justify-center
+                text-5xl md:text-6xl
+                shadow-lg
+                group-hover:rotate-6
+                group-hover:scale-110
+                transition-all duration-300
+              ">
+                🤖
+              </div>
+
+              <div>
+                <div className="inline-block bg-yellow-300 text-purple-800 px-3 py-1 rounded-full text-xs font-black mb-2 shadow-sm rotate-[-2deg]">
+                  ✨ MAGIC GAME MAKER ✨
+                </div>
+
+                <h2 className="
+                  font-mochiy
+                  text-2xl md:text-4xl
+                  text-white
+                  drop-shadow-[0_4px_0_rgba(88,28,135,0.4)]
+                ">
+                  Create Your Own Game! 🎮
+                </h2>
+
+                <p className="text-white/90 font-bold text-sm md:text-base mt-2">
+                  Tell our AI what you want to play and watch the magic happen! 🚀
+                </p>
+              </div>
+            </div>
+
+            {/* Button */}
+            <div className="
+              shrink-0
+              bg-white
+              text-fuchsia-600
+              font-mochiy
+              text-sm md:text-base
+              px-7 py-4
+              rounded-2xl
+              border-4 border-fuchsia-200
+              shadow-[0_6px_0_#e879f9]
+              group-hover:bg-yellow-300
+              group-hover:text-purple-700
+              group-hover:border-yellow-200
+              transition-all duration-300
+            ">
+              Let's Create! ✨
+            </div>
+          </div>
+        </button>
+      </section>
 
       {/* ================= GAMES GRID ================= */}
       <main className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 gap-10">

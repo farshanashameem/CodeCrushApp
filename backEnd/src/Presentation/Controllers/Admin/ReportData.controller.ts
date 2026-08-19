@@ -1,4 +1,5 @@
 
+import { IAIGamePopularityReportUseCase } from '@/Application/Admin/Interfaces/Report/IAIGamePopularityReport.usecase';
 import { IGetChildProgressReportUseCase } from '@/Application/Admin/Interfaces/Report/IGetChildProgressReport.usecase';
 import { IGetGamePerformanceReport } from '@/Application/Admin/Interfaces/Report/IGetGamePerformanceReport.usecase';
 import { IGetLevelPerformanceReportUseCase } from '@/Application/Admin/Interfaces/Report/IGetLevelPerformanceReport.usecase';
@@ -16,7 +17,7 @@ export class ReportDataController {
         private _gameReportuseCase : IGetGamePerformanceReport,
         private _levelReportUseCase: IGetLevelPerformanceReportUseCase,
         private _revenueReportUseCase: IGetRevenueReportUseCase,
-        
+        private _aiGamePopularityUseCase: IAIGamePopularityReportUseCase
     ) {}
 
     userReport = async ( req: Request, res: Response, next: NextFunction ) : Promise< Response | void > => {
@@ -76,6 +77,20 @@ export class ReportDataController {
             sendSuccess( res, StatusCodes.OK, '', report);
 
         } catch( error ) {
+            next( error);
+        }
+    };
+
+    aiGamePopularityReport = async ( req: Request, res: Response, next: NextFunction ): Promise< Response | void > => {
+        try{
+            const report = await this._aiGamePopularityUseCase.execute();
+            sendSuccess(res,
+                StatusCodes.OK,
+                '',
+                report
+            );
+
+        }catch ( error ){
             next( error);
         }
     };

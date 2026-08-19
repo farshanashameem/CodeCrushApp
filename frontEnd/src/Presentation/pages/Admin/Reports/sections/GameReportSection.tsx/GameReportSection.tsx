@@ -10,6 +10,7 @@ import CompletionRateChart from "./CompletionRateChart";
 import ScoreByGameChart from "./ScoreByGameChart";
 import TopGamesTable from "./TopGamesTable";
 import type { ReportRange } from "../../../../../../Types/reports";
+import AIGamePopularityTable from "./AIGamePopularityTable";
 
 interface GameReportSectionProps {
   dateRange: ReportRange;
@@ -71,6 +72,8 @@ export default function GameReportSection({
           <TopGamesTable
             data={gameReport?.topGames ?? []}
           />
+
+          <AIGamePopularityTable/>
 
         </div>
       </div>

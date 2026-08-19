@@ -40,6 +40,7 @@ export const API_ROUTES = {
       GAMES: "/auth/admin/reports/games",
       LEVELS: "/auth/admin/reports/levels",
       REVENUE: "/auth/admin/reports/revenue",
+      AI_GAME_POPULARITY: "/auth/admin/reports/ai-games/popularity",
     },
     EXPORT_REPORTS: {
       USER_REPORT: "/auth/admin/reports/users/export",
@@ -47,6 +48,7 @@ export const API_ROUTES = {
       GAME_REPORT: "/auth/admin/reports/games/export",
       LEVEL_REPORT: "/auth/admin/reports/levels/export",
       REVENUE_REPORT: "/auth/admin/reports/revenue/export",
+       AI_GAME_POPULARITY_REPORT: "/auth/admin/reports/ai-games/popularity/export",
     },
     USERS: {
       GET_ALL: "/auth/admin/users",
@@ -129,5 +131,8 @@ export const API_ROUTES = {
         `/auth/child/games/${gameId}/levels/${levelId}/progress`,
     },
    
+  },
+  AI_GAME: {
+    GENERATE: "/auth/ai-game/generate",
   },
 };
