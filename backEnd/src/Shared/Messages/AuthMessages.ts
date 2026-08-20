@@ -70,6 +70,9 @@ export const authMessages = {
         // AI GAME
         AI_GAME_GENERATED_SUCCESSFULLY: 'AI game generated successfully',
     
+        //GAME REVIEW
+        GAME_REVIEW_CREATED_SUCCESSFULLY: 'GAME_REVIEW_CREATED_SUCCESSFULLY',
+        GAME_REVIEW_FETCHED_SUCCESSFULLY: 'GAME_REVIEW_FETCHED_SUCCESSFULLY',
     }, 
 
     error: {

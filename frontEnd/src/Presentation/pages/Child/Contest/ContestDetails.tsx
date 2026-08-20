@@ -176,36 +176,60 @@ const ContestDetails = ({
   // FINAL REWARD DETAILS
   // ============================================================
 
-  const getRewardDetails = () => {
-    switch (childReward) {
-      case "GOLD":
+const getRewardDetails = () => {
+  // ============================================================
+  // PARTICIPATION CONTEST
+  // Everyone gets participation badge
+  // No winner medals
+  // ============================================================
+
+  if (isParticipation) {
+    return {
+      icon: "🎖️",
+      title: "Participation Badge!",
+      description:
+        "Great job participating in the contest!",
+      titleClass: "text-indigo-600",
+      showRank: false,
+    };
+  }
+
+  // ============================================================
+  // CHALLENGE CONTEST
+  // Top 3 get medals
+  // Everyone else gets participation badge
+  // ============================================================
+
+  if (isChallenge) {
+    switch (calculatedRank) {
+      case 1:
         return {
           icon: "🥇",
           title: "Gold Medal!",
           description:
             "Amazing! You finished in first place!",
-          titleClass:
-            "text-yellow-500",
+          titleClass: "text-yellow-500",
+          showRank: true,
         };
 
-      case "SILVER":
+      case 2:
         return {
           icon: "🥈",
           title: "Silver Medal!",
           description:
             "Great job! You finished in second place!",
-          titleClass:
-            "text-slate-500",
+          titleClass: "text-slate-500",
+          showRank: true,
         };
 
-      case "BRONZE":
+      case 3:
         return {
           icon: "🥉",
           title: "Bronze Medal!",
           description:
             "Well done! You finished in third place!",
-          titleClass:
-            "text-orange-600",
+          titleClass: "text-orange-600",
+          showRank: true,
         };
 
       default:
@@ -214,14 +238,24 @@ const ContestDetails = ({
           title: "Participation Badge!",
           description:
             "Great job participating in the contest!",
-          titleClass:
-            "text-indigo-600",
+          titleClass: "text-indigo-600",
+          showRank: true,
         };
     }
-  };
+  }
 
-  const rewardDetails =
-    getRewardDetails();
+  // Fallback
+  return {
+    icon: "🎖️",
+    title: "Participation Badge!",
+    description:
+      "Great job participating in the contest!",
+    titleClass: "text-indigo-600",
+    showRank: false,
+  };
+};
+
+  const rewardDetails = getRewardDetails();
 
   return (
     <div className="space-y-7">
@@ -426,30 +460,19 @@ const ContestDetails = ({
 
           {/* FINAL RANK */}
 
-          {calculatedRank && (
-            <div className="mt-6 inline-flex flex-col items-center bg-indigo-50 rounded-2xl px-8 py-4">
+          {rewardDetails.showRank && calculatedRank && (
+  <div className="mt-6 inline-flex flex-col items-center bg-indigo-50 rounded-2xl px-8 py-4">
+    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">
+      Final Rank
+    </span>
 
-              <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">
-                Final Rank
-              </span>
+    <span className="text-4xl font-black text-indigo-600 mt-1">
+      #{calculatedRank}
+    </span>
+  </div>
+)}
 
-              <span className="text-4xl font-black text-indigo-600 mt-1">
-                #{calculatedRank}
-              </span>
-
-            </div>
-          )}
-
-          {/* REWARD */}
-
-          {childWinner && (
-            <p className="mt-4 text-sm font-bold text-slate-500">
-              Reward earned:{" "}
-              <span className="text-indigo-600">
-                {childWinner.reward}
-              </span>
-            </p>
-          )}
+         
 
         </div>
       )}

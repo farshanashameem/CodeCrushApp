@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import aiGameBackground from "../../../../../assets/ai-game-background.png"
 import aiGameLogo from "../../../../../assets/ai-game-logo.png";
-
+import { getCurrentChildSession } from "../../../../../redux/Slices/childGameSlice";
 import ChildLayout from "../../../../SharedComponents/Child/ChildLayout";
 
-import type { RootState } from "../../../../../redux/store";
+import type { AppDispatch, RootState } from "../../../../../redux/store";
 
 import QuizPlayPage from "./Quiz/QuizPlayPage";
 import TypingPlayPage from "./Typing/TypingPlayPage";
@@ -37,9 +37,13 @@ const AI_GAME_DATA_KEY = "aiGameData";
 
 const AIGamePlayPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { currentChild } = useSelector((state: RootState) => state.childGame);
-
+    useEffect(() => {
+      dispatch(getCurrentChildSession());
+    }, [dispatch]);
+  
   /* ================================================================= */
   /* STATE */
   /* ================================================================= */
@@ -54,7 +58,7 @@ const AIGamePlayPage = () => {
 
   useEffect(() => {
     const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
-console.log(storedGame)
+
     if (!storedGame) {
       setError("Game data not found. Please create a new game.");
       return;

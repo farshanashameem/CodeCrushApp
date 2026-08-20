@@ -46,12 +46,12 @@ const ChildHeader = ({
           <img
             src={logo}
             alt="logo"
-            className="w-20 h-20 object-contain"
+            className="w-30 h-30 object-contain"
           />
         )}
 
         <div>
-          <h1 className="font-mochiy text-3xl md:text-5xl text-indigo-600">
+          <h1 className="font-mochiy text-2xl md:text-3xl text-indigo-600">
             {title || "🌈 Skill Quest"}
           </h1>
 
@@ -102,8 +102,20 @@ const ChildHeader = ({
           </span>
         </button>
 
+         
         {showMenu && (
           <div className="absolute right-0 top-20 bg-white border-4 border-indigo-400 rounded-3xl shadow-2xl p-2 w-52 z-50">
+
+             {/* Home */}
+    <button
+      onClick={() => {
+        setShowMenu(false);
+        navigate("/play");
+      }}
+      className="w-full text-left font-mochiy text-sm text-indigo-600 px-4 py-3 hover:bg-indigo-50 rounded-2xl flex items-center gap-2"
+    >
+      🏠 Home
+    </button>
 
             {/* Contest */}
             <button

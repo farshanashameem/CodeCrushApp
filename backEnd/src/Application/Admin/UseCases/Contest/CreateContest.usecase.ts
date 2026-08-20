@@ -1,8 +1,8 @@
 import { IContestRepository } from '@/Domain/RepositoryInterface/IContest.repository';
-import ICreateContestUseCase from '../../Interfaces/Contest/ICreateContest.usecase';
 import { CreateContestInputDTO, CreateContestOutputDTO } from '../../dto/Contest/createContest.dto';
 import ContestEntity from '@/Domain/Entities/Contest.entity';
 import ContestStatus from '@/Domain/enums/ContestStatus.enum';
+import { ICreateContestUseCase } from '../../Interfaces/Contest/ICreateContest.usecase';
 
 export class CreateContestUseCase implements ICreateContestUseCase {
     constructor(
