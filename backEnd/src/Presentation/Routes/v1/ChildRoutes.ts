@@ -1,6 +1,6 @@
 import Express from 'express';
 import { ROUTES } from '@/Shared/Routes';
-import { startChildSessionController, endChildSessionController,  verifyChildSessionMiddleware, getLevelProgressController, childContestController } from '@/Presentation/Factory/ChildFactory';
+import { startChildSessionController, endChildSessionController,  verifyChildSessionMiddleware, getLevelProgressController, childContestController, gameReviewController } from '@/Presentation/Factory/ChildFactory';
 import { childGameController } from '@/Presentation/Factory/ChildFactory';
 import { authHandler } from '@/Presentation/Middlewares/AuthMiddleware';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
@@ -42,4 +42,9 @@ router.patch( ROUTES.CHILD.CONTEST.PROGRESS, childContestController.updateContes
 router.get( ROUTES.CHILD.CONTEST.LEADERBOARD, childContestController.getContestLeaderboard );
 router.get( ROUTES.CHILD.CONTEST.COMPLETED_PARTICIPANTS, childContestController.getCompletedParticipants );
 
+
+// Game Review routes
+router.get( ROUTES.CHILD.REVIEW.BY_GAME, gameReviewController.getGamereview);
+router.post( ROUTES.CHILD.REVIEW.BY_GAME, gameReviewController.createGamereview);
+router.get( ROUTES.CHILD.REVIEW.ALL_BY_GAME, gameReviewController.getGamereviews);
 export default router;

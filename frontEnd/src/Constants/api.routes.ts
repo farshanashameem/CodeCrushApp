@@ -130,6 +130,13 @@ export const API_ROUTES = {
       BY_LEVEL: (gameId: string, levelId: string) =>
         `/auth/child/games/${gameId}/levels/${levelId}/progress`,
     },
+    REVIEW: {
+      BY_GAME: (gameId: string) =>
+        `/auth/child/games/${gameId}/review`,
+
+      ALL_BY_GAME: (gameId: string) =>
+        `/auth/child/games/${gameId}/reviews`,
+    },
    
   },
   AI_GAME: {

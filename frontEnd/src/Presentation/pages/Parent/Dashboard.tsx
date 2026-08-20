@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import AuthLayout from "../../layouts/AuthLayout";
 import icon from "../../../assets/parentIcon.png";
-
+ 
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../../redux/store";
 import { getMe, logoutUser } from "../../../redux/Slices/authSlice";

@@ -21,8 +21,7 @@ export class UpdateContestProgressUseCase implements IUpdateContestProgressUseCa
         // Check whether this level was already completed
         const completedLevelIds = progress.getCompletedLevelIds();
 
-        const isNewLevel =
-            !completedLevelIds.includes(request.levelId);
+        const isNewLevel = !completedLevelIds.includes(request.levelId);
 
         if (isNewLevel) {
             progress.addCompletedLevel(request.levelId);

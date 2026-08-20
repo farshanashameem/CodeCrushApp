@@ -121,7 +121,11 @@ export const ROUTES = {
             PROGRESS: '/contests/:contestId/progress',
             LEADERBOARD: '/contests/:contestId/leaderboard',
             COMPLETED_PARTICIPANTS: '/contests/:contestId/participants/completed',
-        },   
+        },         
+        REVIEW: {
+            BY_GAME: '/games/:gameId/review',
+            ALL_BY_GAME: '/games/:gameId/reviews',
+        },
     },
     AI_GAME: {
         BASE: '/ai-game',

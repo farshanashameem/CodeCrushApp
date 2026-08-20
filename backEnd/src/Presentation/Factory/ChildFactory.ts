@@ -8,6 +8,7 @@ import { ChildProgressController } from '../Controllers/Child/ChildProgress.cont
 import { GetCurrentChildSessionController } from '../Controllers/Child/GetCurrentChildSession.controller';
 import { GetLevelProgressController } from '../Controllers/Child/GetLevelProgress.controller';
 import { ChildContestController } from '../Controllers/Child/Contest.controller';
+import { GameReviewController } from '../Controllers/Child/gameReview.controller.ts';
 
 //UseCases
 
@@ -29,6 +30,9 @@ import { GetContestProgressUseCase } from '@/Application/Child/UseCases/Contest/
 import { GetJoinedContestsUseCase } from '@/Application/Child/UseCases/Contest/GetJoinedContests.usecase';
 import { JoinContestUseCase } from '@/Application/Child/UseCases/Contest/JoinContest.usecase';
 import { UpdateContestProgressUseCase } from '@/Application/Child/UseCases/Contest/UpdateContestProgress.usecase';
+import { GetGameReviewUseCase } from '@/Application/Child/UseCases/Review/GetGameReview.usecase';
+import { GetGameReviewsUseCase } from '@/Application/Child/UseCases/Review/Getgamereviews.usecase';
+import { CreateGameReviewUseCase } from '@/Application/Child/UseCases/Review/CreateGameReview.usecase';
 
 //Repositories
 
@@ -42,6 +46,7 @@ import { ProgressRepository } from '@/Infrastructure/Repositories/Progress.repos
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
 import { ContestRepository } from '@/Infrastructure/Repositories/Contest.repository';
 import { ContestProgressRepository } from '@/Infrastructure/Repositories/ContestProgress.repository';
+import { GameReviewRepository } from '@/Infrastructure/Repositories/GameReview.repository';
 
 //Services
 import { TokenService } from '@/Infrastructure/Services/TokenService';
@@ -57,6 +62,7 @@ const progressRepository = new ProgressRepository();
 const parentRepository = new ParentRepository();
 const contestRepository = new ContestRepository();
 const contestProgressRepository = new ContestProgressRepository();
+const gameReviewRepository = new GameReviewRepository();
 
 const tokenService = new TokenService();
 
@@ -153,6 +159,17 @@ const joinContestUseCase = new JoinContestUseCase(
     contestProgressRepository
 );
 
+const createGameReviewUseCase = new CreateGameReviewUseCase(
+    gameReviewRepository
+);
+
+const getGameReviewUseCase = new GetGameReviewUseCase(
+    gameReviewRepository
+);
+
+const getGameReviewsUseCase = new GetGameReviewsUseCase(
+    gameReviewRepository
+);
 
 
 export const startChildSessionController = new StartChildSessionController(
@@ -196,4 +213,10 @@ export const childContestController = new ChildContestController(
     updateContestProgressUseCase,
     getContestLeaderboardUseCase,
     getCompletedParticipantsUseCase
+);
+
+export const gameReviewController = new GameReviewController(
+    createGameReviewUseCase,
+    getGameReviewUseCase,
+    getGameReviewsUseCase
 );

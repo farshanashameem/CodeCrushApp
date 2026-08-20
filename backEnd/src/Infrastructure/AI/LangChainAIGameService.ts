@@ -38,10 +38,30 @@ export class LangChainAIGameService implements IAIGameService {
 
         switch (input.gameType) {
 
-            case AIGameType.QUIZ:
-                countInstruction =
-                    `Generate exactly ${input.questionCount} questions.`;
-                break;
+        case AIGameType.QUIZ:
+            countInstruction = `
+        Generate exactly ${input.questionCount} questions.
+
+        For every question:
+        - Generate exactly 4 answer options.
+        - There must be exactly ONE correct answer.
+        - Determine the correct answer from the question content BEFORE creating the options.
+        - Verify the correct answer independently before returning the question.
+        - Set the correctAnswer/correct option only after verifying it.
+        - Do NOT assume that the first option is correct.
+        - Randomize the position of the correct answer across A, B, C, and D.
+        - Across the entire quiz, distribute correct answers as evenly as possible among A, B, C, and D.
+        - Do not use a predictable answer-position pattern.
+        - The correct answer must not consistently appear in the first or second position.
+        - All incorrect options must be plausible but factually incorrect.
+        - Do not make the correct option noticeably longer, more detailed, or more specific than the incorrect options.
+        - Before returning each question, verify that the selected correct option actually answers the question.
+
+        IMPORTANT:
+        The answer position must be independently randomized for every question.
+        Never always place the correct answer at index 0 or index 1.
+        `;
+            break;
 
             case AIGameType.TYPING:
                 countInstruction =
