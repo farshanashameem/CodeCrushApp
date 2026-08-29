@@ -138,10 +138,11 @@ export class ParentAuthController {
         try {
             const parsed = forgotPasswordSchema.parse( req.body );
             const payload: ForgotPasswordInputDTO = {
-                email: parsed.email
+                email: parsed.email,
+                type: OTPType.FORGOT_PASSWORD
             };
 
-            //logger.info( `From controller: ${payload}`);
+            
 
             await this._forgotPasswordUseCase.execute(payload);
 

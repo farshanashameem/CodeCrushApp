@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-
+import { useMemo, useState } from "react";
 
 import {
   getCriteriaValue,
@@ -12,11 +11,32 @@ import {
 import { EmptyState, LoadingState } from "./ContestList";
 import type { Contest } from "../../../../Types/ChildContest";
 
+interface ContestProgress {
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
+  stats?: {
+    score?: number;
+    stars?: number;
+    levelsCompleted?: number;
+  };
+}
+
+interface LeaderboardPlayer {
+  childId: string;
+  childName: string;
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
+  rank?: number;
+}
+
+
 interface ContestDetailsProps {
   contest: Contest;
   joined: boolean;
-  progress: any;
-  leaderboard: any[];
+  progress: ContestProgress | null;
+  leaderboard: LeaderboardPlayer[];
   currentChildId?: string;
   currentChildRank: number | null;
   loadingProgress: boolean;
@@ -32,7 +52,6 @@ const ContestDetails = ({
   progress,
   leaderboard,
   currentChildId,
-  currentChildRank,
   loadingProgress,
   loadingLeaderboard,
   joiningContest,
@@ -58,27 +77,18 @@ const ContestDetails = ({
   // CONTEST STATUS
   // ============================================================
 
-  const isCompleted =
-    contest.status === "COMPLETED" ||
-    new Date(contest.endDate).getTime() < Date.now();
+  /*
+   * Date.now() is an impure function and React Compiler
+   * does not allow it directly during render.
+   *
+   * useMemo gives us a stable value for this render.
+   */
+ const [currentTime] = useState(() => Date.now());
 
-  // ============================================================
-  // CHILD'S WINNER / MEDAL
-  // ============================================================
+const isCompleted =
+  contest.status === "COMPLETED" ||
+  new Date(contest.endDate).getTime() < currentTime;
 
-  const childWinner = useMemo(() => {
-    if (!currentChildId || !contest.winners) {
-      return undefined;
-    }
-
-    return contest.winners.find(
-      (winner) =>
-        winner.childId === currentChildId,
-    );
-  }, [contest.winners, currentChildId]);
-
-  const childReward =
-    childWinner?.reward;
 
   // ============================================================
   // TARGET PROGRESS
@@ -122,29 +132,32 @@ const ContestDetails = ({
   // SORT LEADERBOARD
   // ============================================================
 
-  const sortedLeaderboard = useMemo(() => {
-    if (!Array.isArray(leaderboard)) {
-      return [];
-    }
+  const sortedLeaderboard = useMemo(
+    () => {
+      if (!Array.isArray(leaderboard)) {
+        return [];
+      }
 
-    const criteria = String(
-      winnerCriteria ?? "SCORE",
-    ).toUpperCase();
+      const criteria = String(
+        winnerCriteria ?? "SCORE",
+      ).toUpperCase();
 
-    return [...leaderboard].sort((a, b) => {
-      const aValue = getCriteriaValue(
-        a,
-        criteria,
-      );
+      return [...leaderboard].sort((a, b) => {
+        const aValue = getCriteriaValue(
+          a,
+          criteria,
+        );
 
-      const bValue = getCriteriaValue(
-        b,
-        criteria,
-      );
+        const bValue = getCriteriaValue(
+          b,
+          criteria,
+        );
 
-      return bValue - aValue;
-    });
-  }, [leaderboard, winnerCriteria]);
+        return bValue - aValue;
+      });
+    },
+    [leaderboard, winnerCriteria],
+  );
 
   // ============================================================
   // CURRENT / FINAL RANK
@@ -176,14 +189,75 @@ const ContestDetails = ({
   // FINAL REWARD DETAILS
   // ============================================================
 
-const getRewardDetails = () => {
-  // ============================================================
-  // PARTICIPATION CONTEST
-  // Everyone gets participation badge
-  // No winner medals
-  // ============================================================
+  const getRewardDetails = () => {
+    // ============================================================
+    // PARTICIPATION CONTEST
+    // Everyone gets participation badge
+    // No winner medals
+    // ============================================================
 
-  if (isParticipation) {
+    if (isParticipation) {
+      return {
+        icon: "🎖️",
+        title: "Participation Badge!",
+        description:
+          "Great job participating in the contest!",
+        titleClass: "text-indigo-600",
+        showRank: false,
+      };
+    }
+
+    // ============================================================
+    // CHALLENGE CONTEST
+    // Top 3 get medals
+    // Everyone else gets participation badge
+    // ============================================================
+
+    if (isChallenge) {
+      switch (calculatedRank) {
+        case 1:
+          return {
+            icon: "🥇",
+            title: "Gold Medal!",
+            description:
+              "Amazing! You finished in first place!",
+            titleClass: "text-yellow-500",
+            showRank: true,
+          };
+
+        case 2:
+          return {
+            icon: "🥈",
+            title: "Silver Medal!",
+            description:
+              "Great job! You finished in second place!",
+            titleClass: "text-slate-500",
+            showRank: true,
+          };
+
+        case 3:
+          return {
+            icon: "🥉",
+            title: "Bronze Medal!",
+            description:
+              "Well done! You finished in third place!",
+            titleClass: "text-orange-600",
+            showRank: true,
+          };
+
+        default:
+          return {
+            icon: "🎖️",
+            title: "Participation Badge!",
+            description:
+              "Great job participating in the contest!",
+            titleClass: "text-indigo-600",
+            showRank: true,
+          };
+      }
+    }
+
+    // Fallback
     return {
       icon: "🎖️",
       title: "Participation Badge!",
@@ -192,70 +266,10 @@ const getRewardDetails = () => {
       titleClass: "text-indigo-600",
       showRank: false,
     };
-  }
-
-  // ============================================================
-  // CHALLENGE CONTEST
-  // Top 3 get medals
-  // Everyone else gets participation badge
-  // ============================================================
-
-  if (isChallenge) {
-    switch (calculatedRank) {
-      case 1:
-        return {
-          icon: "🥇",
-          title: "Gold Medal!",
-          description:
-            "Amazing! You finished in first place!",
-          titleClass: "text-yellow-500",
-          showRank: true,
-        };
-
-      case 2:
-        return {
-          icon: "🥈",
-          title: "Silver Medal!",
-          description:
-            "Great job! You finished in second place!",
-          titleClass: "text-slate-500",
-          showRank: true,
-        };
-
-      case 3:
-        return {
-          icon: "🥉",
-          title: "Bronze Medal!",
-          description:
-            "Well done! You finished in third place!",
-          titleClass: "text-orange-600",
-          showRank: true,
-        };
-
-      default:
-        return {
-          icon: "🎖️",
-          title: "Participation Badge!",
-          description:
-            "Great job participating in the contest!",
-          titleClass: "text-indigo-600",
-          showRank: true,
-        };
-    }
-  }
-
-  // Fallback
-  return {
-    icon: "🎖️",
-    title: "Participation Badge!",
-    description:
-      "Great job participating in the contest!",
-    titleClass: "text-indigo-600",
-    showRank: false,
   };
-};
 
-  const rewardDetails = getRewardDetails();
+  const rewardDetails =
+    getRewardDetails();
 
   return (
     <div className="space-y-7">
@@ -301,9 +315,7 @@ const getRewardDetails = () => {
 
           {isCompleted && (
             <div className="mt-6 inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border-2 border-white/20 rounded-full px-5 py-2">
-              <span>
-                🏁
-              </span>
+              <span>🏁</span>
 
               <span className="font-black">
                 Contest Completed
@@ -460,19 +472,20 @@ const getRewardDetails = () => {
 
           {/* FINAL RANK */}
 
-          {rewardDetails.showRank && calculatedRank && (
-  <div className="mt-6 inline-flex flex-col items-center bg-indigo-50 rounded-2xl px-8 py-4">
-    <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">
-      Final Rank
-    </span>
+          {rewardDetails.showRank &&
+            calculatedRank && (
+              <div className="mt-6 inline-flex flex-col items-center bg-indigo-50 rounded-2xl px-8 py-4">
 
-    <span className="text-4xl font-black text-indigo-600 mt-1">
-      #{calculatedRank}
-    </span>
-  </div>
-)}
+                <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">
+                  Final Rank
+                </span>
 
-         
+                <span className="text-4xl font-black text-indigo-600 mt-1">
+                  #{calculatedRank}
+                </span>
+
+              </div>
+            )}
 
         </div>
       )}
@@ -485,33 +498,41 @@ const getRewardDetails = () => {
       {joined &&
         !isCompleted &&
         isParticipation && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="space-y-4">
 
-            <StatCard
-              icon={winnerCriteriaIcon}
-              label={winnerCriteriaLabel}
-              value={currentTargetValue}
-            />
+            {loadingProgress ? (
+              <LoadingState />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-            <StatCard
-              icon="⭐"
-              label="Stars"
-              value={Number(
-                progress?.stars ??
-                  progress?.stats?.stars ??
-                  0,
-              )}
-            />
+                <StatCard
+                  icon={winnerCriteriaIcon}
+                  label={winnerCriteriaLabel}
+                  value={currentTargetValue}
+                />
 
-            <StatCard
-              icon="🎮"
-              label="Levels Completed"
-              value={Number(
-                progress?.levelsCompleted ??
-                  progress?.stats?.levelsCompleted ??
-                  0,
-              )}
-            />
+                <StatCard
+                  icon="⭐"
+                  label="Stars"
+                  value={Number(
+                    progress?.stars ??
+                      progress?.stats?.stars ??
+                      0,
+                  )}
+                />
+
+                <StatCard
+                  icon="🎮"
+                  label="Levels Completed"
+                  value={Number(
+                    progress?.levelsCompleted ??
+                      progress?.stats?.levelsCompleted ??
+                      0,
+                  )}
+                />
+
+              </div>
+            )}
 
           </div>
         )}
@@ -524,31 +545,39 @@ const getRewardDetails = () => {
       {joined &&
         !isCompleted &&
         isChallenge && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="space-y-4">
 
-            <StatCard
-              icon="🏆"
-              label="Score"
-              value={Number(
-                progress?.score ?? 0,
-              )}
-            />
+            {loadingProgress ? (
+              <LoadingState />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-            <StatCard
-              icon="⭐"
-              label="Stars"
-              value={Number(
-                progress?.stars ?? 0,
-              )}
-            />
+                <StatCard
+                  icon="🏆"
+                  label="Score"
+                  value={Number(
+                    progress?.score ?? 0,
+                  )}
+                />
 
-            <StatCard
-              icon="🎯"
-              label="Levels Completed"
-              value={Number(
-                progress?.levelsCompleted ?? 0,
-              )}
-            />
+                <StatCard
+                  icon="⭐"
+                  label="Stars"
+                  value={Number(
+                    progress?.stars ?? 0,
+                  )}
+                />
+
+                <StatCard
+                  icon="🎯"
+                  label="Levels Completed"
+                  value={Number(
+                    progress?.levelsCompleted ?? 0,
+                  )}
+                />
+
+              </div>
+            )}
 
           </div>
         )}
@@ -625,7 +654,7 @@ interface LeaderboardProps {
   winnerCriteria?: string;
   winnerCriteriaLabel: string;
   winnerCriteriaIcon: string;
-  sortedLeaderboard: any[];
+  sortedLeaderboard: LeaderboardPlayer[];
   currentChildId?: string;
   loadingLeaderboard: boolean;
 }
@@ -640,7 +669,6 @@ const Leaderboard = ({
   currentChildId,
   loadingLeaderboard,
 }: LeaderboardProps) => {
-
   return (
     <div className="bg-white rounded-[2rem] border-4 border-indigo-200 shadow-[0_7px_0_#c7d2fe] overflow-hidden">
 
@@ -657,11 +685,9 @@ const Leaderboard = ({
             </h2>
 
             <p className="text-sm text-slate-400 mt-1">
-
               {isChallenge
                 ? `Ranked by ${winnerCriteriaLabel} — highest wins!`
                 : `Track everyone's progress toward the ${contest.targetValue} ${winnerCriteriaLabel} target.`}
-
             </p>
 
           </div>
@@ -688,13 +714,11 @@ const Leaderboard = ({
 
       {loadingLeaderboard ? (
         <LoadingState />
-
       ) : !sortedLeaderboard.length ? (
         <EmptyState
           icon="🏆"
           text="No participants yet."
         />
-
       ) : (
         <div>
 
@@ -730,7 +754,6 @@ const Leaderboard = ({
 
             {sortedLeaderboard.map(
               (player, index) => {
-
                 const isCurrentChild =
                   player.childId ===
                   currentChildId;
@@ -739,13 +762,13 @@ const Leaderboard = ({
                   index + 1;
 
                 const score =
-                  player?.score ?? 0;
+                  player.score ?? 0;
 
                 const stars =
-                  player?.stars ?? 0;
+                  player.stars ?? 0;
 
                 const levelsCompleted =
-                  player?.levelsCompleted ?? 0;
+                  player.levelsCompleted ?? 0;
 
                 return (
                   <div
@@ -774,11 +797,9 @@ const Leaderboard = ({
                         <div>
 
                           <p className="font-black text-slate-700">
-
                             {isCurrentChild
                               ? "You"
                               : player.childName}
-
                           </p>
 
                           {isCurrentChild && (
@@ -838,11 +859,9 @@ const Leaderboard = ({
                         <div className="flex-1">
 
                           <p className="font-black text-slate-700">
-
                             {isCurrentChild
                               ? "You"
                               : player.childName}
-
                           </p>
 
                           {isCurrentChild && (
@@ -926,7 +945,6 @@ const LeaderboardValue = ({
         : ""
     }`}
   >
-
     <p
       className={`text-lg font-black ${
         highlighted
@@ -936,7 +954,6 @@ const LeaderboardValue = ({
     >
       {icon} {value}
     </p>
-
   </div>
 );
 
@@ -965,7 +982,6 @@ const MobileLeaderboardValue = ({
         : "bg-slate-50"
     }`}
   >
-
     <p className="text-sm">
       {icon}
     </p>
@@ -983,7 +999,6 @@ const MobileLeaderboardValue = ({
     <p className="text-[9px] text-slate-400 uppercase font-bold">
       {label}
     </p>
-
   </div>
 );
 

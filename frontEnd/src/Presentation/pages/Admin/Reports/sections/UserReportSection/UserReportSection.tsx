@@ -20,7 +20,7 @@ export default function UserReportSection({
 
   const dispatch = useDispatch<AppDispatch>();
 
-const { userReport, loading, error } = useSelector(
+const { userReport,} = useSelector(
   (state: RootState) => state.report
 );
 

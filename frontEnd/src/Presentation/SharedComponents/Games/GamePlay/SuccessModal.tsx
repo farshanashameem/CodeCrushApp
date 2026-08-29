@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
+
 import { gameTheme } from "../../../../Constants/gameTheme";
 import successMusic from "../../../../assets/happy.mp3";
 
@@ -35,19 +36,24 @@ const SuccessModal = ({
 
   // Success Music
   useEffect(() => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+
+    if (!audio) return;
 
     if (open) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+      audio.currentTime = 0;
+
+      audio.play().catch(() => {
+        console.log("Unable to play success music");
+      });
     } else {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      audio.pause();
+      audio.currentTime = 0;
     }
 
     return () => {
-      audioRef.current?.pause();
-      if (audioRef.current) audioRef.current.currentTime = 0;
+      audio.pause();
+      audio.currentTime = 0;
     };
   }, [open]);
 
@@ -87,26 +93,30 @@ const SuccessModal = ({
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      particles.forEach((p) => {
-        p.y += p.speed;
-        p.x += Math.sin(p.angle);
-        p.angle += 0.03;
+      particles.forEach((particle) => {
+        particle.y += particle.speed;
+        particle.x += Math.sin(particle.angle);
+        particle.angle += 0.03;
 
         ctx.save();
 
-        ctx.translate(p.x, p.y);
+        ctx.translate(particle.x, particle.y);
+        ctx.rotate(particle.rotate);
 
-        ctx.rotate(p.rotate);
+        ctx.fillStyle = particle.color;
 
-        ctx.fillStyle = p.color;
-
-        ctx.fillRect(-4, -4, 8, 8);
+        ctx.fillRect(
+          -particle.r / 2,
+          -particle.r / 2,
+          particle.r,
+          particle.r,
+        );
 
         ctx.restore();
 
-        if (p.y > canvas.height + 20) {
-          p.y = -20;
-          p.x = Math.random() * canvas.width;
+        if (particle.y > canvas.height + 20) {
+          particle.y = -20;
+          particle.x = Math.random() * canvas.width;
         }
       });
 
@@ -115,7 +125,9 @@ const SuccessModal = ({
 
     draw();
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [open]);
 
   if (!open) return null;
@@ -128,7 +140,7 @@ const SuccessModal = ({
         {/* Background */}
         <div className="absolute inset-0">
           <img
-            src={theme.successBackground}
+            src={theme?.successBackground}
             alt=""
             className="w-full h-full object-cover object-center"
           />
@@ -147,18 +159,15 @@ const SuccessModal = ({
           {/* Header */}
           <div className="flex flex-col items-center">
             <h1 className="font-mochiy text-5xl text-yellow-300 drop-shadow-[0_5px_8px_rgba(0,0,0,0.8)]">
-             
             </h1>
 
             <p className="mt-2 text-white/90 font-semibold tracking-wide">
-             
             </p>
           </div>
 
           {/* Bottom Section */}
           <div className="flex flex-col items-center">
             {/* Stars */}
-
             <div className="flex gap-4 mb-6">
               {[1, 2, 3].map((star) => (
                 <span
@@ -173,8 +182,8 @@ const SuccessModal = ({
                 </span>
               ))}
             </div>
-            {/* Score Card */}
 
+            {/* Score Card */}
             <div className="w-full max-w-lg rounded-[30px] bg-white/15 backdrop-blur-xl border border-white/30 shadow-2xl p-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center border-r border-white/20">
@@ -200,7 +209,6 @@ const SuccessModal = ({
             </div>
 
             {/* Achievement Badges */}
-
             {(isNewHighScore || isNewBestTime) && (
               <div className="mt-5 flex flex-col gap-3 w-full max-w-lg">
                 {isNewHighScore && (
@@ -218,7 +226,6 @@ const SuccessModal = ({
             )}
 
             {/* Buttons */}
-
             <div className="mt-8 flex w-full max-w-lg gap-5">
               <button
                 onClick={onRetry}

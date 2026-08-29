@@ -11,6 +11,12 @@ const router = Express.Router();
 
 // Parent starts gaming
 router.post(  ROUTES.CHILD.SESSION.START, authHandler(tokenService), startChildSessionController.startSession) ;
+router.get( ROUTES.CHILD.GAME.ALL, childGameController.getAllGames );
+
+// Game Review routes
+router.get( ROUTES.CHILD.REVIEW.BY_GAME, gameReviewController.getGamereview);
+router.post( ROUTES.CHILD.REVIEW.BY_GAME, gameReviewController.createGamereview);
+router.get( ROUTES.CHILD.REVIEW.ALL_BY_GAME, gameReviewController.getGamereviews);
 
 // Child authenticated routes
 router.use(  verifyChildSessionMiddleware.execute );
@@ -19,7 +25,6 @@ router.use(  verifyChildSessionMiddleware.execute );
 router.post( ROUTES.CHILD.SESSION.END, endChildSessionController.endSession );
 
 // Games
-router.get( ROUTES.CHILD.GAME.ALL, childGameController.getAllGames );
 
 router.get( ROUTES.CHILD.GAME.BY_ID ,childGameController.getGame );
 
@@ -38,13 +43,9 @@ router.get( ROUTES.CHILD.CONTEST.BASE, childContestController.getAvailableContes
 router.get( ROUTES.CHILD.CONTEST.JOINED, childContestController.getJoinedContests );
 router.post( ROUTES.CHILD.CONTEST.JOIN, childContestController.joinContest);
 router.get( ROUTES.CHILD.CONTEST.PROGRESS, childContestController.getContestProgress );
-router.patch( ROUTES.CHILD.CONTEST.PROGRESS, childContestController.updateContestProgress);
 router.get( ROUTES.CHILD.CONTEST.LEADERBOARD, childContestController.getContestLeaderboard );
 router.get( ROUTES.CHILD.CONTEST.COMPLETED_PARTICIPANTS, childContestController.getCompletedParticipants );
 
 
-// Game Review routes
-router.get( ROUTES.CHILD.REVIEW.BY_GAME, gameReviewController.getGamereview);
-router.post( ROUTES.CHILD.REVIEW.BY_GAME, gameReviewController.createGamereview);
-router.get( ROUTES.CHILD.REVIEW.ALL_BY_GAME, gameReviewController.getGamereviews);
+
 export default router;

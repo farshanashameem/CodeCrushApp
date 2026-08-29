@@ -22,6 +22,7 @@ export interface GetGameReviewPayload {
 
 export interface GameReviewWithChildName {
   id: string;
+  childId: string;
   childName: string;
   gameId: string;
   rating: number;

@@ -1,19 +1,25 @@
-export const formatDate = (
-  date: string | Date,
-): string => {
-  return new Date(date).toLocaleDateString(
-    "en-IN",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    },
-  );
+export interface ContestPlayerStats {
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
+}
+
+export interface ContestPlayer {
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
+  stats?: ContestPlayerStats;
+}
+
+export const formatDate = (date: string | Date): string => {
+  return new Date(date).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 };
 
-export const getRankEmoji = (
-  rank: number,
-): string => {
+export const getRankEmoji = (rank: number): string => {
   if (rank === 1) return "🥇";
   if (rank === 2) return "🥈";
   if (rank === 3) return "🥉";
@@ -58,30 +64,28 @@ export const getWinnerCriteriaIcon = (
 };
 
 export const getCriteriaValue = (
-  player: any,
+  player: ContestPlayer,
   criteria?: string,
 ): number => {
-  switch (
-    String(criteria ?? "").toUpperCase()
-  ) {
+  switch (String(criteria ?? "").toUpperCase()) {
     case "SCORE":
       return Number(
-        player?.score ??
-          player?.stats?.score ??
+        player.score ??
+          player.stats?.score ??
           0,
       );
 
     case "STARS":
       return Number(
-        player?.stars ??
-          player?.stats?.stars ??
+        player.stars ??
+          player.stats?.stars ??
           0,
       );
 
     case "LEVELS":
       return Number(
-        player?.levelsCompleted ??
-          player?.stats?.levelsCompleted ??
+        player.levelsCompleted ??
+          player.stats?.levelsCompleted ??
           0,
       );
 

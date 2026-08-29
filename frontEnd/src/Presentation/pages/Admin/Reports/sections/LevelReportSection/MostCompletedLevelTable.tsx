@@ -1,4 +1,3 @@
-import ChartCard from "../../components/ChartCard";
 import type { MostCompletedLevel } from "../../../../../../Types/reports";
 import TableCard from "../../components/TableCard";
 

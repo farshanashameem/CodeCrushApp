@@ -15,15 +15,12 @@ import { PaymentType } from "../../../Constants/payment";
 const ParentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [animate, setAnimate] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const { children, loading } = useSelector(
     (state: RootState) => state.childManagement,
   );
 
-  useEffect(() => {
-    setAnimate(true);
-  }, []);
+ 
 
   useEffect(() => {
     dispatch(fetchChildren());
@@ -42,9 +39,9 @@ const ParentDashboard = () => {
   return (
     <AuthLayout>
       <div
-        className={`w-full max-w-5xl mx-auto px-4 sm:px-6
-        flex flex-col items-center transition-all duration-700 ease-out
-        ${animate ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+        className="w-full max-w-5xl mx-auto px-4 sm:px-6
+        flex flex-col items-center
+        animate-[fadeSlideUp_700ms_ease-out]"
       >
         {/* HEADER SECTION */}
         <div className="flex flex-col items-center mb-8">
@@ -238,7 +235,7 @@ const ParentDashboard = () => {
             </div>
           </div>
         )}
-        {/* CHILD SECTION */}(
+        {/* CHILD SECTION */}
         <div className="w-full transition-all duration-300">
           {children.length === 0 ? (
             <div className="text-center bg-gray-50 rounded-2xl p-10 border-2 border-dashed border-gray-200">
@@ -314,7 +311,7 @@ const ParentDashboard = () => {
             </div>
           )}
         </div>
-        )
+        
       </div>
 
       <RazorpayPaymentModal

@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 const colors = [
   "bg-pink-400",
   "bg-yellow-300",
@@ -18,20 +16,18 @@ interface Balloon {
   color: string;
 }
 
-export default function FloatingBalloons() {
-  const balloons = useMemo<Balloon[]>(
-    () =>
-      Array.from({ length: 14 }, (_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        size: 50 + Math.random() * 35,
-        duration: 12 + Math.random() * 8,
-        delay: Math.random() * 10,
-        color: colors[Math.floor(Math.random() * colors.length)],
-      })),
-    []
-  );
+// Generate random balloon properties outside the React component.
+// This keeps the component pure and satisfies React 19's purity rules.
+const balloons: Balloon[] = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  left: Math.random() * 100,
+  size: 50 + Math.random() * 35,
+  duration: 12 + Math.random() * 8,
+  delay: Math.random() * 10,
+  color: colors[Math.floor(Math.random() * colors.length)],
+}));
 
+export default function FloatingBalloons() {
   return (
     <>
       <style>
@@ -40,6 +36,7 @@ export default function FloatingBalloons() {
             from {
               transform: translateY(120vh);
             }
+
             to {
               transform: translateY(-140vh);
             }
@@ -59,7 +56,7 @@ export default function FloatingBalloons() {
             }}
           >
             <div
-              className={`${balloon.color} rounded-full shadow-xl relative`}
+              className={`${balloon.color} relative rounded-full shadow-xl`}
               style={{
                 width: balloon.size,
                 height: balloon.size * 1.2,

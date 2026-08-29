@@ -11,7 +11,7 @@ import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
 import { IParentRepository } from '@/Domain/RepositoryInterface/IParent.repository';
 import { IContestRepository } from '@/Domain/RepositoryInterface/IContest.repository';
 import { IContestProgressRepository } from '@/Domain/RepositoryInterface/IContestProgress.repository';
-import { IUpdateContestProgressUseCase } from '../Interfaces/Contest/IUpdateContestProgress.usecase';
+
 
 export class SubmitLevelUseCase implements ISubmitLevelUseCase {
   constructor(
@@ -21,7 +21,7 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
     private _parentRepo: IParentRepository,
     private _contestRepo: IContestRepository,
     private _contestProgressRepo: IContestProgressRepository,
-    private _updateContestProgressUseCase: IUpdateContestProgressUseCase
+   
   ) {}
 
   async execute(input: SubmitLevelDTO): Promise<SubmitLevelOutputDTO> {
@@ -202,9 +202,7 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
   // CONTEST PROGRESS
   // ================================================================
 
-  private async updateContestProgress(
-    input: SubmitLevelDTO
-  ): Promise<void> {
+  private async updateContestProgress( input: SubmitLevelDTO ): Promise<void> {
 
     // --------------------------------------------------------------
     // 1. Get active contests
@@ -262,14 +260,26 @@ export class SubmitLevelUseCase implements ISubmitLevelUseCase {
       // ------------------------------------------------------------
       // 5. Update contest progress
       // ------------------------------------------------------------
+        const progress = await this._contestProgressRepo.findByContestIdAndChildId( contestId, input.childId);
+        if( !progress ) {
+            throw new AppError( authMessages.error.CONTEST_PROGRESS_NOT_FOUND, StatusCodes.NOT_FOUND);
+        }
+        const stats = progress.getStats();
 
-      await this._updateContestProgressUseCase.execute({
-        contestId,
-        childId: input.childId,
-        levelId: input.levelId,
-        score: input.score,
-        stars: input.stars,
-      });
+        // Check whether this level was already completed
+        const completedLevelIds = progress.getCompletedLevelIds();
+
+        const isNewLevel = !completedLevelIds.includes(input.levelId);
+
+        if (isNewLevel) {
+            progress.addCompletedLevel(input.levelId);
+            stats.score += input.score;
+            stats.stars += input.stars;
+            stats.levelsCompleted += 1;
+        }
+
+        const updated = await this._contestProgressRepo.save(progress);
+      
     }
   }
 

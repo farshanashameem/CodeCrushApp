@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import SortingResultPage from "./SortingResultPage";
 
@@ -45,15 +45,155 @@ const MAX_CATEGORIES = 4;
 const MAX_ITEMS = 20;
 
 /* ===================================================================== */
+/* GAME LOADER */
+/* ===================================================================== */
+
+/*
+ * sessionStorage is synchronous, so there is no need to use
+ * useEffect + setState just to load the game.
+ *
+ * This function validates the stored game and returns the
+ * initial state required by the component.
+ */
+
+interface LoadedGameState {
+  game: SortingGameData | null;
+  answers: (SortingResult["answers"][number] | undefined)[];
+  error: string;
+}
+
+const loadSortingGame = (): LoadedGameState => {
+  const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
+
+  if (!storedGame) {
+    return {
+      game: null,
+      answers: [],
+      error: "Game data not found. Please create a new game.",
+    };
+  }
+
+  try {
+    const parsedGame: SortingGameData = JSON.parse(storedGame);
+
+    /* ------------------------------------------------------------- */
+    /* BASIC VALIDATION */
+    /* ------------------------------------------------------------- */
+
+    if (parsedGame.gameType !== "SORTING") {
+      return {
+        game: null,
+        answers: [],
+        error: "This game cannot be played right now.",
+      };
+    }
+
+    if (
+      !parsedGame.categoryCount ||
+      parsedGame.categoryCount < 2 ||
+      parsedGame.categoryCount > MAX_CATEGORIES
+    ) {
+      return {
+        game: null,
+        answers: [],
+        error: "Invalid number of sorting categories.",
+      };
+    }
+
+    if (
+      !Array.isArray(parsedGame.categories) ||
+      parsedGame.categories.length !== parsedGame.categoryCount
+    ) {
+      return {
+        game: null,
+        answers: [],
+        error: "Invalid sorting categories.",
+      };
+    }
+
+    if (
+      !Array.isArray(parsedGame.items) ||
+      parsedGame.items.length === 0 ||
+      parsedGame.items.length > MAX_ITEMS
+    ) {
+      return {
+        game: null,
+        answers: [],
+        error: "Invalid sorting items.",
+      };
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VALIDATE CATEGORIES */
+    /* ------------------------------------------------------------- */
+
+    const uniqueCategories = new Set(parsedGame.categories);
+
+    if (uniqueCategories.size !== parsedGame.categories.length) {
+      return {
+        game: null,
+        answers: [],
+        error: "Sorting categories must be unique.",
+      };
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VALIDATE ITEMS */
+    /* ------------------------------------------------------------- */
+
+    const hasInvalidItem = parsedGame.items.some(
+      (item) =>
+        !item.name ||
+        !item.category ||
+        !parsedGame.categories.includes(item.category),
+    );
+
+    if (hasInvalidItem) {
+      return {
+        game: null,
+        answers: [],
+        error: "Some sorting items contain invalid categories.",
+      };
+    }
+
+    /* ------------------------------------------------------------- */
+    /* INITIAL ANSWERS */
+    /* ------------------------------------------------------------- */
+
+    const answers = new Array<SortingResult["answers"][number] | undefined>(
+      parsedGame.items.length,
+    ).fill(undefined);
+
+    return {
+      game: parsedGame,
+      answers,
+      error: "",
+    };
+  } catch {
+    return {
+      game: null,
+      answers: [],
+      error: "Something went wrong while loading your game.",
+    };
+  }
+};
+
+/* ===================================================================== */
 /* COMPONENT */
 /* ===================================================================== */
 
 const SortingPlayPage = () => {
   /* ================================================================= */
+  /* INITIAL GAME STATE */
+  /* ================================================================= */
+
+  const [initialGameState] = useState<LoadedGameState>(() => loadSortingGame());
+
+  /* ================================================================= */
   /* STATE */
   /* ================================================================= */
 
-  const [game, setGame] = useState<SortingGameData | null>(null);
+  const [game] = useState<SortingGameData | null>(initialGameState.game);
 
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
 
@@ -64,105 +204,16 @@ const SortingPlayPage = () => {
    * answers[0] = answer for item 1
    * answers[1] = answer for item 2
    */
+
   const [answers, setAnswers] = useState<
     (SortingResult["answers"][number] | undefined)[]
-  >([]);
+  >(initialGameState.answers);
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    null,
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [result, setResult] = useState<SortingResult | null>(null);
 
-  const [error, setError] = useState("");
-
-  /* ================================================================= */
-  /* LOAD GAME DATA */
-  /* ================================================================= */
-
-  useEffect(() => {
-    const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
-
-    if (!storedGame) {
-      setError("Game data not found. Please create a new game.");
-      return;
-    }
-
-    try {
-      const parsedGame: SortingGameData = JSON.parse(storedGame);
-
-      /* ------------------------------------------------------------- */
-      /* BASIC VALIDATION */
-      /* ------------------------------------------------------------- */
-
-      if (parsedGame.gameType !== "SORTING") {
-        setError("This game cannot be played right now.");
-        return;
-      }
-
-      if (
-        !parsedGame.categoryCount ||
-        parsedGame.categoryCount < 2 ||
-        parsedGame.categoryCount > MAX_CATEGORIES
-      ) {
-        setError("Invalid number of sorting categories.");
-        return;
-      }
-
-      if (
-        !Array.isArray(parsedGame.categories) ||
-        parsedGame.categories.length !== parsedGame.categoryCount
-      ) {
-        setError("Invalid sorting categories.");
-        return;
-      }
-
-      if (
-        !Array.isArray(parsedGame.items) ||
-        parsedGame.items.length === 0 ||
-        parsedGame.items.length > MAX_ITEMS
-      ) {
-        setError("Invalid sorting items.");
-        return;
-      }
-
-      /* ------------------------------------------------------------- */
-      /* VALIDATE CATEGORIES */
-      /* ------------------------------------------------------------- */
-
-      const uniqueCategories = new Set(parsedGame.categories);
-
-      if (uniqueCategories.size !== parsedGame.categories.length) {
-        setError("Sorting categories must be unique.");
-        return;
-      }
-
-      /* ------------------------------------------------------------- */
-      /* VALIDATE ITEMS */
-      /* ------------------------------------------------------------- */
-
-      const hasInvalidItem = parsedGame.items.some(
-        (item) =>
-          !item.name ||
-          !item.category ||
-          !parsedGame.categories.includes(item.category),
-      );
-
-      if (hasInvalidItem) {
-        setError("Some sorting items contain invalid categories.");
-        return;
-      }
-
-      setGame(parsedGame);
-
-      /*
-       * Create an answer array with one position per item.
-       */
-      setAnswers(new Array(parsedGame.items.length).fill(undefined));
-    } catch {
-      setError("Something went wrong while loading your game.");
-    }
-  }, []);
+  const [error] = useState(initialGameState.error);
 
   /* ================================================================= */
   /* CURRENT ITEM */
@@ -186,10 +237,9 @@ const SortingPlayPage = () => {
     /*
      * Every item should have an answer before finishing.
      */
+
     const completedAnswers = finalAnswers.filter(
-      (
-        answer,
-      ): answer is SortingResult["answers"][number] =>
+      (answer): answer is SortingResult["answers"][number] =>
         answer !== undefined,
     );
 
@@ -262,6 +312,7 @@ const SortingPlayPage = () => {
      * This is important because the child may come back
      * using Previous and change the answer.
      */
+
     updatedAnswers[currentItemIndex] = answer;
 
     setAnswers(updatedAnswers);
@@ -278,6 +329,7 @@ const SortingPlayPage = () => {
     /*
      * Load the next item's previous answer if it exists.
      */
+
     const nextAnswer = updatedAnswers[currentItemIndex + 1];
 
     setSelectedCategory(nextAnswer?.selectedCategory ?? null);
@@ -295,6 +347,7 @@ const SortingPlayPage = () => {
     /*
      * Move to previous item.
      */
+
     const previousIndex = currentItemIndex - 1;
 
     setCurrentItemIndex(previousIndex);
@@ -302,6 +355,7 @@ const SortingPlayPage = () => {
     /*
      * Restore the previously selected category.
      */
+
     const previousAnswer = answers[previousIndex];
 
     setSelectedCategory(previousAnswer?.selectedCategory ?? null);
@@ -344,23 +398,38 @@ const SortingPlayPage = () => {
   }
 
   /* ================================================================= */
+/* RETRY GAME */
+/* ================================================================= */
+
+const handleRetry = () => {
+  if (!game) {
+    return;
+  }
+
+  const resetAnswers = new Array<
+    SortingResult["answers"][number] | undefined
+  >(game.items.length).fill(undefined);
+
+  setCurrentItemIndex(0);
+  setAnswers(resetAnswers);
+  setSelectedCategory(null);
+  setResult(null);
+};
+  /* ================================================================= */
   /* RESULT */
   /* ================================================================= */
 
   if (result) {
-    return <SortingResultPage game={game} result={result} />;
+    return <SortingResultPage game={game} result={result} onRetry={ handleRetry}/>;
   }
 
   /* ================================================================= */
   /* PROGRESS */
   /* ================================================================= */
 
-  const answeredCount = answers.filter(
-    (answer) => answer !== undefined,
-  ).length;
+  const answeredCount = answers.filter((answer) => answer !== undefined).length;
 
-  const progress =
-    totalItems > 0 ? (answeredCount / totalItems) * 100 : 0;
+  const progress = totalItems > 0 ? (answeredCount / totalItems) * 100 : 0;
 
   /* ================================================================= */
   /* RENDER */
@@ -516,11 +585,7 @@ const SortingPlayPage = () => {
                   <span
                     className={`
                       font-mochiy text-xs md:text-base
-                      ${
-                        selected
-                          ? "text-indigo-700"
-                          : "text-slate-700"
-                      }
+                      ${selected ? "text-indigo-700" : "text-slate-700"}
                     `}
                   >
                     {category}

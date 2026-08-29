@@ -1,4 +1,3 @@
-import ChartCard from "../../components/ChartCard";
 import type { HardestLevel } from "../../../../../../Types/reports";
 import TableCard from "../../components/TableCard";
 

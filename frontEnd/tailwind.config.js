@@ -31,7 +31,17 @@ export default {
         borderGlow: {
           "0%,100%": { boxShadow: "0 0 20px rgba(59,130,246,0.6)" },
           "50%": { boxShadow: "0 0 40px rgba(59,130,246,1)" },
-        }
+        },
+        fadeSlideUp: {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(40px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
 
       },
 

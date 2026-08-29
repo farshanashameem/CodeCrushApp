@@ -75,5 +75,5 @@ export const CronScheduler = (
         }
     });
 
-    logger.info('✅ Cron Jobs Initialized');
+    logger.info('Cron Jobs Initialized');
 };

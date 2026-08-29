@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy } from "react";
 import { Toaster } from "react-hot-toast";
 import { AuthInitializer } from "./AuthInitializer";
 import GlobalAudio from "./Presentation/SharedComponents/GlobalAudio";
@@ -7,7 +7,6 @@ import ProtectedRoute from "./Presentation/SharedComponents/ProtectedRoute";
 
 
 import { ROUTES } from "./Constants/Routes";
-import { useAuth } from "./Hooks/useAuth";
 
 import LoadingPage from "./Presentation/pages/LoadingPage/LoadingPage";
 import HomePage from "./Presentation/pages/Home/Home";

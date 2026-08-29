@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AxiosError } from "axios";
 
 import api from "../../Lib/axios";
 
@@ -8,9 +9,61 @@ import type {
     ContestProgress,
     ContestLeaderboardItem,
     CompletedParticipant,
-    JoinContestResponse,} from "../../Types/ChildContest"
+    JoinContestResponse,
+} from "../../Types/ChildContest";
 
 import { API_ROUTES } from "../../Constants/api.routes";
+
+/* =========================================================
+   Response Types
+========================================================= */
+
+interface ContestListResponse<T> {
+    data: {
+        contests: T[];
+    };
+}
+
+interface ContestProgressResponse {
+    data: ContestProgress;
+}
+
+interface ContestLeaderboardResponse {
+    data: {
+        leaderboard: ContestLeaderboardItem[];
+    };
+}
+
+interface CompletedParticipantsResponse {
+    participants: CompletedParticipant[];
+}
+
+interface ApiErrorResponse {
+    message?: string;
+}
+
+/* =========================================================
+   Error Helper
+========================================================= */
+
+const getErrorMessage = (
+    error: unknown,
+    fallbackMessage: string
+): string => {
+    if (error instanceof AxiosError) {
+        const responseData = error.response?.data as
+            | ApiErrorResponse
+            | undefined;
+
+        return responseData?.message ?? fallbackMessage;
+    }
+
+    return fallbackMessage;
+};
+
+/* =========================================================
+   State
+========================================================= */
 
 interface ChildContestState {
     availableContests: AvailableContest[];
@@ -33,6 +86,10 @@ interface ChildContestState {
     error: string | null;
 }
 
+/* =========================================================
+   Initial State
+========================================================= */
+
 const initialState: ChildContestState = {
     availableContests: [],
     joinedContests: [],
@@ -54,12 +111,22 @@ const initialState: ChildContestState = {
     error: null,
 };
 
-export const getAvailableContests = createAsyncThunk(
+/* =========================================================
+   Get Available Contests
+========================================================= */
+
+export const getAvailableContests = createAsyncThunk<
+    AvailableContest[],
+    string,
+    { rejectValue: string }
+>(
     "childContest/getAvailableContests",
 
-    async (childId: string, { rejectWithValue }) => {
+    async (childId, { rejectWithValue }) => {
         try {
-            const response = await api.get(
+            const response = await api.get<
+                ContestListResponse<AvailableContest>
+            >(
                 API_ROUTES.CHILD.CONTEST.BASE,
                 {
                     params: {
@@ -69,21 +136,33 @@ export const getAvailableContests = createAsyncThunk(
             );
 
             return response.data.data.contests;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to fetch available contests"
+                getErrorMessage(
+                    error,
+                    "Failed to fetch available contests"
+                )
             );
         }
     }
 );
 
-export const getJoinedContests = createAsyncThunk(
+/* =========================================================
+   Get Joined Contests
+========================================================= */
+
+export const getJoinedContests = createAsyncThunk<
+    JoinedContest[],
+    string,
+    { rejectValue: string }
+>(
     "childContest/getJoinedContests",
 
-    async (childId: string, { rejectWithValue }) => {
+    async (childId, { rejectWithValue }) => {
         try {
-            const response = await api.get(
+            const response = await api.get<
+                ContestListResponse<JoinedContest>
+            >(
                 API_ROUTES.CHILD.CONTEST.JOINED,
                 {
                     params: {
@@ -91,27 +170,37 @@ export const getJoinedContests = createAsyncThunk(
                     },
                 }
             );
-          
+
             return response.data.data.contests;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to fetch joined contests"
+                getErrorMessage(
+                    error,
+                    "Failed to fetch joined contests"
+                )
             );
         }
     }
 );
 
-export const joinContest = createAsyncThunk(
+/* =========================================================
+   Join Contest
+========================================================= */
+
+export const joinContest = createAsyncThunk<
+    JoinContestResponse,
+    {
+        contestId: string;
+        childId: string;
+    },
+    { rejectValue: string }
+>(
     "childContest/joinContest",
 
     async (
         {
             contestId,
             childId,
-        }: {
-            contestId: string;
-            childId: string;
         },
         { rejectWithValue }
     ) => {
@@ -121,30 +210,43 @@ export const joinContest = createAsyncThunk(
                 contestId
             );
 
-            const response = await api.post(url, {
-                childId,
-            });
+            const response = await api.post<JoinContestResponse>(
+                url,
+                {
+                    childId,
+                }
+            );
 
-            return response.data as JoinContestResponse;
-        } catch (error: any) {
+            return response.data;
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to join contest"
+                getErrorMessage(
+                    error,
+                    "Failed to join contest"
+                )
             );
         }
     }
 );
 
-export const getContestProgress = createAsyncThunk(
+/* =========================================================
+   Get Contest Progress
+========================================================= */
+
+export const getContestProgress = createAsyncThunk<
+    ContestProgress,
+    {
+        contestId: string;
+        childId: string;
+    },
+    { rejectValue: string }
+>(
     "childContest/getContestProgress",
 
     async (
         {
             contestId,
             childId,
-        }: {
-            contestId: string;
-            childId: string;
         },
         { rejectWithValue }
     ) => {
@@ -154,58 +256,79 @@ export const getContestProgress = createAsyncThunk(
                 contestId
             );
 
-            const response = await api.get(url, {
-                params: {
-                    childId,
-                },
-            });
+            const response = await api.get<ContestProgressResponse>(
+                url,
+                {
+                    params: {
+                        childId,
+                    },
+                }
+            );
 
-
-
-            return response.data?.data;
-        } catch (error: any) {
+            return response.data.data;
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to fetch contest progress"
+                getErrorMessage(
+                    error,
+                    "Failed to fetch contest progress"
+                )
             );
         }
     }
 );
 
+/* =========================================================
+   Get Contest Leaderboard
+========================================================= */
 
+export const getContestLeaderboard = createAsyncThunk<
+    ContestLeaderboardItem[],
+    string,
+    { rejectValue: string }
+>(
+    "childContest/getContestLeaderboard",
 
-export const getContestLeaderboard = createAsyncThunk(
-  "childContest/getContestLeaderboard",
+    async (
+        contestId,
+        { rejectWithValue }
+    ) => {
+        try {
+            const url =
+                API_ROUTES.CHILD.CONTEST.LEADERBOARD.replace(
+                    ":contestId",
+                    contestId
+                );
 
-  async (
-    contestId: string,
-    { rejectWithValue }
-  ) => {
-    try {
-      const url = API_ROUTES.CHILD.CONTEST.LEADERBOARD.replace(
-        ":contestId",
-        contestId
-      );
+            const response =
+                await api.get<ContestLeaderboardResponse>(
+                    url
+                );
 
-      const response = await api.get(url);
-
-      console.log("Leaderboard response:", response.data);
-
-      return response.data.data.leaderboard;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-          "Failed to fetch contest leaderboard"
-      );
+            return response.data.data.leaderboard;
+        } catch (error: unknown) {
+            return rejectWithValue(
+                getErrorMessage(
+                    error,
+                    "Failed to fetch contest leaderboard"
+                )
+            );
+        }
     }
-  }
 );
 
-export const getCompletedParticipants = createAsyncThunk(
+/* =========================================================
+   Get Completed Participants
+========================================================= */
+
+export const getCompletedParticipants = createAsyncThunk<
+    CompletedParticipantsResponse,
+    string,
+    { rejectValue: string }
+>(
     "childContest/getCompletedParticipants",
 
     async (
-        contestId: string,
+        contestId,
         { rejectWithValue }
     ) => {
         try {
@@ -215,18 +338,26 @@ export const getCompletedParticipants = createAsyncThunk(
                     contestId
                 );
 
-            const response = await api.get(url);
+            const response =
+                await api.get<CompletedParticipantsResponse>(
+                    url
+                );
 
             return response.data;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to fetch completed participants"
+                getErrorMessage(
+                    error,
+                    "Failed to fetch completed participants"
+                )
             );
         }
     }
 );
 
+/* =========================================================
+   Slice
+========================================================= */
 
 const childContestSlice = createSlice({
     name: "childContest",
@@ -256,168 +387,210 @@ const childContestSlice = createSlice({
             state.loadingParticipants = false;
 
             state.joiningContest = false;
+            state.updatingProgress = false;
 
             state.error = null;
         },
     },
 
     extraReducers: (builder) => {
-    builder
+        builder
 
-        // =========================
-        // Get Available Contests
-        // =========================
+            /* =================================================
+               Get Available Contests
+            ================================================= */
 
-        .addCase( getAvailableContests.pending, (state) => {
-                state.loadingAvailable = true;
-                state.error = null;
-            }
-        )
+            .addCase(
+                getAvailableContests.pending,
+                (state) => {
+                    state.loadingAvailable = true;
+                    state.error = null;
+                }
+            )
 
-        .addCase( getAvailableContests.fulfilled, (state, action) => {
-                state.loadingAvailable = false;
-               
-                state.availableContests = action.payload;
-            }
-        )
+            .addCase(
+                getAvailableContests.fulfilled,
+                (state, action) => {
+                    state.loadingAvailable = false;
+                    state.availableContests = action.payload;
+                }
+            )
 
-        .addCase( getAvailableContests.rejected, (state, action) => {
-                state.loadingAvailable = false;
-                state.error =
-                    action.payload as string;
-            }
-        )
+            .addCase(
+                getAvailableContests.rejected,
+                (state, action) => {
+                    state.loadingAvailable = false;
+                    state.error =
+                        action.payload ??
+                        "Failed to fetch available contests";
+                }
+            )
 
+            /* =================================================
+               Get Joined Contests
+            ================================================= */
 
-        // =========================
-        // Get Joined Contests
-        // =========================
+            .addCase(
+                getJoinedContests.pending,
+                (state) => {
+                    state.loadingJoined = true;
+                    state.error = null;
+                }
+            )
 
-        .addCase( getJoinedContests.pending, (state) => {
-                state.loadingJoined = true;
-                state.error = null;
-            }
-        )
+            .addCase(
+                getJoinedContests.fulfilled,
+                (state, action) => {
+                    state.loadingJoined = false;
+                    state.joinedContests = action.payload;
+                }
+            )
 
-        .addCase( getJoinedContests.fulfilled, (state, action) => {
-                state.loadingJoined = false;
-                state.joinedContests =
-                    action.payload;
-            }
-        )
+            .addCase(
+                getJoinedContests.rejected,
+                (state, action) => {
+                    state.loadingJoined = false;
+                    state.error =
+                        action.payload ??
+                        "Failed to fetch joined contests";
+                }
+            )
 
-        .addCase( getJoinedContests.rejected, (state, action) => {
-                state.loadingJoined = false;
-                state.error =
-                    action.payload as string;
-            }
-        )
+            /* =================================================
+               Join Contest
+            ================================================= */
 
+            .addCase(
+                joinContest.pending,
+                (state) => {
+                    state.joiningContest = true;
+                    state.error = null;
+                }
+            )
 
-        // =========================
-        // Join Contest
-        // =========================
+            .addCase(
+                joinContest.fulfilled,
+                (state) => {
+                    state.joiningContest = false;
+                }
+            )
 
-        .addCase( joinContest.pending, (state) => {
-                state.joiningContest = true;
-                state.error = null;
-            }
-        )
+            .addCase(
+                joinContest.rejected,
+                (state, action) => {
+                    state.joiningContest = false;
+                    state.error =
+                        action.payload ??
+                        "Failed to join contest";
+                }
+            )
 
-        .addCase( joinContest.fulfilled, (state) => {
-                state.joiningContest = false;
+            /* =================================================
+               Get Contest Progress
+            ================================================= */
 
-            }   
-        )
+            .addCase(
+                getContestProgress.pending,
+                (state) => {
+                    state.loadingProgress = true;
+                    state.error = null;
+                }
+            )
 
-        .addCase( joinContest.rejected, (state, action) => {
-                state.joiningContest = false;
-                state.error =
-                    action.payload as string;
-            }
-        )
+            .addCase(
+                getContestProgress.fulfilled,
+                (state, action) => {
+                    state.loadingProgress = false;
+                    state.selectedContestProgress =
+                        action.payload;
+                }
+            )
 
+            .addCase(
+                getContestProgress.rejected,
+                (state, action) => {
+                    state.loadingProgress = false;
+                    state.error =
+                        action.payload ??
+                        "Failed to fetch contest progress";
+                }
+            )
 
-        // =========================
-        // Get Contest Progress
-        // =========================
+            /* =================================================
+               Get Leaderboard
+            ================================================= */
 
-        .addCase( getContestProgress.pending, (state) => {
-                state.loadingProgress = true;
-                state.error = null;
-            }
-        )
+            .addCase(
+                getContestLeaderboard.pending,
+                (state) => {
+                    state.loadingLeaderboard = true;
+                    state.error = null;
+                }
+            )
 
-        .addCase( getContestProgress.fulfilled, (state, action) => {
-                state.loadingProgress = false;
-               
-                state.selectedContestProgress = action.payload;
-            }
-        )
+            .addCase(
+                getContestLeaderboard.fulfilled,
+                (state, action) => {
+                    state.loadingLeaderboard = false;
+                    state.leaderboard = action.payload;
+                }
+            )
 
-        .addCase( getContestProgress.rejected, (state, action) => {
-                state.loadingProgress = false;
-                state.error =
-                    action.payload as string;
-            }
-        )
+            .addCase(
+                getContestLeaderboard.rejected,
+                (state, action) => {
+                    state.loadingLeaderboard = false;
+                    state.error =
+                        action.payload ??
+                        "Failed to fetch contest leaderboard";
+                }
+            )
 
+            /* =================================================
+               Get Completed Participants
+            ================================================= */
 
+            .addCase(
+                getCompletedParticipants.pending,
+                (state) => {
+                    state.loadingParticipants = true;
+                    state.error = null;
+                }
+            )
 
-        // =========================
-        // Get Leaderboard
-        // =========================
+            .addCase(
+                getCompletedParticipants.fulfilled,
+                (state, action) => {
+                    state.loadingParticipants = false;
+                    state.completedParticipants =
+                        action.payload.participants;
+                }
+            )
 
-        .addCase( getContestLeaderboard.pending, (state) => {
-                state.loadingLeaderboard = true;
-                state.error = null;
-            }
-        )
-
-        .addCase( getContestLeaderboard.fulfilled, (state, action) => {
-                state.loadingLeaderboard = false;
-                state.leaderboard =  action.payload;
-            }
-        )
-
-        .addCase( getContestLeaderboard.rejected, (state, action) => {
-                state.loadingLeaderboard = false;
-                state.error =
-                    action.payload as string;
-            }
-        )
-
-
-        // =========================
-        // Get Completed Participants
-        // =========================
-
-        .addCase( getCompletedParticipants.pending, (state) => {
-                state.loadingParticipants = true;
-                state.error = null;
-            }
-        )
-
-        .addCase( getCompletedParticipants.fulfilled, (state, action) => {
-                state.loadingParticipants = false;
-                state.completedParticipants =
-                    action.payload.participants;
-            }
-        )
-
-        .addCase( getCompletedParticipants.rejected, (state, action) => {
-                state.loadingParticipants = false;
-                state.error =
-                    action.payload as string;
-            }
-        );
-}
+            .addCase(
+                getCompletedParticipants.rejected,
+                (state, action) => {
+                    state.loadingParticipants = false;
+                    state.error =
+                        action.payload ??
+                        "Failed to fetch completed participants";
+                }
+            );
+    },
 });
+
+/* =========================================================
+   Actions
+========================================================= */
 
 export const {
     clearContestError,
     clearContestProgress,
     clearContestData,
 } = childContestSlice.actions;
+
+/* =========================================================
+   Reducer
+========================================================= */
 
 export default childContestSlice.reducer;

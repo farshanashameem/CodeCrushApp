@@ -44,30 +44,31 @@ const ChildHomePage = () => {
     (state: RootState) => state.childGame,
   );
 
-  const [showBirthday, setShowBirthday] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+
+  const [birthdayDismissed, setBirthdayDismissed] = useState(false);
+
+  const today = new Date();
+
+  const dob = currentChild?.dob ? new Date(currentChild.dob) : null;
+
+  const isBirthday =
+    currentChild !== null &&
+    dob !== null &&
+    today.getDate() === dob.getDate() &&
+    today.getMonth() === dob.getMonth();
+
+  const birthdayKey = currentChild
+    ? `birthday-${currentChild.id}-${today.getFullYear()}`
+    : "";
+
+  const showBirthday =
+    isBirthday && !birthdayDismissed && !sessionStorage.getItem(birthdayKey);
 
   useEffect(() => {
     dispatch(getCurrentChildSession());
     dispatch(fetchGames());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (!currentChild?.dob) return;
-
-    const today = new Date();
-    const dob = new Date(currentChild.dob);
-
-    const isBirthday =
-      today.getDate() === dob.getDate() &&
-      today.getMonth() === dob.getMonth();
-
-    const birthdayKey = `birthday-${currentChild.id}-${today.getFullYear()}`;
-
-    if (isBirthday && !sessionStorage.getItem(birthdayKey)) {
-      setShowBirthday(true);
-    }
-  }, [currentChild]);
 
   const isPremium = currentChild?.isPremium ?? false;
 
@@ -91,7 +92,6 @@ const ChildHomePage = () => {
 
       {/* ================= HEADER ================= */}
       <header className="flex justify-between items-center px-6 md:px-12 py-6 bg-white/40 backdrop-blur-md border-b-4 border-dashed border-indigo-200 sticky top-0 z-40">
-
         {/* LOGO */}
         <div className="animate-bounce-slow">
           <div className="flex items-center gap-3">
@@ -122,9 +122,7 @@ const ChildHomePage = () => {
               <div className="w-12 h-12 rounded-full border-2 border-amber-400 overflow-hidden bg-purple-100 shadow-inner group-hover:rotate-12 transition-transform">
                 <img
                   src={
-                    avatarMap[
-                      currentChild?.avatar as keyof typeof avatarMap
-                    ]
+                    avatarMap[currentChild?.avatar as keyof typeof avatarMap]
                   }
                   className="w-full h-full object-cover"
                   alt="Avatar"
@@ -165,7 +163,6 @@ const ChildHomePage = () => {
           {/* DROPDOWN */}
           {showMenu && (
             <div className="absolute right-0 top-20 bg-white border-4 border-indigo-400 rounded-3xl shadow-2xl p-2 w-52 z-50 animate-fade-in-down">
-
               {/* CONTEST */}
               <button
                 onClick={() => {
@@ -196,7 +193,6 @@ const ChildHomePage = () => {
 
       {/* ================= HERO ================= */}
       <div className="relative text-center mt-12 mb-12 px-4 max-w-4xl mx-auto">
-
         <div className="absolute -left-4 -top-6 text-5xl animate-bounce hidden md:block select-none">
           ☁️
         </div>
@@ -261,9 +257,7 @@ const ChildHomePage = () => {
           "
         >
           {/* Decorative stars */}
-          <div className="absolute top-3 left-6 text-2xl animate-pulse">
-            ✨
-          </div>
+          <div className="absolute top-3 left-6 text-2xl animate-pulse">✨</div>
 
           <div className="absolute top-5 right-8 text-3xl animate-bounce-slow">
             ⭐
@@ -278,10 +272,10 @@ const ChildHomePage = () => {
           <div className="absolute -bottom-12 -left-8 w-40 h-40 bg-white/10 rounded-full" />
 
           <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
-            
             {/* Left */}
             <div className="flex items-center gap-5 text-center md:text-left">
-              <div className="
+              <div
+                className="
                 w-20 h-20 md:w-24 md:h-24
                 bg-white
                 rounded-3xl
@@ -291,7 +285,8 @@ const ChildHomePage = () => {
                 group-hover:rotate-6
                 group-hover:scale-110
                 transition-all duration-300
-              ">
+              "
+              >
                 🤖
               </div>
 
@@ -300,23 +295,27 @@ const ChildHomePage = () => {
                   ✨ MAGIC GAME MAKER ✨
                 </div>
 
-                <h2 className="
+                <h2
+                  className="
                   font-mochiy
                   text-2xl md:text-4xl
                   text-white
                   drop-shadow-[0_4px_0_rgba(88,28,135,0.4)]
-                ">
+                "
+                >
                   Create Your Own Game! 🎮
                 </h2>
 
                 <p className="text-white/90 font-bold text-sm md:text-base mt-2">
-                  Tell our AI what you want to play and watch the magic happen! 🚀
+                  Tell our AI what you want to play and watch the magic happen!
+                  🚀
                 </p>
               </div>
             </div>
 
             {/* Button */}
-            <div className="
+            <div
+              className="
               shrink-0
               bg-white
               text-fuchsia-600
@@ -330,11 +329,86 @@ const ChildHomePage = () => {
               group-hover:text-purple-700
               group-hover:border-yellow-200
               transition-all duration-300
-            ">
+            "
+            >
               Let's Create! ✨
             </div>
           </div>
         </button>
+      </section>
+
+      {/* ================= CONTESTS ================= */}
+
+      <section className="max-w-6xl mx-auto px-6 mb-12">
+        <div
+          onClick={() => navigate("/child/contests")}
+          className="
+              relative overflow-hidden
+              bg-gradient-to-r from-amber-400 via-orange-400 to-pink-500
+              border-4 border-white
+              rounded-[2.5rem]
+              p-6 md:p-8
+              shadow-[0_10px_0_#ea580c]
+              hover:-translate-y-2
+              hover:scale-[1.01]
+              active:translate-y-1
+              active:shadow-[0_5px_0_#ea580c]
+              transition-all duration-300
+              cursor-pointer
+              group
+            "
+        >
+          {/* Decorative elements */}
+          <div className="absolute top-3 left-6 text-3xl animate-bounce">
+            🏆
+          </div>
+
+          <div className="absolute top-4 right-8 text-2xl animate-pulse">
+            ⭐
+          </div>
+
+          <div className="absolute bottom-3 left-1/3 text-xl">🎖️</div>
+
+          <div className="relative flex items-center justify-center gap-5 text-center">
+            <div
+              className="
+                  w-20 h-20
+                  bg-white
+                  rounded-3xl
+                  flex items-center justify-center
+                  text-5xl
+                  shadow-lg
+                  group-hover:rotate-6
+                  group-hover:scale-110
+                  transition-all duration-300
+                "
+            >
+              🏆
+            </div>
+
+            <div>
+              <div className="inline-block bg-yellow-200 text-orange-700 px-3 py-1 rounded-full text-xs font-black mb-2">
+                ✨ CHALLENGE TIME ✨
+              </div>
+
+              <h2
+                className="
+                  font-mochiy
+                  text-2xl md:text-4xl
+                  text-white
+                  drop-shadow-[0_4px_0_rgba(154,52,18,0.4)]
+                "
+              >
+                Contests 🏆
+              </h2>
+
+              <p className="text-white/90 font-bold text-sm md:text-base mt-2">
+                Ready to challenge yourself? Join a contest and become a
+                champion!
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ================= GAMES GRID ================= */}
@@ -351,8 +425,7 @@ const ChildHomePage = () => {
             "border-amber-400 shadow-[0_12px_0_#fbbf24]",
           ];
 
-          const currentStyle =
-            borderColors[index % borderColors.length];
+          const currentStyle = borderColors[index % borderColors.length];
 
           return (
             <div
@@ -360,9 +433,7 @@ const ChildHomePage = () => {
               onClick={() => {
                 if (isBlocked || isLocked) return;
 
-                navigate(
-                  `/play/${currentChild?.id}/games/${game.id}`,
-                );
+                navigate(`/play/${currentChild?.id}/games/${game.id}`);
               }}
               className={`
                 relative bg-white border-4 rounded-[2.5rem]
@@ -421,8 +492,7 @@ const ChildHomePage = () => {
                   src={gameImages[game.image] || game.image}
                   alt={game.name}
                   className={`h-full max-h-36 object-contain transform transition-all duration-300 drop-shadow-md ${
-                    !isLocked &&
-                    "group-hover:scale-110 group-hover:rotate-2"
+                    !isLocked && "group-hover:scale-110 group-hover:rotate-2"
                   }`}
                 />
               </div>
@@ -497,18 +567,18 @@ const ChildHomePage = () => {
       `}</style>
 
       {/* ================= BIRTHDAY ================= */}
-      {showBirthday && currentChild && (
-        <BirthdayCelebration
-          childName={currentChild.name}
-          age={currentChild.age}
-          onContinue={() => {
-            const key = `birthday-${currentChild.id}-${new Date().getFullYear()}`;
+     {showBirthday && currentChild && (
+      <BirthdayCelebration
+        childName={currentChild.name}
+        age={currentChild.age}
+        onContinue={() => {
+          const key = `birthday-${currentChild.id}-${new Date().getFullYear()}`;
 
-            sessionStorage.setItem(key, "true");
-            setShowBirthday(false);
-          }}
-        />
-      )}
+          sessionStorage.setItem(key, "true");
+          setBirthdayDismissed(true);
+        }}
+      />
+    )}
     </div>
   );
 };
