@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import contestBackground from "../../../assets/level-backgrounds/contest-bg.png";
 import contestLogo from "../../../assets/contest-logo.png";
+
 import type { AppDispatch, RootState } from "../../../redux/store";
 
 import {
@@ -19,84 +20,104 @@ import { getCurrentChildSession } from "../../../redux/Slices/childGameSlice";
 
 import ChildLayout from "../../SharedComponents/Child/ChildLayout";
 
+/* ===================================================================== */
+/* TYPES */
+/* ===================================================================== */
+
 type ContestTab = "active" | "mine" | "ranking";
 
-const ChildContestsPage = () => {
-  const dispatch = useDispatch<AppDispatch>();
+type WinnerCriteria = "SCORE" | "STARS" | "LEVELS";
 
-  const {
-    availableContests,
-    joinedContests,
-    selectedContestProgress,
-    leaderboard,
+type ContestType = "CHALLENGE" | "PARTICIPATION";
 
-    loadingAvailable,
-    loadingJoined,
-    loadingProgress,
-    loadingLeaderboard,
+interface Contest {
+  id: string;
+  title: string;
+  description: string;
+  gameIds?: string[];
+  type: ContestType | string;
+  winnerCriteria?: WinnerCriteria | string;
+  targetValue?: number;
+  startDate: string | Date;
+  endDate: string | Date;
+}
 
-    joiningContest,
-    error,
-  } = useSelector((state: RootState) => state.childContest);
+interface JoinedContest {
+  contestId: string;
+  title: string;
+  description?: string;
+  gameIds?: string[];
+  type?: ContestType | string;
+  winnerCriteria?: WinnerCriteria | string;
+  targetValue?: number;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  completed?: boolean;
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
+}
 
-  const { currentChild } = useSelector((state: RootState) => state.childGame);
+interface ContestProgress {
+  contestId?: string;
+  childId?: string;
 
-  const [activeTab, setActiveTab] = useState<ContestTab>("active");
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
 
-  const [selectedContestId, setSelectedContestId] = useState<string | null>(
-    null,
-  );
+  stats?: {
+    score?: number;
+    stars?: number;
+    levelsCompleted?: number;
+  };
 
-  /* ===================================================================== */
-  /* INITIAL DATA */
-  /* ===================================================================== */
+  completed?: boolean;
+}
 
-  // Restore child session after refresh
-  useEffect(() => {
-    dispatch(getCurrentChildSession());
-  }, [dispatch]);
+interface LeaderboardPlayer {
+  childId: string;
+  childName?: string;
 
-  // Fetch contest data after currentChild is restored
-  useEffect(() => {
-    if (!currentChild?.id) return;
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
 
-    dispatch(getAvailableContests(currentChild.id));
-    dispatch(getJoinedContests(currentChild.id));
+  stats?: {
+    score?: number;
+    stars?: number;
+    levelsCompleted?: number;
+  };
+}
 
-    return () => {
-      dispatch(clearContestProgress());
-      dispatch(clearContestError());
-    };
-  }, [currentChild?.id, dispatch]);
+/* ===================================================================== */
+/* UTILITY TYPES */
+/* ===================================================================== */
 
-  
+type ContestLike = Contest | JoinedContest;
 
-  /* ===================================================================== */
-  /* SELECTED CONTEST */
-  /* ===================================================================== */
+/* ===================================================================== */
+/* HELPERS */
+/* ===================================================================== */
 
-  const selectedAvailableContest = useMemo(
-    () =>
-      availableContests?.find((contest) => contest.id === selectedContestId),
-    [availableContests, selectedContestId],
-  );
+const normalizeCriteria = (criteria?: string): WinnerCriteria => {
+  const normalized = String(criteria ?? "SCORE").toUpperCase();
 
-  const selectedJoinedContest = useMemo(
-    () =>
-      joinedContests?.find(
-        (contest) => contest.contestId === selectedContestId,
-      ),
-    [joinedContests, selectedContestId],
-  );
+  if (normalized === "STARS") {
+    return "STARS";
+  }
 
-  const selectedContest = selectedAvailableContest || selectedJoinedContest;
+  if (normalized === "LEVELS") {
+    return "LEVELS";
+  }
 
-  /* ===================================================================== */
-  /* HELPERS */
-  /* ===================================================================== */
+  return "SCORE";
+};
 
-const normalizeCriteria = (criteria?: string): string => {
-  return String(criteria ?? "SCORE").toUpperCase();
+const normalizeContestType = (type?: string): ContestType => {
+  return String(type ?? "").toUpperCase() === "PARTICIPATION"
+    ? "PARTICIPATION"
+    : "CHALLENGE";
 };
 
 const getWinnerCriteriaLabel = (criteria?: string): string => {
@@ -131,42 +152,164 @@ const getWinnerCriteriaIcon = (criteria?: string): string => {
   }
 };
 
-/**
- * Get the actual numeric value used for
- * leaderboard sorting and displaying.
- */
 const getCriteriaValue = (
-  player: any,
+  player: LeaderboardPlayer,
   criteria?: string,
 ): number => {
   const normalizedCriteria = normalizeCriteria(criteria);
 
   switch (normalizedCriteria) {
     case "SCORE":
-      return Number(
-        player?.score ??
-        player?.stats?.score ??
-        0,
-      );
+      return Number(player.score ?? player.stats?.score ?? 0);
 
     case "STARS":
-      return Number(
-        player?.stars ??
-        player?.stats?.stars ??
-        0,
-      );
+      return Number(player.stars ?? player.stats?.stars ?? 0);
 
     case "LEVELS":
       return Number(
-        player?.levelsCompleted ??
-        player?.stats?.levelsCompleted ??
-        0,
+        player.levelsCompleted ?? player.stats?.levelsCompleted ?? 0,
       );
 
     default:
       return 0;
   }
 };
+
+const getProgressValue = (
+  progress: ContestProgress | null,
+  criteria?: string,
+): number => {
+  if (!progress) {
+    return 0;
+  }
+
+  const normalizedCriteria = normalizeCriteria(criteria);
+
+  switch (normalizedCriteria) {
+    case "SCORE":
+      return Number(progress.score ?? progress.stats?.score ?? 0);
+
+    case "STARS":
+      return Number(progress.stars ?? progress.stats?.stars ?? 0);
+
+    case "LEVELS":
+      return Number(
+        progress.levelsCompleted ?? progress.stats?.levelsCompleted ?? 0,
+      );
+
+    default:
+      return 0;
+  }
+};
+
+const getScoreValue = (progress: ContestProgress | null): number => {
+  return Number(progress?.score ?? progress?.stats?.score ?? 0);
+};
+
+const getStarsValue = (progress: ContestProgress | null): number => {
+  return Number(progress?.stars ?? progress?.stats?.stars ?? 0);
+};
+
+const getLevelsValue = (progress: ContestProgress | null): number => {
+  return Number(
+    progress?.levelsCompleted ?? progress?.stats?.levelsCompleted ?? 0,
+  );
+};
+
+const formatDate = (date: string | Date): string => {
+  return new Date(date).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getRankEmoji = (rank: number): string => {
+  if (rank === 1) {
+    return "🥇";
+  }
+
+  if (rank === 2) {
+    return "🥈";
+  }
+
+  if (rank === 3) {
+    return "🥉";
+  }
+
+  return `#${rank}`;
+};
+
+/* ===================================================================== */
+/* MAIN PAGE */
+/* ===================================================================== */
+
+const ChildContestsPage = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const {
+    availableContests,
+    joinedContests,
+    selectedContestProgress,
+    leaderboard,
+
+    loadingAvailable,
+    loadingJoined,
+    loadingProgress,
+    loadingLeaderboard,
+
+    joiningContest,
+    error,
+  } = useSelector((state: RootState) => state.childContest);
+
+  const { currentChild } = useSelector((state: RootState) => state.childGame);
+
+  const [activeTab, setActiveTab] = useState<ContestTab>("active");
+
+  const [selectedContestId, setSelectedContestId] = useState<string | null>(
+    null,
+  );
+
+  /* ===================================================================== */
+  /* INITIAL DATA */
+  /* ===================================================================== */
+
+  useEffect(() => {
+    dispatch(getCurrentChildSession());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!currentChild?.id) {
+      return;
+    }
+
+    dispatch(getAvailableContests(currentChild.id));
+    dispatch(getJoinedContests(currentChild.id));
+
+    return () => {
+      dispatch(clearContestProgress());
+      dispatch(clearContestError());
+    };
+  }, [currentChild?.id, dispatch]);
+
+  /* ===================================================================== */
+  /* SELECTED CONTEST */
+  /* ===================================================================== */
+
+  const selectedAvailableContest = useMemo<Contest | undefined>(() => {
+    return availableContests?.find(
+      (contest: Contest) => contest.id === selectedContestId,
+    );
+  }, [availableContests, selectedContestId]);
+
+  const selectedJoinedContest = useMemo<JoinedContest | undefined>(() => {
+    return joinedContests?.find(
+      (contest: JoinedContest) => contest.contestId === selectedContestId,
+    );
+  }, [joinedContests, selectedContestId]);
+
+  const selectedContest: ContestLike | undefined =
+    selectedAvailableContest ?? selectedJoinedContest;
 
   /* ===================================================================== */
   /* OPEN CONTEST */
@@ -178,7 +321,7 @@ const getCriteriaValue = (
     dispatch(clearContestProgress());
 
     const joinedContest = joinedContests.find(
-      (contest) => contest.contestId === contestId,
+      (contest: JoinedContest) => contest.contestId === contestId,
     );
 
     if (joinedContest && currentChild?.id) {
@@ -194,7 +337,7 @@ const getCriteriaValue = (
   };
 
   /* ===================================================================== */
-  /* CLOSE CONTEST DETAILS */
+  /* CLOSE DETAILS */
   /* ===================================================================== */
 
   const handleCloseDetails = () => {
@@ -207,7 +350,9 @@ const getCriteriaValue = (
   /* ===================================================================== */
 
   const handleJoinContest = async (contestId: string) => {
-    if (!currentChild?.id) return;
+    if (!currentChild?.id) {
+      return;
+    }
 
     try {
       await dispatch(
@@ -231,7 +376,7 @@ const getCriteriaValue = (
 
       dispatch(getContestLeaderboard(contestId));
     } catch {
-      // Error is already handled by Redux state.
+      // Redux already handles the error.
     }
   };
 
@@ -245,7 +390,7 @@ const getCriteriaValue = (
       child={currentChild}
       coins={0}
       logo={contestLogo}
-      title="🏆Contests"
+      title="🏆 Contests"
       isPremium={currentChild?.isPremium}
     >
       <div
@@ -273,19 +418,13 @@ const getCriteriaValue = (
           "
         />
 
-        {/* PAGE CONTENT */}
+        {/* CONTENT */}
 
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* HEADER */}
 
           <div className="text-center mb-8">
-            <p
-              className="
-                mt-4
-                text-slate-700
-                font-bold
-              "
-            >
+            <p className="mt-4 text-slate-700 font-bold">
               Compete • Play • Earn • Become a Champion!
             </p>
           </div>
@@ -380,7 +519,6 @@ const getCriteriaValue = (
           {activeTab === "ranking" && (
             <RankingView
               contests={joinedContests}
-              currentChildId={currentChild?.id}
               onContestClick={(contestId) => {
                 setActiveTab("mine");
                 handleContestClick(contestId);
@@ -388,12 +526,12 @@ const getCriteriaValue = (
             />
           )}
 
-          {/* CONTEST DETAILS */}
+          {/* DETAILS */}
 
           {selectedContestId && selectedContest && (
             <ContestDetails
               contest={selectedContest}
-              joined={!!selectedJoinedContest}
+              joined={Boolean(selectedJoinedContest)}
               progress={selectedContestProgress}
               leaderboard={leaderboard}
               currentChildId={currentChild?.id}
@@ -431,6 +569,7 @@ const ContestTabButton = ({
 }: ContestTabButtonProps) => {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`
         px-5
@@ -473,7 +612,7 @@ const ContestTabButton = ({
 /* ===================================================================== */
 
 interface ContestListProps {
-  contests: any[];
+  contests: Contest[];
   loading: boolean;
   emptyIcon: string;
   emptyText: string;
@@ -522,7 +661,7 @@ const ContestList = ({
 /* ===================================================================== */
 
 interface JoinedContestListProps {
-  contests: any[];
+  contests: JoinedContest[];
   loading: boolean;
   onContestClick: (id: string) => void;
 }
@@ -567,14 +706,17 @@ const JoinedContestList = ({
 /* ===================================================================== */
 
 interface ContestCardProps {
-  contest: any;
+  contest: ContestLike;
   joined: boolean;
   onClick: () => void;
 }
 
 const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
+  const contestId = "id" in contest ? contest.id : contest.contestId;
+
   return (
     <button
+      type="button"
       onClick={onClick}
       className="
         text-left
@@ -589,9 +731,10 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
         transition-all
         duration-300
         group
+        w-full
       "
     >
-      {/* Contest Banner */}
+      {/* BANNER */}
 
       <div
         className="
@@ -628,14 +771,7 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
           ⭐
         </div>
 
-        <div
-          className="
-            relative
-            z-10
-            p-6
-            text-white
-          "
-        >
+        <div className="relative z-10 p-6 text-white">
           <div
             className="
               text-xs
@@ -648,15 +784,7 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
             {contest.type}
           </div>
 
-          <h2
-            className="
-              font-mochiy
-              text-2xl
-              mt-2
-            "
-          >
-            {contest.title}
-          </h2>
+          <h2 className="font-mochiy text-2xl mt-2">{contest.title}</h2>
 
           {joined && (
             <span
@@ -678,7 +806,7 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
         </div>
       </div>
 
-      {/* Content */}
+      {/* CONTENT */}
 
       <div className="p-5">
         <p
@@ -692,26 +820,19 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
           {contest.description}
         </p>
 
-        <div
-          className="
-            flex
-            flex-wrap
-            gap-2
-            mt-4
-          "
-        >
-          {contest.gameIds?.map((gameId: string) => (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {contest.gameIds?.map((gameId) => (
             <span
-              key={gameId}
+              key={`${contestId}-${gameId}`}
               className="
-                  bg-indigo-50
-                  text-indigo-600
-                  px-3
-                  py-1
-                  rounded-full
-                  text-xs
-                  font-bold
-                "
+                bg-indigo-50
+                text-indigo-600
+                px-3
+                py-1
+                rounded-full
+                text-xs
+                font-bold
+              "
             >
               🎮 Game
             </span>
@@ -737,7 +858,7 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
               font-bold
             "
           >
-            📅 Ends {formatDate(contest.endDate)}
+            📅 Ends {contest.endDate ? formatDate(contest.endDate) : "—"}
           </span>
 
           <span
@@ -762,10 +883,10 @@ const ContestCard = ({ contest, joined, onClick }: ContestCardProps) => {
 /* ===================================================================== */
 
 interface ContestDetailsProps {
-  contest: any;
+  contest: ContestLike;
   joined: boolean;
-  progress: any;
-  leaderboard: any[];
+  progress: ContestProgress | null;
+  leaderboard: LeaderboardPlayer[];
   currentChildId?: string;
   loadingProgress: boolean;
   loadingLeaderboard: boolean;
@@ -786,88 +907,46 @@ const ContestDetails = ({
   onBack,
   onJoin,
 }: ContestDetailsProps) => {
-  /* ============================================================= */
-  /* CONTEST TYPE */
-  /* ============================================================= */
+  const contestType = normalizeContestType(contest.type);
 
-  const isParticipation = contest.type === "PARTICIPATION";
+  const isParticipation = contestType === "PARTICIPATION";
+  const isChallenge = contestType === "CHALLENGE";
 
-  const isChallenge = contest.type === "CHALLENGE";
-           
-
-  /* ============================================================= */
-  /* WINNER CRITERIA */
-  /* ============================================================= */
-
-  const winnerCriteria = contest.winnerCriteria;
+  const winnerCriteria = normalizeCriteria(contest.winnerCriteria);
 
   const winnerCriteriaLabel = getWinnerCriteriaLabel(winnerCriteria);
 
   const winnerCriteriaIcon = getWinnerCriteriaIcon(winnerCriteria);
 
-  /* ============================================================= */
-  /* TARGET PROGRESS */
-  /* ============================================================= */
+  /* ================================================================= */
+  /* CURRENT TARGET VALUE */
+  /* ================================================================= */
 
   const currentTargetValue = useMemo(() => {
-  if (!progress) return 0;
+    return getProgressValue(progress, winnerCriteria);
+  }, [progress, winnerCriteria]);
 
-  const criteria = String(winnerCriteria ?? "").toUpperCase();
-
-  switch (criteria) {
-    case "SCORE":
-      return Number(
-        progress.score ??
-        progress.stats?.score ??
-        0
-      );
-
-    case "STARS":
-      return Number(
-        progress.stars ??
-        progress.stats?.stars ??
-        0
-      );
-
-    case "LEVELS":
-      return Number(
-        progress.levelsCompleted ??
-        progress.stats?.levelsCompleted ??
-        0
-      );
-
-    default:
-      return 0;
-  }
-}, [progress, winnerCriteria]);
-  /* ============================================================= */
+  /* ================================================================= */
   /* SORT LEADERBOARD */
-  /* ============================================================= */
+  /* ================================================================= */
 
-const sortedLeaderboard = useMemo(() => {
-  if (!Array.isArray(leaderboard)) {
-    return [];
-  }
+  const sortedLeaderboard = useMemo<LeaderboardPlayer[]>(() => {
+    if (!Array.isArray(leaderboard)) {
+      return [];
+    }
 
-  const criteria = String(winnerCriteria ?? "SCORE").toUpperCase();
+    return [...leaderboard].sort((firstPlayer, secondPlayer) => {
+      const firstValue = getCriteriaValue(firstPlayer, winnerCriteria);
 
-  const sorted = [...leaderboard].sort((a, b) => {
-    const aValue = getCriteriaValue(a, criteria);
-    const bValue = getCriteriaValue(b, criteria);
+      const secondValue = getCriteriaValue(secondPlayer, winnerCriteria);
 
- 
+      return secondValue - firstValue;
+    });
+  }, [leaderboard, winnerCriteria]);
 
-    return bValue - aValue;
-  });
-
-
-
-  return sorted;
-}, [leaderboard, winnerCriteria]);
-
-  /* ============================================================= */
-  /* CURRENT CHILD POSITION */
-  /* ============================================================= */
+  /* ================================================================= */
+  /* CURRENT CHILD RANK */
+  /* ================================================================= */
 
   const calculatedRank = useMemo(() => {
     if (!currentChildId || !sortedLeaderboard.length) {
@@ -881,15 +960,16 @@ const sortedLeaderboard = useMemo(() => {
     return index === -1 ? null : index + 1;
   }, [sortedLeaderboard, currentChildId]);
 
-  /* ============================================================= */
+  /* ================================================================= */
   /* RENDER */
-  /* ============================================================= */
+  /* ================================================================= */
 
   return (
     <div className="space-y-7">
       {/* BACK */}
 
       <button
+        type="button"
         onClick={onBack}
         className="
           bg-white
@@ -935,13 +1015,7 @@ const sortedLeaderboard = useMemo(() => {
           🏆
         </div>
 
-        <div
-          className="
-            relative
-            z-10
-            max-w-4xl
-          "
-        >
+        <div className="relative z-10 max-w-4xl">
           <span
             className="
               inline-block
@@ -978,7 +1052,7 @@ const sortedLeaderboard = useMemo(() => {
             {contest.description}
           </p>
 
-          {/* CHALLENGE WINNER CRITERIA */}
+          {/* CHALLENGE CRITERIA */}
 
           {isChallenge && (
             <div
@@ -1004,32 +1078,13 @@ const sortedLeaderboard = useMemo(() => {
                 🏆 Winner Criteria
               </p>
 
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-3
-                  mt-2
-                "
-              >
+              <div className="flex items-center gap-3 mt-2">
                 <span className="text-4xl">{winnerCriteriaIcon}</span>
 
                 <div>
-                  <p
-                    className="
-                      text-2xl
-                      font-black
-                    "
-                  >
-                    {winnerCriteriaLabel}
-                  </p>
+                  <p className="text-2xl font-black">{winnerCriteriaLabel}</p>
 
-                  <p
-                    className="
-                      text-sm
-                      text-white/70
-                    "
-                  >
+                  <p className="text-sm text-white/70">
                     Highest {winnerCriteriaLabel.toLowerCase()} wins
                   </p>
                 </div>
@@ -1037,64 +1092,55 @@ const sortedLeaderboard = useMemo(() => {
             </div>
           )}
 
-          
-
           {/* PARTICIPATION TARGET */}
 
-            {isParticipation && (
-              <div
-                className="
-                  mt-6
-                  bg-white
-                  text-indigo-700
-                  rounded-2xl
-                  p-5
-                  shadow-lg
-                "
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-4xl">
-                    {winnerCriteriaIcon}
-                  </span>
+          {isParticipation && (
+            <div
+              className="
+                mt-6
+                bg-white
+                text-indigo-700
+                rounded-2xl
+                p-5
+                shadow-lg
+              "
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-4xl">{winnerCriteriaIcon}</span>
 
-                  <div>
-                    <p
-                      className="
-                        text-xs
-                        uppercase
-                        tracking-widest
-                        font-black
-                        text-indigo-400
-                      "
-                    >
-                      🎯 Contest Target
-                    </p>
+                <div>
+                  <p
+                    className="
+                      text-xs
+                      uppercase
+                      tracking-widest
+                      font-black
+                      text-indigo-400
+                    "
+                  >
+                    🎯 Contest Target
+                  </p>
 
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-2xl font-black">
-                        {winnerCriteriaLabel}: {contest.targetValue}
-                      </span>
-                    </div>
-                  </div>
+                  <p className="text-2xl font-black mt-1">
+                    {winnerCriteriaLabel}: {contest.targetValue ?? 0}
+                  </p>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* DATE / GAME */}
+
+          <div className="flex flex-wrap gap-3 mt-6">
+            {contest.startDate && (
+              <InfoPill>📅 {formatDate(contest.startDate)}</InfoPill>
             )}
 
-          {/* DATE / GAME INFO */}
+            {contest.endDate && (
+              <InfoPill>🏁 {formatDate(contest.endDate)}</InfoPill>
+            )}
 
-          <div
-            className="
-              flex
-              flex-wrap
-              gap-3
-              mt-6
-            "
-          >
-            <InfoPill>📅 {formatDate(contest.startDate)}</InfoPill>
-
-            <InfoPill>🏁 {formatDate(contest.endDate)}</InfoPill>
-
-            <InfoPill>🎮 {contest.gameIds?.length || 0} Games</InfoPill>
+            <InfoPill>🎮 {contest.gameIds?.length ?? 0} Games</InfoPill>
           </div>
         </div>
       </div>
@@ -1129,18 +1175,13 @@ const sortedLeaderboard = useMemo(() => {
               Ready to compete? 🚀
             </h2>
 
-            <p
-              className="
-                text-sm
-                text-slate-500
-                mt-1
-              "
-            >
+            <p className="text-sm text-slate-500 mt-1">
               Join this contest and start earning points!
             </p>
           </div>
 
           <button
+            type="button"
             onClick={onJoin}
             disabled={joiningContest}
             className="
@@ -1166,41 +1207,35 @@ const sortedLeaderboard = useMemo(() => {
         </div>
       )}
 
+      {/* LOADING PROGRESS */}
+
+      {joined && loadingProgress && (
+        <LoadingState text="Loading your progress..." />
+      )}
+
       {/* PARTICIPATION PROGRESS */}
 
-        {joined && isParticipation && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <StatCard
-              icon={winnerCriteriaIcon}
-              label={winnerCriteriaLabel}
-              value={currentTargetValue}
-            />
+      {joined && !loadingProgress && isParticipation && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <StatCard
+            icon={winnerCriteriaIcon}
+            label={winnerCriteriaLabel}
+            value={currentTargetValue}
+          />
 
-            <StatCard
-              icon="⭐"
-              label="Stars"
-              value={Number(
-                progress?.stars ??
-                progress?.stats?.stars ??
-                0
-              )}
-            />
+          <StatCard icon="⭐" label="Stars" value={getStarsValue(progress)} />
 
-            <StatCard
-              icon="🎮"
-              label="Levels Completed"
-              value={Number(
-                progress?.levelsCompleted ??
-                progress?.stats?.levelsCompleted ??
-                0
-              )}
-            />
-          </div>
-        )}
+          <StatCard
+            icon="🎮"
+            label="Levels Completed"
+            value={getLevelsValue(progress)}
+          />
+        </div>
+      )}
 
       {/* CHALLENGE PROGRESS */}
 
-      {joined && isChallenge && (
+      {joined && !loadingProgress && isChallenge && (
         <div
           className="
             grid
@@ -1209,14 +1244,14 @@ const sortedLeaderboard = useMemo(() => {
             gap-5
           "
         >
-          <StatCard icon="🏆" label="Score" value={progress?.score ?? 0} />
+          <StatCard icon="🏆" label="Score" value={getScoreValue(progress)} />
 
-          <StatCard icon="⭐" label="Stars" value={progress?.stars ?? 0} />
+          <StatCard icon="⭐" label="Stars" value={getStarsValue(progress)} />
 
           <StatCard
             icon="🎯"
             label="Levels Completed"
-            value={progress?.levelsCompleted ?? 0}
+            value={getLevelsValue(progress)}
           />
         </div>
       )}
@@ -1273,9 +1308,7 @@ const sortedLeaderboard = useMemo(() => {
         </div>
       )}
 
-      {/* ========================================================= */}
       {/* LEADERBOARD */}
-      {/* ========================================================= */}
 
       {joined && (
         <div
@@ -1288,7 +1321,7 @@ const sortedLeaderboard = useMemo(() => {
             overflow-hidden
           "
         >
-          {/* LEADERBOARD HEADER */}
+          {/* HEADER */}
 
           <div
             className="
@@ -1328,7 +1361,9 @@ const sortedLeaderboard = useMemo(() => {
                 >
                   {isChallenge
                     ? `Ranked by ${winnerCriteriaLabel} — highest wins!`
-                    : `Track everyone's progress toward the ${contest.targetValue} ${winnerCriteriaLabel} target.`}
+                    : `Track everyone's progress toward the ${
+                        contest.targetValue ?? 0
+                      } ${winnerCriteriaLabel} target.`}
                 </p>
               </div>
 
@@ -1362,10 +1397,10 @@ const sortedLeaderboard = useMemo(() => {
             </div>
           </div>
 
-          {/* LOADING */}
+          {/* LEADERBOARD LOADING */}
 
           {loadingLeaderboard ? (
-            <LoadingState />
+            <LoadingState text="Loading leaderboard..." />
           ) : !sortedLeaderboard.length ? (
             <EmptyState icon="🏆" text="No participants yet." />
           ) : (
@@ -1409,11 +1444,19 @@ const sortedLeaderboard = useMemo(() => {
 
                   const rank = index + 1;
 
-                  const score = player?.score ?? 0;
+                  const score = Number(
+                    player.score ?? player.stats?.score ?? 0,
+                  );
 
-                  const stars = player?.stars ?? 0;
+                  const stars = Number(
+                    player.stars ?? player.stats?.stars ?? 0,
+                  );
 
-                  const levelsCompleted = player?.levelsCompleted ?? 0;
+                  const levelsCompleted = Number(
+                    player.levelsCompleted ??
+                      player.stats?.levelsCompleted ??
+                      0,
+                  );
 
                   return (
                     <div
@@ -1479,7 +1522,9 @@ const sortedLeaderboard = useMemo(() => {
                                   text-slate-700
                                 "
                             >
-                              {isCurrentChild ? "You" : player.childName}
+                              {isCurrentChild
+                                ? "You"
+                                : (player.childName ?? "Player")}
                             </p>
 
                             {isCurrentChild && (
@@ -1575,7 +1620,9 @@ const sortedLeaderboard = useMemo(() => {
                                   text-slate-700
                                 "
                             >
-                              {isCurrentChild ? "You" : player.childName}
+                              {isCurrentChild
+                                ? "You"
+                                : (player.childName ?? "Player")}
                             </p>
 
                             {isCurrentChild && (
@@ -1662,7 +1709,6 @@ const LeaderboardValue = ({
         rounded-xl
         px-3
         py-2
-
         ${highlighted ? "bg-indigo-100 ring-2 ring-indigo-300" : ""}
       `}
     >
@@ -1702,7 +1748,6 @@ const MobileLeaderboardValue = ({
         text-center
         rounded-xl
         py-2
-
         ${highlighted ? "bg-indigo-100 ring-2 ring-indigo-300" : "bg-slate-50"}
       `}
     >
@@ -1736,8 +1781,7 @@ const MobileLeaderboardValue = ({
 /* ===================================================================== */
 
 interface RankingViewProps {
-  contests: any[];
-  currentChildId?: string;
+  contests: JoinedContest[];
   onContestClick: (id: string) => void;
 }
 
@@ -1773,18 +1817,14 @@ const RankingView = ({ contests, onContestClick }: RankingViewProps) => {
           📊 My Contest Journey
         </h2>
 
-        <p
-          className="
-            text-slate-500
-            mt-2
-          "
-        >
+        <p className="text-slate-500 mt-2">
           Track all the contests you've joined and check your progress.
         </p>
       </div>
 
       {contests.map((contest) => (
         <button
+          type="button"
           key={contest.contestId}
           onClick={() => onContestClick(contest.contestId)}
           className="
@@ -1891,15 +1931,13 @@ const InfoPill = ({ children }: { children: React.ReactNode }) => (
   </span>
 );
 
-const StatCard = ({
-  icon,
-  label,
-  value,
-}: {
+interface StatCardProps {
   icon: string;
   label: string;
   value: number;
-}) => (
+}
+
+const StatCard = ({ icon, label, value }: StatCardProps) => (
   <div
     className="
       bg-white
@@ -1938,38 +1976,26 @@ const StatCard = ({
   </div>
 );
 
-const MiniStat = ({ label, value }: { label: string; value: number }) => (
-  <div className="text-center">
-    <p
-      className="
-        text-xs
-        text-slate-400
-      "
-    >
-      {label}
-    </p>
+interface MiniStatProps {
+  label: string;
+  value: number;
+}
 
-    <p
-      className="
-        font-black
-        text-indigo-600
-      "
-    >
-      {value}
-    </p>
+const MiniStat = ({ label, value }: MiniStatProps) => (
+  <div className="text-center">
+    <p className="text-xs text-slate-400">{label}</p>
+
+    <p className="font-black text-indigo-600">{value}</p>
   </div>
 );
 
-const LoadingState = () => (
+interface LoadingStateProps {
+  text?: string;
+}
+
+const LoadingState = ({ text = "Loading contests..." }: LoadingStateProps) => (
   <div className="py-20 text-center">
-    <div
-      className="
-        text-5xl
-        animate-bounce
-      "
-    >
-      🏆
-    </div>
+    <div className="text-5xl animate-bounce">🏆</div>
 
     <p
       className="
@@ -1978,12 +2004,17 @@ const LoadingState = () => (
         font-bold
       "
     >
-      Loading contests...
+      {text}
     </p>
   </div>
 );
 
-const EmptyState = ({ icon, text }: { icon: string; text: string }) => (
+interface EmptyStateProps {
+  icon: string;
+  text: string;
+}
+
+const EmptyState = ({ icon, text }: EmptyStateProps) => (
   <div
     className="
       bg-white
@@ -2008,75 +2039,3 @@ const EmptyState = ({ icon, text }: { icon: string; text: string }) => (
     </p>
   </div>
 );
-
-/* ===================================================================== */
-/* HELPERS */
-/* ===================================================================== */
-
-const formatDate = (date: string | Date) => {
-  return new Date(date).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-};
-
-const getRankEmoji = (rank: number) => {
-  if (rank === 1) return "🥇";
-  if (rank === 2) return "🥈";
-  if (rank === 3) return "🥉";
-
-  return `#${rank}`;
-};
-
-/* ===================================================================== */
-/* WINNER CRITERIA HELPERS */
-/* ===================================================================== */
-
-const getWinnerCriteriaLabel = (criteria?: string): string => {
-  switch (criteria) {
-    case "SCORE":
-      return "Score";
-
-    case "STARS":
-      return "Stars";
-
-    case "LEVELS":
-      return "Levels";
-
-    default:
-      return "Score";
-  }
-};
-
-const getWinnerCriteriaIcon = (criteria?: string): string => {
-  switch (criteria) {
-    case "SCORE":
-      return "🏆";
-
-    case "STARS":
-      return "⭐";
-
-    case "LEVELS":
-      return "🎯";
-
-    default:
-      return "🏆";
-  }
-};
-
-const getCriteriaValue = (player: any, criteria?: string): number => {
-  switch (criteria) {
-    case "SCORE":
-      return player?.score ?? 0;
-
-    case "STARS":
-      return player?.stars ?? 0;
-
-    case "LEVELS":
-      return player?.levelsCompleted ?? 0;
-
-    default:
-      return 0;
-  }
-};

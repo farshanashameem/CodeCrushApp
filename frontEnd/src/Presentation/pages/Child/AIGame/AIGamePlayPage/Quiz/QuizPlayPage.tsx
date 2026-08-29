@@ -299,6 +299,25 @@ const QuizPlayPage = () => {
   }
 
   /* ================================================================= */
+/* RETRY GAME */
+/* ================================================================= */
+
+const handleRetry = () => {
+  if (!game) {
+    return;
+  }
+
+  setCurrentQuestionIndex(0);
+
+  setAnswers(
+    new Array<number | undefined>(game.questions.length).fill(
+      undefined,
+    ),
+  );
+
+  setResult(null);
+};
+  /* ================================================================= */
   /* RESULT */
   /* ================================================================= */
 
@@ -307,6 +326,7 @@ const QuizPlayPage = () => {
       <QuizResultPage
         game={game}
         result={result}
+        onRetry={handleRetry}
       />
     );
   }

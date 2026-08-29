@@ -1,6 +1,3 @@
-import { useSelector } from "react-redux";
-
-import type { RootState } from "../../../../../../redux/store";
 
 import type { TypingGameData, TypingResult } from "./TypingPlayPage";
 
@@ -11,15 +8,15 @@ import type { TypingGameData, TypingResult } from "./TypingPlayPage";
 interface TypingResultPageProps {
   game: TypingGameData;
   result: TypingResult;
+  onRetry: () => void;
 }
 
 /* ===================================================================== */
 /* COMPONENT */
 /* ===================================================================== */
 
-const TypingResultPage = ({ game, result }: TypingResultPageProps) => {
-  const { currentChild } = useSelector((state: RootState) => state.childGame);
-
+const TypingResultPage = ({ game, result, onRetry }: TypingResultPageProps) => {
+ 
   /* ================================================================= */
   /* RESULT CALCULATIONS */
   /* ================================================================= */
@@ -290,13 +287,43 @@ const TypingResultPage = ({ game, result }: TypingResultPageProps) => {
           {/* DONE BUTTON */}
           {/* ===================================================== */}
 
+        <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {/* Retry */}
+          <button
+            type="button"
+            onClick={onRetry}
+            className="
+              w-full
+              rounded-2xl
+              border-4
+              border-white
+              bg-gradient-to-r
+              from-green-400
+              to-emerald-500
+              px-6
+              py-4
+              font-mochiy
+              text-base
+              text-white
+              shadow-[0_6px_0_#059669]
+              transition-all
+              duration-200
+              hover:-translate-y-1
+              active:translate-y-1
+              active:shadow-[0_3px_0_#059669]
+              md:text-lg
+            "
+          >
+            🔄 Retry
+          </button>
+
+          {/* Done */}
           <button
             type="button"
             onClick={() => {
               window.history.back();
             }}
             className="
-              mt-7
               w-full
               rounded-2xl
               border-4
@@ -321,6 +348,7 @@ const TypingResultPage = ({ game, result }: TypingResultPageProps) => {
           >
             🎉 Done!
           </button>
+        </div>
         </div>
       </main>
     </div>

@@ -343,13 +343,15 @@ const AIGameCreatorPage = () => {
 
         navigate("/child/ai-game/play");
 
-    } catch (error: any) {
-        setError(
-            error ||
-            "Oops! We couldn't create your game. Please try again! 🤖"
-        );
-    }
-};
+    } catch (error: unknown) {
+        const message =
+          typeof error === "string"
+            ? error
+            : "Oops! We couldn't create your game. Please try again! 🤖";
+
+        setError(message);
+      }
+      };
 
   const countLimits = getCountLimits();
 

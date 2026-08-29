@@ -1,9 +1,10 @@
 // components/GameHeader.tsx
 
 import { gameImages } from "../../Constants/gameImages";
+import type { Game } from "../../Types/game";
 
 interface Props {
-  game: any;
+  game: Game;
   levelCount?: number;
   onBack: () => void;
   onAddLevel?: () => void;

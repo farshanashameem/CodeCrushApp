@@ -15,7 +15,6 @@ import {
   LogOut, 
   TrendingUp, 
   BarChart3, 
-  Shield, // Changed from ShieldAlert
   ArrowRight 
 } from "lucide-react";
 

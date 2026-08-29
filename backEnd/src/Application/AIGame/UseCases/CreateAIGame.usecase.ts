@@ -1,12 +1,12 @@
 import { CreateAIGameInputDTO, CreateAIGameOutputDTO } from '@/Application/AIGame/dto/CreateAIGame.dto';
 import { IAIGameService } from '@/Application/Interfaces/Services/IAIGameService';
 import { ICreateAIGameUseCase } from '../Interfaces/ICreateAIGame.usecase';
-import { IIncrementAIGamePopularityUseCase } from '../Interfaces/IIncrementAIGamePopularity.usecase';
+import { IAIGamePopularityRepository } from '@/Domain/RepositoryInterface/IGamePopularity.repository';
 
 export class CreateAIGameUseCase implements ICreateAIGameUseCase {
     constructor(
         private  _aiGameService: IAIGameService,
-        private _incrementAIGamePopularityUseCase: IIncrementAIGamePopularityUseCase,
+        private _aiGamePopularityRepository: IAIGamePopularityRepository
     ) {}
 
     async execute(input: CreateAIGameInputDTO): Promise<CreateAIGameOutputDTO> {
@@ -15,10 +15,10 @@ export class CreateAIGameUseCase implements ICreateAIGameUseCase {
 
                 // 2. Game was successfully generated
                 //    So increment its popularity
-                await this._incrementAIGamePopularityUseCase.execute({
-                    gameType: input.gameType,
-                    difficulty: input.difficulty,
-                });
+                await this._aiGamePopularityRepository.incrementCreationCount(
+                     input.gameType,
+                     input.difficulty,
+                );
 
                 // 3. Return the generated game
                 return game;

@@ -22,7 +22,7 @@ export default function ChildReportSection({
 }: ChildReportSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { childReport, loading, error } = useSelector(
+  const { childReport,  } = useSelector(
     (state: RootState) => state.report
   );
 

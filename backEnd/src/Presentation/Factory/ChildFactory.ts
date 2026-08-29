@@ -29,9 +29,8 @@ import { GetContestLeaderboardUseCase } from '@/Application/Child/UseCases/Conte
 import { GetContestProgressUseCase } from '@/Application/Child/UseCases/Contest/GetContestProgress.usecase';
 import { GetJoinedContestsUseCase } from '@/Application/Child/UseCases/Contest/GetJoinedContests.usecase';
 import { JoinContestUseCase } from '@/Application/Child/UseCases/Contest/JoinContest.usecase';
-import { UpdateContestProgressUseCase } from '@/Application/Child/UseCases/Contest/UpdateContestProgress.usecase';
 import { GetGameReviewUseCase } from '@/Application/Child/UseCases/Review/GetGameReview.usecase';
-import { GetGameReviewsUseCase } from '@/Application/Child/UseCases/Review/Getgamereviews.usecase';
+import { GetGameReviewsUseCase } from '@/Application/Child/UseCases/Review/GetGameReviews.usecase';
 import { CreateGameReviewUseCase } from '@/Application/Child/UseCases/Review/CreateGameReview.usecase';
 
 //Repositories
@@ -98,9 +97,7 @@ const getLevelUseCase = new GetLevelUseCase(
     iconRepository
 );
 
-const updateContestProgressUseCase = new UpdateContestProgressUseCase(
-    contestProgressRepository
-);
+
 
 const submitLevelUseCase = new SubmitLevelUseCase(
     progressRepository,
@@ -109,7 +106,7 @@ const submitLevelUseCase = new SubmitLevelUseCase(
     parentRepository,
     contestRepository,
     contestProgressRepository,
-    updateContestProgressUseCase
+   
 
 );
 
@@ -210,7 +207,6 @@ export const childContestController = new ChildContestController(
     joinContestUseCase,
     getJoinedContestsUseCase,
     getContestProgressUseCase,
-    updateContestProgressUseCase,
     getContestLeaderboardUseCase,
     getCompletedParticipantsUseCase
 );

@@ -10,7 +10,7 @@ const GlobalAudio = () => {
       try {
         await audioRef.current?.play();
         setSoundOn(true);
-      } catch (error) {
+      } catch {
         console.log("Autoplay blocked by browser");
       }
     };
@@ -19,14 +19,21 @@ const GlobalAudio = () => {
   }, []);
 
   const toggleSound = async () => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+
+    if (!audio) return;
 
     if (soundOn) {
-      audioRef.current.pause();
+      audio.pause();
       setSoundOn(false);
-    } else {
-      await audioRef.current.play();
+      return;
+    }
+
+    try {
+      await audio.play();
       setSoundOn(true);
+    } catch {
+      console.log("Unable to play background music");
     }
   };
 
@@ -40,6 +47,7 @@ const GlobalAudio = () => {
       <button
         onClick={toggleSound}
         className="fixed top-5 right-5 z-[999] bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-lg text-lg hover:scale-110 transition"
+        aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
       >
         {soundOn ? "🔊" : "🔇"}
       </button>

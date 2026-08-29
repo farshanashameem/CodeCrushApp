@@ -21,11 +21,9 @@ import { getCurrentChildSession } from "../../../../redux/Slices/childGameSlice"
 import ChildLayout from "../../../SharedComponents/Child/ChildLayout";
 
 import ContestTabs from "./ContestTabs";
-
 import ContestDetails from "./ContestDetails";
 import { ContestList, JoinedContestList } from "./ContestList";
 import RankingView from "./RankingView";
-
 
 type ContestTab = "active" | "mine" | "ranking";
 
@@ -51,6 +49,14 @@ const ChildContestsPage = () => {
     (state: RootState) => state.childGame,
   );
 
+  /*
+   * Extract the child ID once.
+   *
+   * This avoids React Compiler dependency issues caused by
+   * accessing currentChild inside memoized callbacks.
+   */
+  const currentChildId = currentChild?.id;
+
   const [activeTab, setActiveTab] =
     useState<ContestTab>("active");
 
@@ -68,16 +74,16 @@ const ChildContestsPage = () => {
 
   // Fetch contests after current child is restored
   useEffect(() => {
-    if (!currentChild?.id) return;
+    if (!currentChildId) return;
 
-    dispatch(getAvailableContests(currentChild.id));
-    dispatch(getJoinedContests(currentChild.id));
+    dispatch(getAvailableContests(currentChildId));
+    dispatch(getJoinedContests(currentChildId));
 
     return () => {
       dispatch(clearContestProgress());
       dispatch(clearContestError());
     };
-  }, [currentChild?.id, dispatch]);
+  }, [currentChildId, dispatch]);
 
   // ============================================================
   // SELECTED CONTEST
@@ -115,11 +121,11 @@ const ChildContestsPage = () => {
       (contest) => contest.contestId === contestId,
     );
 
-    if (joinedContest && currentChild?.id) {
+    if (joinedContest && currentChildId) {
       dispatch(
         getContestProgress({
           contestId,
-          childId: currentChild.id,
+          childId: currentChildId,
         }),
       );
 
@@ -141,25 +147,25 @@ const ChildContestsPage = () => {
   // ============================================================
 
   const handleJoinContest = async (contestId: string) => {
-    if (!currentChild?.id) return;
+    if (!currentChildId) return;
 
     try {
       await dispatch(
         joinContest({
           contestId,
-          childId: currentChild.id,
+          childId: currentChildId,
         }),
       ).unwrap();
 
       await Promise.all([
-        dispatch(getAvailableContests(currentChild.id)),
-        dispatch(getJoinedContests(currentChild.id)),
+        dispatch(getAvailableContests(currentChildId)),
+        dispatch(getJoinedContests(currentChildId)),
       ]);
 
       dispatch(
         getContestProgress({
           contestId,
-          childId: currentChild.id,
+          childId: currentChildId,
         }),
       );
 
@@ -173,15 +179,18 @@ const ChildContestsPage = () => {
   // CURRENT CHILD RANK
   // ============================================================
 
-  const currentChildRank = useMemo(() => {
-    if (!currentChild?.id) return null;
-
-    const item = leaderboard?.find(
-      (item) => item.childId === currentChild.id,
-    );
-
-    return item?.rank ?? null;
-  }, [leaderboard, currentChild?.id]);
+  /*
+   * No useMemo is required here.
+   *
+   * Finding one child inside the leaderboard is a cheap operation,
+   * and removing useMemo also avoids React Compiler dependency
+   * preservation warnings.
+   */
+  const currentChildRank = currentChildId
+    ? leaderboard?.find(
+        (item) => item.childId === currentChildId,
+      )?.rank ?? null
+    : null;
 
   // ============================================================
   // RENDER
@@ -250,7 +259,7 @@ const ChildContestsPage = () => {
           {activeTab === "ranking" && (
             <RankingView
               contests={joinedContests}
-              currentChildId={currentChild?.id}
+              currentChildId={currentChildId}
               onContestClick={(contestId) => {
                 setActiveTab("mine");
                 handleContestClick(contestId);
@@ -265,7 +274,7 @@ const ChildContestsPage = () => {
               joined={!!selectedJoinedContest}
               progress={selectedContestProgress}
               leaderboard={leaderboard}
-              currentChildId={currentChild?.id}
+              currentChildId={currentChildId}
               currentChildRank={currentChildRank}
               loadingProgress={loadingProgress}
               loadingLeaderboard={loadingLeaderboard}

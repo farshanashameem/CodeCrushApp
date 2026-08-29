@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CatchResultPage from "./CatchResultPage";
 
@@ -58,23 +58,12 @@ const AI_GAME_DATA_KEY = "aiGameData";
 
 const MAX_FALLING_OBJECTS = 18;
 
-/*
- * Frontend-only speed.
- *
- * Backend data is not changed.
- */
 const SPEED_BY_DIFFICULTY: Record<string, number> = {
   EASY: 0.38,
   MEDIUM: 0.48,
   HARD: 0.58,
 };
 
-/*
- * Generic visual obstacles.
- *
- * These are only decoys.
- * They are not part of the backend game data.
- */
 const DECOY_OBJECTS = [
   "🍎",
   "🌈",
@@ -111,9 +100,7 @@ const CatchPlayPage = () => {
 
   const [currentTargetIndex, setCurrentTargetIndex] = useState(0);
 
-  const [caughtCounts, setCaughtCounts] = useState<Record<string, number>>(
-    {},
-  );
+  const [caughtCounts, setCaughtCounts] = useState<Record<string, number>>({});
 
   const [missed, setMissed] = useState(0);
 
@@ -125,7 +112,8 @@ const CatchPlayPage = () => {
 
   const [message, setMessage] = useState("");
 
-  const [nextId, setNextId] = useState(1);
+ 
+  const nextIdRef = useRef(1);
 
   /* ================================================================= */
   /* TARGET */
@@ -140,7 +128,7 @@ const CatchPlayPage = () => {
   }, [game, currentTargetIndex]);
 
   const targetCaught = targetObject
-    ? caughtCounts[targetObject.name] ?? 0
+    ? (caughtCounts[targetObject.name] ?? 0)
     : 0;
 
   const targetRemaining = targetObject
@@ -239,53 +227,52 @@ const CatchPlayPage = () => {
   /* CREATE FALLING OBJECT */
   /* ================================================================= */
 
-  const createFallingObject = (
-    gameData: CatchGameData,
-    id: number,
-    forceTarget = false,
-  ): FallingObject => {
-    const difficultySpeed =
-      SPEED_BY_DIFFICULTY[gameData.difficulty] ??
-      SPEED_BY_DIFFICULTY.EASY;
+  const createFallingObject = useCallback(
+    (
+      gameData: CatchGameData,
+      id: number,
+      forceTarget = false,
+    ): FallingObject => {
+      const difficultySpeed =
+        SPEED_BY_DIFFICULTY[gameData.difficulty] ?? SPEED_BY_DIFFICULTY.EASY;
 
-    const activeTarget = gameData.objects[currentTargetIndex];
+      const activeTarget = gameData.objects[currentTargetIndex];
 
-    /*
-     * Force target when needed.
-     *
-     * This guarantees the child does not have to wait
-     * too long before seeing the required object.
-     */
-    const shouldCreateTarget =
-      forceTarget || Math.random() < 0.24;
+      /*
+       * Force target when needed.
+       *
+       * This guarantees the child does not have to wait
+       * too long before seeing the required object.
+       */
+      const shouldCreateTarget = forceTarget || Math.random() < 0.24;
 
-    if (shouldCreateTarget && activeTarget) {
+      if (shouldCreateTarget && activeTarget) {
+        return {
+          id,
+          name: activeTarget.name,
+          emoji: activeTarget.emoji,
+          isTarget: true,
+          x: Math.random() * 88 + 6,
+          y: -8,
+          speed: difficultySpeed * (0.9 + Math.random() * 0.2),
+        };
+      }
+
+      const decoy =
+        DECOY_OBJECTS[Math.floor(Math.random() * DECOY_OBJECTS.length)];
+
       return {
         id,
-        name: activeTarget.name,
-        emoji: activeTarget.emoji,
-        isTarget: true,
+        name: `decoy-${id}`,
+        emoji: decoy,
+        isTarget: false,
         x: Math.random() * 88 + 6,
         y: -8,
         speed: difficultySpeed * (0.9 + Math.random() * 0.2),
       };
-    }
-
-    const decoy =
-      DECOY_OBJECTS[
-        Math.floor(Math.random() * DECOY_OBJECTS.length)
-      ];
-
-    return {
-      id,
-      name: `decoy-${id}`,
-      emoji: decoy,
-      isTarget: false,
-      x: Math.random() * 88 + 6,
-      y: -8,
-      speed: difficultySpeed * (0.9 + Math.random() * 0.2),
-    };
-  };
+    },
+    [currentTargetIndex],
+  );
 
   /* ================================================================= */
   /* INITIAL OBJECTS */
@@ -306,11 +293,7 @@ const CatchPlayPage = () => {
     for (let index = 0; index < MAX_FALLING_OBJECTS; index++) {
       const forceTarget = index < 4;
 
-      const object = createFallingObject(
-        game,
-        index + 1,
-        forceTarget,
-      );
+      const object = createFallingObject(game, index + 1, forceTarget);
 
       /*
        * Spread them vertically so they don't all start together.
@@ -321,8 +304,12 @@ const CatchPlayPage = () => {
     }
 
     setFallingObjects(initialObjects);
-    setNextId(MAX_FALLING_OBJECTS + 1);
-  }, [game, targetObject, currentTargetIndex]);
+
+    /*
+     * Store the next ID in a ref instead of state.
+     */
+    nextIdRef.current = MAX_FALLING_OBJECTS + 1;
+  }, [game, targetObject, createFallingObject]);
 
   /* ================================================================= */
   /* GAME LOOP */
@@ -369,30 +356,19 @@ const CatchPlayPage = () => {
          * Keep the play area full.
          */
         while (updatedObjects.length < MAX_FALLING_OBJECTS) {
-          const newObject = createFallingObject(
-            game,
-            nextId + updatedObjects.length,
-          );
+          const newObject = createFallingObject(game, nextIdRef.current++);
 
           updatedObjects.push(newObject);
         }
 
         return updatedObjects;
       });
-
-      setNextId((previousId) => previousId + 1);
     }, 100);
 
     return () => {
       window.clearInterval(gameLoop);
     };
-  }, [
-    game,
-    result,
-    targetObject,
-    currentTargetIndex,
-    nextId,
-  ]);
+  }, [game, result, targetObject, createFallingObject]);
 
   /* ================================================================= */
   /* MESSAGE */
@@ -467,14 +443,13 @@ const CatchPlayPage = () => {
 
     if (nextIndex >= game.objects.length) {
       finishGame(updatedCounts, updatedScore, updatedMissed);
+
       return;
     }
 
     setCurrentTargetIndex(nextIndex);
 
-    setMessage(
-      `🎉 ${game.objects[currentTargetIndex].name} completed!`,
-    );
+    setMessage(`🎉 ${game.objects[currentTargetIndex].name} completed!`);
   };
 
   /* ================================================================= */
@@ -493,6 +468,7 @@ const CatchPlayPage = () => {
      */
     if (!object.isTarget || object.name !== targetObject.name) {
       setMessage("👀 Catch the correct one!");
+
       return;
     }
 
@@ -524,11 +500,7 @@ const CatchPlayPage = () => {
     );
 
     if (updatedCount >= targetObject.count) {
-      moveToNextTarget(
-        updatedCounts,
-        updatedScore,
-        missed,
-      );
+      moveToNextTarget(updatedCounts, updatedScore, missed);
 
       return;
     }
@@ -548,13 +520,9 @@ const CatchPlayPage = () => {
         <div className="w-full max-w-lg rounded-[2rem] border-4 border-white bg-white/95 p-8 text-center shadow-[0_10px_0_#c4b5fd]">
           <div className="mb-4 text-6xl">😵</div>
 
-          <h2 className="font-mochiy text-xl text-indigo-600">
-            Oops!
-          </h2>
+          <h2 className="font-mochiy text-xl text-indigo-600">Oops!</h2>
 
-          <p className="mt-3 font-bold text-slate-500">
-            {error}
-          </p>
+          <p className="mt-3 font-bold text-slate-500">{error}</p>
         </div>
       </div>
     );
@@ -568,9 +536,7 @@ const CatchPlayPage = () => {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 animate-bounce text-5xl">
-            🤖
-          </div>
+          <div className="mb-4 animate-bounce text-5xl">🤖</div>
 
           <p className="font-mochiy text-lg text-indigo-600">
             Getting your game ready...
@@ -584,13 +550,29 @@ const CatchPlayPage = () => {
   /* RESULT */
   /* ================================================================= */
 
+  const handleRetry = () => {
+  if (!game) {
+    return;
+  }
+
+  const initialCounts: Record<string, number> = {};
+
+  game.objects.forEach((object) => {
+    initialCounts[object.name] = 0;
+  });
+
+  setCaughtCounts(initialCounts);
+  setCurrentTargetIndex(0);
+  setMissed(0);
+  setScore(0);
+  setResult(null);
+  setMessage("");
+  setError("");
+
+  nextIdRef.current = 1;
+};
   if (result) {
-    return (
-      <CatchResultPage
-        game={game}
-        result={result}
-      />
-    );
+    return <CatchResultPage game={game} result={result} onRetry={handleRetry} />;
   }
 
   /* ================================================================= */
@@ -598,9 +580,7 @@ const CatchPlayPage = () => {
   /* ================================================================= */
 
   const overallProgress =
-    totalRequired > 0
-      ? (totalCaught / totalRequired) * 100
-      : 0;
+    totalRequired > 0 ? (totalCaught / totalRequired) * 100 : 0;
 
   /* ================================================================= */
   /* RENDER */
@@ -685,9 +665,7 @@ const CatchPlayPage = () => {
             </p>
 
             <div className="mt-1 flex items-center justify-center gap-2">
-              <span className="text-3xl md:text-4xl">
-                {targetObject.emoji}
-              </span>
+              <span className="text-3xl md:text-4xl">{targetObject.emoji}</span>
 
               <div className="text-left">
                 <p className="font-mochiy text-sm text-indigo-700 md:text-lg">
@@ -784,8 +762,7 @@ const CatchPlayPage = () => {
 
           <div className="mt-2 shrink-0 text-center">
             <p className="text-[9px] font-bold text-slate-500 md:text-xs">
-              👆 Catch only the highlighted target before it reaches
-              the ground!
+              👆 Catch only the highlighted target before it reaches the ground!
             </p>
           </div>
         </div>

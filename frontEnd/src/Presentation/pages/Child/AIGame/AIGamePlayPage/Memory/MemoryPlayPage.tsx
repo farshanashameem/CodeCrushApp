@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import MemoryResultPage from "./MemoryResultPage";
 
@@ -37,17 +37,146 @@ const AI_GAME_DATA_KEY = "aiGameData";
 const MAX_PAIRS = 10;
 
 /* ===================================================================== */
+/* LOAD GAME DATA */
+/* ===================================================================== */
+
+interface LoadedGameData {
+  game: MemoryGameData | null;
+  cards: MemoryCard[];
+  error: string;
+}
+
+const loadGameData = (): LoadedGameData => {
+  const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
+
+  if (!storedGame) {
+    return {
+      game: null,
+      cards: [],
+      error: "Game data not found. Please create a new game.",
+    };
+  }
+
+  try {
+    const parsedGame: MemoryGameData = JSON.parse(storedGame);
+
+    /* ------------------------------------------------------------- */
+    /* BASIC VALIDATION */
+    /* ------------------------------------------------------------- */
+
+    if (parsedGame.gameType !== "MEMORY") {
+      return {
+        game: null,
+        cards: [],
+        error: "This game cannot be played right now.",
+      };
+    }
+
+    if (
+      !parsedGame.pairCount ||
+      parsedGame.pairCount < 1 ||
+      parsedGame.pairCount > MAX_PAIRS
+    ) {
+      return {
+        game: null,
+        cards: [],
+        error: "Invalid number of memory pairs.",
+      };
+    }
+
+    if (
+      !Array.isArray(parsedGame.cards) ||
+      parsedGame.cards.length !== parsedGame.pairCount * 2
+    ) {
+      return {
+        game: null,
+        cards: [],
+        error: "Invalid memory game data.",
+      };
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VALIDATE PAIRS */
+    /* ------------------------------------------------------------- */
+
+    const pairCounts = new Map<number, number>();
+
+    for (const card of parsedGame.cards) {
+      if (
+        typeof card.id !== "number" ||
+        typeof card.content !== "string" ||
+        !card.content.trim()
+      ) {
+        return {
+          game: null,
+          cards: [],
+          error: "Some memory cards are invalid.",
+        };
+      }
+
+      pairCounts.set(card.id, (pairCounts.get(card.id) ?? 0) + 1);
+    }
+
+    const hasInvalidPairs =
+      pairCounts.size !== parsedGame.pairCount ||
+      Array.from(pairCounts.values()).some((count) => count !== 2);
+
+    if (hasInvalidPairs) {
+      return {
+        game: null,
+        cards: [],
+        error: "Some memory pairs are invalid.",
+      };
+    }
+
+    /* ------------------------------------------------------------- */
+    /* SHUFFLE */
+    /* ------------------------------------------------------------- */
+
+    const shuffledCards = [...parsedGame.cards].sort(
+      () => Math.random() - 0.5,
+    );
+
+    return {
+      game: parsedGame,
+      cards: shuffledCards,
+      error: "",
+    };
+  } catch {
+    return {
+      game: null,
+      cards: [],
+      error: "Something went wrong while loading your game.",
+    };
+  }
+};
+
+/* ===================================================================== */
 /* COMPONENT */
 /* ===================================================================== */
 
 const MemoryPlayPage = () => {
   /* ================================================================= */
+  /* INITIAL GAME DATA */
+  /* ================================================================= */
+
+  const [initialGameData] = useState<LoadedGameData>(() =>
+    loadGameData(),
+  );
+
+  /* ================================================================= */
   /* STATE */
   /* ================================================================= */
 
-  const [game, setGame] = useState<MemoryGameData | null>(null);
+  const [game] = useState<MemoryGameData | null>(
+    initialGameData.game,
+  );
 
-  const [cards, setCards] = useState<MemoryCard[]>([]);
+  const [cards] = useState<MemoryCard[]>(
+    initialGameData.cards,
+  );
+
+  const [error] = useState(initialGameData.error);
 
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
 
@@ -58,91 +187,6 @@ const MemoryPlayPage = () => {
   const [checkingPair, setCheckingPair] = useState(false);
 
   const [result, setResult] = useState<MemoryResult | null>(null);
-
-  const [error, setError] = useState("");
-
-  /* ================================================================= */
-  /* LOAD GAME DATA */
-  /* ================================================================= */
-
-  useEffect(() => {
-    const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
-
-    if (!storedGame) {
-      setError("Game data not found. Please create a new game.");
-      return;
-    }
-
-    try {
-      const parsedGame: MemoryGameData = JSON.parse(storedGame);
-
-      /* ------------------------------------------------------------- */
-      /* BASIC VALIDATION */
-      /* ------------------------------------------------------------- */
-
-      if (parsedGame.gameType !== "MEMORY") {
-        setError("This game cannot be played right now.");
-        return;
-      }
-
-      if (
-        !parsedGame.pairCount ||
-        parsedGame.pairCount < 1 ||
-        parsedGame.pairCount > MAX_PAIRS
-      ) {
-        setError("Invalid number of memory pairs.");
-        return;
-      }
-
-      if (
-        !Array.isArray(parsedGame.cards) ||
-        parsedGame.cards.length !== parsedGame.pairCount * 2
-      ) {
-        setError("Invalid memory game data.");
-        return;
-      }
-
-      /* ------------------------------------------------------------- */
-      /* VALIDATE PAIRS */
-      /* ------------------------------------------------------------- */
-
-      const pairCounts = new Map<number, number>();
-
-      parsedGame.cards.forEach((card) => {
-        if (
-          typeof card.id !== "number" ||
-          typeof card.content !== "string" ||
-          !card.content.trim()
-        ) {
-          return;
-        }
-
-        pairCounts.set(card.id, (pairCounts.get(card.id) ?? 0) + 1);
-      });
-
-      const hasInvalidPairs =
-        pairCounts.size !== parsedGame.pairCount ||
-        Array.from(pairCounts.values()).some((count) => count !== 2);
-
-      if (hasInvalidPairs) {
-        setError("Some memory pairs are invalid.");
-        return;
-      }
-
-      /* ------------------------------------------------------------- */
-      /* SHUFFLE */
-      /* ------------------------------------------------------------- */
-
-      const shuffledCards = [...parsedGame.cards].sort(
-        () => Math.random() - 0.5,
-      );
-
-      setGame(parsedGame);
-      setCards(shuffledCards);
-    } catch {
-      setError("Something went wrong while loading your game.");
-    }
-  }, []);
 
   /* ================================================================= */
   /* FINISH GAME */
@@ -308,6 +352,22 @@ const MemoryPlayPage = () => {
   }
 
   /* ================================================================= */
+/* RETRY GAME */
+/* ================================================================= */
+
+const handleRetry = () => {
+  if (!game) {
+    return;
+  }
+
+  setFlippedCards([]);
+  setMatchedCards([]);
+  setAttempts(0);
+  setCheckingPair(false);
+  setResult(null);
+
+};
+  /* ================================================================= */
   /* RESULT */
   /* ================================================================= */
 
@@ -316,6 +376,7 @@ const MemoryPlayPage = () => {
       <MemoryResultPage
         game={game}
         result={result}
+        onRetry={handleRetry}
       />
     );
   }
@@ -337,7 +398,6 @@ const MemoryPlayPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden px-4 py-6 md:px-8 md:py-8">
-
       {/* ========================================================= */}
       {/* DECORATIONS */}
       {/* ========================================================= */}
@@ -364,13 +424,11 @@ const MemoryPlayPage = () => {
 
       <main className="mx-auto w-full max-w-4xl">
         <div className="rounded-[2rem] border-4 border-white bg-white/95 p-5 shadow-[0_12px_0_#c4b5fd] backdrop-blur-sm md:rounded-[2.5rem] md:p-8">
-
           {/* ===================================================== */}
           {/* HEADER */}
           {/* ===================================================== */}
 
           <div className="mb-6 text-center">
-
             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-yellow-300 px-4 py-1.5 text-xs font-black text-purple-800 shadow-md">
               🤖 AI GAME
             </div>
@@ -382,7 +440,6 @@ const MemoryPlayPage = () => {
             <p className="mt-2 text-xs font-bold text-slate-500 md:text-sm">
               {game.description}
             </p>
-
           </div>
 
           {/* ===================================================== */}
@@ -390,7 +447,6 @@ const MemoryPlayPage = () => {
           {/* ===================================================== */}
 
           <div className="mb-5 flex flex-wrap items-center justify-center gap-3 md:justify-between">
-
             <div className="rounded-full bg-indigo-100 px-4 py-2 text-xs font-black text-indigo-600 md:text-sm">
               🧩 Pairs: {game.pairCount}
             </div>
@@ -402,7 +458,6 @@ const MemoryPlayPage = () => {
             <div className="rounded-full bg-green-100 px-4 py-2 text-xs font-black text-green-600 md:text-sm">
               🌟 Matched: {matchedPairs}/{game.pairCount}
             </div>
-
           </div>
 
           {/* ===================================================== */}
@@ -410,14 +465,12 @@ const MemoryPlayPage = () => {
           {/* ===================================================== */}
 
           <div className="mb-8 h-3 overflow-hidden rounded-full bg-slate-100">
-
             <div
               className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300"
               style={{
                 width: `${progress}%`,
               }}
             />
-
           </div>
 
           {/* ===================================================== */}
@@ -425,7 +478,6 @@ const MemoryPlayPage = () => {
           {/* ===================================================== */}
 
           <div className="mb-6 rounded-3xl border-4 border-indigo-100 bg-indigo-50 p-5 text-center">
-
             <div className="mb-2 text-4xl">
               🧠
             </div>
@@ -437,7 +489,6 @@ const MemoryPlayPage = () => {
             <p className="mt-2 text-xs font-bold text-slate-500 md:text-sm">
               Find the two cards that belong together.
             </p>
-
           </div>
 
           {/* ===================================================== */}
@@ -445,9 +496,7 @@ const MemoryPlayPage = () => {
           {/* ===================================================== */}
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-
             {cards.map((card, index) => {
-
               const isFlipped =
                 flippedCards.includes(index);
 
@@ -486,17 +535,13 @@ const MemoryPlayPage = () => {
                     }
                   `}
                 >
-
                   {/* ================================================= */}
                   {/* CARD CONTENT */}
                   {/* ================================================= */}
 
                   {showContent ? (
-
                     <div className="flex h-full min-h-[85px] items-center justify-center">
-
                       <div className="text-center">
-
                         <div className="mb-2 text-2xl md:text-3xl">
                           {isMatched ? "✅" : "✨"}
                         </div>
@@ -504,27 +549,18 @@ const MemoryPlayPage = () => {
                         <p className="font-mochiy text-xs text-indigo-700 md:text-sm">
                           {card.content}
                         </p>
-
                       </div>
-
                     </div>
-
                   ) : (
-
                     <div className="flex min-h-[85px] items-center justify-center">
-
                       <div className="text-4xl">
                         ❓
                       </div>
-
                     </div>
-
                   )}
-
                 </button>
               );
             })}
-
           </div>
 
           {/* ===================================================== */}
@@ -532,16 +568,12 @@ const MemoryPlayPage = () => {
           {/* ===================================================== */}
 
           <div className="mt-7 rounded-2xl border-4 border-dashed border-indigo-200 bg-indigo-50 p-4 text-center">
-
             <p className="font-mochiy text-sm text-indigo-600 md:text-base">
               🌟 Matched {matchedPairs} of {game.pairCount} pairs!
             </p>
-
           </div>
-
         </div>
       </main>
-
     </div>
   );
 };

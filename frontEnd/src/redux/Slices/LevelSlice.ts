@@ -3,7 +3,7 @@ import type { CreateLevelPayload, Level, UpdateLevelPayload } from "../../Types/
 import api from "../../Lib/axios";
 import { API_ROUTES } from "../../Constants/api.routes";
 import type { AxiosError } from "axios";
-import type { CreatePicturePuzzleLevelPayload } from "../../Types/picturePuzzle";
+
 
 export const fetchLevelsByGame = createAsyncThunk< Level[],  string, { rejectValue: string } >(
   "admin/fetchLevelsByGame",

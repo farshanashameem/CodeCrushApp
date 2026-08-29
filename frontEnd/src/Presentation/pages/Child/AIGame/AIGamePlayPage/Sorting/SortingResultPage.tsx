@@ -1,6 +1,3 @@
-import { useSelector } from "react-redux";
-
-import type { RootState } from "../../../../../../redux/store";
 
 import type {
   SortingGameData,
@@ -14,6 +11,7 @@ import type {
 interface SortingResultPageProps {
   game: SortingGameData;
   result: SortingResult;
+  onRetry: () => void;
 }
 
 /* ===================================================================== */
@@ -22,12 +20,9 @@ interface SortingResultPageProps {
 
 const SortingResultPage = ({
   game,
-  result,
+  result,onRetry
 }: SortingResultPageProps) => {
-  const { currentChild } = useSelector(
-    (state: RootState) => state.childGame,
-  );
-
+ 
   /* ================================================================= */
   /* RESULT CALCULATIONS */
   /* ================================================================= */
@@ -337,37 +332,68 @@ const SortingResultPage = ({
           {/* DONE BUTTON */}
           {/* ===================================================== */}
 
-          <button
-            type="button"
-            onClick={() => {
-              window.history.back();
-            }}
-            className="
-              mt-7
-              w-full
-              rounded-2xl
-              border-4
-              border-white
-              bg-gradient-to-r
-              from-violet-500
-              via-fuchsia-500
-              to-pink-500
-              px-6
-              py-4
-              font-mochiy
-              text-base
-              text-white
-              shadow-[0_6px_0_#c026d3]
-              transition-all
-              duration-200
-              hover:-translate-y-1
-              active:translate-y-1
-              active:shadow-[0_3px_0_#c026d3]
-              md:text-lg
-            "
-          >
-            🎉 Done!
-          </button>
+          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {/* Retry */}
+            <button
+              type="button"
+              onClick={onRetry}
+              className="
+                w-full
+                rounded-2xl
+                border-4
+                border-white
+                bg-gradient-to-r
+                from-green-400
+                to-emerald-500
+                px-6
+                py-4
+                font-mochiy
+                text-base
+                text-white
+                shadow-[0_6px_0_#059669]
+                transition-all
+                duration-200
+                hover:-translate-y-1
+                active:translate-y-1
+                active:shadow-[0_3px_0_#059669]
+                md:text-lg
+              "
+            >
+              🔄 Retry
+            </button>
+
+            {/* Done */}
+            <button
+              type="button"
+              onClick={() => {
+                window.history.back();
+              }}
+              className="
+                w-full
+                rounded-2xl
+                border-4
+                border-white
+                bg-gradient-to-r
+                from-violet-500
+                via-fuchsia-500
+                to-pink-500
+                px-6
+                py-4
+                font-mochiy
+                text-base
+                text-white
+                shadow-[0_6px_0_#c026d3]
+                transition-all
+                duration-200
+                hover:-translate-y-1
+                active:translate-y-1
+                active:shadow-[0_3px_0_#c026d3]
+                md:text-lg
+              "
+            >
+              🎉 Done!
+            </button>
+          </div>
 
         </div>
       </main>

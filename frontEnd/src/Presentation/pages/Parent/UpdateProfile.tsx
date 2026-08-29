@@ -9,6 +9,7 @@ import AuthLayout from "../../layouts/AuthLayout";
 import icon from "../../../assets/parentIcon.png";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../../SharedComponents/ConfirmationModal";
+import type { UpdateProfilePayload } from "../../../Types/parent";
 
 const UpdateProfile = () => {
   const navigate = useNavigate();
@@ -117,8 +118,8 @@ const UpdateProfile = () => {
     try {
       setIsSubmitting(true);
 
-      // Keep the SAME payload structure as before
-      const payload: any = {
+      
+      const payload: UpdateProfilePayload = {
         name: formData.name,
         email: formData.email,
       };
@@ -148,8 +149,15 @@ const UpdateProfile = () => {
       }));
 
       navigate("/parent/dashboard");
-    } catch (error: any) {
-      toast.error(error || "Profile update failed");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : "Profile update failed";
+
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

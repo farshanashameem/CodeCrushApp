@@ -34,64 +34,67 @@ const CreateContestModal = ({
 }: CreateContestModalProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // ============================================================
-  // EDIT MODE
-  // ============================================================
-
-  const isEditMode = Boolean(contest);
-
-  // ============================================================
-  // REDUX
-  // ============================================================
-
   const { loading } = useSelector(
     (state: RootState) => state.contestManagement,
   );
 
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <ContestForm
+      key={contest?.id ?? "create"}
+      contest={contest}
+      loading={loading}
+      dispatch={dispatch}
+      onClose={onClose}
+      onCreated={onCreated}
+    />
+  );
+};
+
+interface ContestFormProps {
+  contest?: Contest | null;
+  loading: boolean;
+  dispatch: AppDispatch;
+  onClose: () => void;
+  onCreated: () => void;
+}
+
+const ContestForm = ({
+  contest,
+  loading,
+  dispatch,
+  onClose,
+  onCreated,
+}: ContestFormProps) => {
+  const isEditMode = Boolean(contest);
+
   const { games } = useSelector((state: RootState) => state.gameManagement);
 
   // ============================================================
-  // FORM STATE
+  // FORM INITIAL STATE
   // ============================================================
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(contest?.title ?? "");
+  const [description, setDescription] = useState(contest?.description ?? "");
 
-  const [type, setType] = useState("");
+  const [type, setType] = useState(contest?.type ?? "");
 
-  const [selectedGameIds, setSelectedGameIds] = useState<string[]>([]);
+  const [selectedGameIds, setSelectedGameIds] = useState<string[]>(
+    contest?.gameIds ?? [],
+  );
 
-  const [winnerCriteria, setWinnerCriteria] = useState("");
+  const [winnerCriteria, setWinnerCriteria] = useState(
+    contest?.winnerCriteria ?? "",
+  );
 
-  const [targetValue, setTargetValue] = useState("");
-
-  const [startDate, setStartDate] = useState("");
-
-  const [endDate, setEndDate] = useState("");
-
-  const [showGameDropdown, setShowGameDropdown] = useState(false);
-
-  // ============================================================
-  // TARGET LOGIC
-  // Target value is required ONLY for CHALLENGE
-  // ============================================================
-
-  const requiresTargetValue = type === "PARTICIPATION";
-
-  // ============================================================
-  // FETCH GAMES
-  // ============================================================
-
-  useEffect(() => {
-    if (isOpen) {
-      dispatch(fetchGames());
-    }
-  }, [dispatch, isOpen]);
-
-  // ============================================================
-  // HELPER - FORMAT DATE
-  // Backend date -> YYYY-MM-DD
-  // ============================================================
+  const [targetValue, setTargetValue] = useState(
+    contest?.type === "PARTICIPATION" && contest.targetValue !== undefined
+      ? String(contest.targetValue)
+      : "",
+  );
 
   const formatDateForInput = (date: string | Date | undefined): string => {
     if (!date) {
@@ -107,46 +110,27 @@ const CreateContestModal = ({
     return parsedDate.toISOString().split("T")[0];
   };
 
+  const [startDate, setStartDate] = useState(
+    formatDateForInput(contest?.startDate),
+  );
+
+  const [endDate, setEndDate] = useState(formatDateForInput(contest?.endDate));
+
+  const [showGameDropdown, setShowGameDropdown] = useState(false);
+
   // ============================================================
-  // POPULATE FORM FOR UPDATE
+  // FETCH GAMES
   // ============================================================
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    dispatch(fetchGames());
+  }, [dispatch]);
 
-    if (contest) {
-      setTitle(contest.title);
+  // ============================================================
+  // TARGET LOGIC
+  // ============================================================
 
-      setDescription(contest.description);
-
-      setType(contest.type);
-
-      setSelectedGameIds(contest.gameIds ?? []);
-
-      setWinnerCriteria(contest.winnerCriteria ?? "");
-
-      /*
-       * Target is only relevant for CHALLENGE.
-       */
-      setTargetValue(
-        contest.type === "PARTICIPATION" && contest.targetValue !== undefined
-          ? String(contest.targetValue)
-          : "",
-      );
-
-      /*
-       * Only date is required.
-       * Time is removed.
-       */
-      setStartDate(formatDateForInput(contest.startDate));
-
-      setEndDate(formatDateForInput(contest.endDate));
-    } else {
-      resetForm();
-    }
-  }, [contest, isOpen]);
+  const requiresTargetValue = type === "PARTICIPATION";
 
   // ============================================================
   // RESET
@@ -154,21 +138,13 @@ const CreateContestModal = ({
 
   const resetForm = () => {
     setTitle("");
-
     setDescription("");
-
     setType("");
-
     setSelectedGameIds([]);
-
     setWinnerCriteria("");
-
     setTargetValue("");
-
     setStartDate("");
-
     setEndDate("");
-
     setShowGameDropdown(false);
   };
 
@@ -182,7 +158,6 @@ const CreateContestModal = ({
     }
 
     resetForm();
-
     onClose();
   };
 
@@ -205,10 +180,7 @@ const CreateContestModal = ({
   const handleTypeChange = (value: string) => {
     setType(value);
 
-    /*
-     * Target value is ONLY for CHALLENGE.
-     */
-    if (value !== "CHALLENGE") {
+    if (value !== "PARTICIPATION") {
       setTargetValue("");
     }
   };
@@ -219,10 +191,6 @@ const CreateContestModal = ({
 
   const handleWinnerCriteriaChange = (value: string) => {
     setWinnerCriteria(value);
-
-    /*
-     * Reset target when winner criteria changes.
-     */
     setTargetValue("");
   };
 
@@ -233,29 +201,15 @@ const CreateContestModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ==========================================================
-    // FORM DATA
-    // ==========================================================
-
     const formData = {
       title,
       description,
-
       type,
-
       gameIds: selectedGameIds.length > 0 ? selectedGameIds : undefined,
-
       winnerCriteria,
 
-      /*
-       * Target is included ONLY for CHALLENGE.
-       */
       targetValue: requiresTargetValue ? targetValue : undefined,
 
-      /*
-       * These are now date-only values:
-       * YYYY-MM-DD
-       */
       startDate,
       endDate,
     };
@@ -283,7 +237,6 @@ const CreateContestModal = ({
         toast.success("Contest created successfully");
 
         resetForm();
-
         onCreated();
       } catch (error) {
         toast.error(
@@ -320,7 +273,6 @@ const CreateContestModal = ({
         toast.success("Contest updated successfully");
 
         resetForm();
-
         onCreated();
       } catch (error) {
         toast.error(
@@ -331,36 +283,22 @@ const CreateContestModal = ({
   };
 
   // ============================================================
-  // MODAL
-  // ============================================================
-
-  if (!isOpen) {
-    return null;
-  }
-
-  // ============================================================
   // UI
   // ============================================================
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* ====================================================== */}
       {/* BACKDROP */}
-      {/* ====================================================== */}
 
       <div
         className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
         onClick={handleClose}
       />
 
-      {/* ====================================================== */}
       {/* MODAL */}
-      {/* ====================================================== */}
 
       <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl border border-white/40">
-        {/* ==================================================== */}
         {/* HEADER */}
-        {/* ==================================================== */}
 
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-slate-100 px-6 py-5">
           <div className="flex items-start justify-between gap-4">
@@ -376,8 +314,6 @@ const CreateContestModal = ({
               </p>
             </div>
 
-            {/* CLOSE */}
-
             <button
               type="button"
               onClick={handleClose}
@@ -389,14 +325,10 @@ const CreateContestModal = ({
           </div>
         </div>
 
-        {/* ==================================================== */}
         {/* FORM */}
-        {/* ==================================================== */}
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* ================================================== */}
           {/* TITLE */}
-          {/* ================================================== */}
 
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -413,9 +345,7 @@ const CreateContestModal = ({
             />
           </div>
 
-          {/* ================================================== */}
           {/* DESCRIPTION */}
-          {/* ================================================== */}
 
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -432,9 +362,7 @@ const CreateContestModal = ({
             />
           </div>
 
-          {/* ================================================== */}
-          {/* CONTEST TYPE */}
-          {/* ================================================== */}
+          {/* TYPE */}
 
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -462,9 +390,7 @@ const CreateContestModal = ({
             </p>
           </div>
 
-          {/* ================================================== */}
           {/* WINNER CRITERIA */}
-          {/* ================================================== */}
 
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -479,9 +405,7 @@ const CreateContestModal = ({
               <option value="">Select winner criteria</option>
 
               <option value="SCORE">Score</option>
-
               <option value="STARS">Stars</option>
-
               <option value="LEVELS">Levels</option>
             </select>
 
@@ -496,9 +420,7 @@ const CreateContestModal = ({
             </p>
           </div>
 
-          {/* ================================================== */}
-          {/* TARGET VALUE */}
-          {/* ================================================== */}
+          {/* TARGET */}
 
           {requiresTargetValue && (
             <div className="animate-fadeIn">
@@ -537,9 +459,7 @@ const CreateContestModal = ({
             </div>
           )}
 
-          {/* ================================================== */}
           {/* GAMES */}
-          {/* ================================================== */}
 
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -567,8 +487,6 @@ const CreateContestModal = ({
                   {showGameDropdown ? "▲" : "▼"}
                 </span>
               </button>
-
-              {/* DROPDOWN */}
 
               {showGameDropdown && (
                 <div className="absolute z-20 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
@@ -617,13 +535,9 @@ const CreateContestModal = ({
             )}
           </div>
 
-          {/* ================================================== */}
           {/* DATES */}
-          {/* ================================================== */}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* START DATE */}
-
             <div>
               <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
                 Start Date
@@ -636,8 +550,6 @@ const CreateContestModal = ({
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
               />
             </div>
-
-            {/* END DATE */}
 
             <div>
               <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -653,13 +565,9 @@ const CreateContestModal = ({
             </div>
           </div>
 
-          {/* ================================================== */}
           {/* FOOTER */}
-          {/* ================================================== */}
 
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
-            {/* CANCEL */}
-
             <button
               type="button"
               onClick={handleClose}
@@ -668,8 +576,6 @@ const CreateContestModal = ({
             >
               Cancel
             </button>
-
-            {/* SUBMIT */}
 
             <button
               type="submit"

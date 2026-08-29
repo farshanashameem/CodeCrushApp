@@ -6,9 +6,12 @@ import icon from "../../../assets/parentIcon.png";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../redux/store";
 
-import { verifyOtp, resendOtp } from "../../../redux/Slices/authSlice";
-import { useNavigate } from "react-router-dom";
+import {
+  verifyOtp,
+  resendOtp,
+} from "../../../redux/Slices/authSlice";
 
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 type OTPType = "REGISTRATION" | "FORGOT_PASSWORD";
@@ -18,85 +21,130 @@ const getOtpSession = () => {
   const typeRaw = sessionStorage.getItem("otp_type");
 
   const type: OTPType | null =
-    typeRaw === "REGISTRATION" || typeRaw === "FORGOT_PASSWORD"
+    typeRaw === "REGISTRATION" ||
+    typeRaw === "FORGOT_PASSWORD"
       ? typeRaw
       : null;
 
-  return { email, type };
+  return {
+    email,
+    type,
+  };
 };
 
 const OTPPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // ------------------------------------------------------------
+  // READ OTP SESSION ONLY ON INITIAL RENDER
+  // ------------------------------------------------------------
+
+  const [otpSession] = useState(() => getOtpSession());
+
+  const { email, type } = otpSession;
+
+  // ------------------------------------------------------------
+  // STATE
+  // ------------------------------------------------------------
+
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [shake, setShake] = useState(false);
+
   const [timer, setTimer] = useState(() => {
-  const expiry = sessionStorage.getItem("otp_expiry");
+    const expiry = sessionStorage.getItem("otp_expiry");
 
-  if (!expiry) return 0;
+    if (!expiry) {
+      return 0;
+    }
 
-  return Math.max(
-    0,
-    Math.floor(
-      (Number(expiry) - Date.now()) / 1000
-    )
-  );
-});
+    return Math.max(
+      0,
+      Math.floor(
+        (Number(expiry) - Date.now()) / 1000,
+      ),
+    );
+  });
+
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
   const inputs = useRef<HTMLInputElement[]>([]);
-  const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
 
-  // Retrieve details directly
-  const { email, type } = getOtpSession();
+  // ------------------------------------------------------------
+  // SESSION GUARD
+  // ------------------------------------------------------------
 
-  // ---------------- SESSION GUARD ----------------
   useEffect(() => {
     if (!email || !type) {
-      toast.error("Session expired. Please try again.");
-      navigate("/parent/auth");
+      toast.error(
+        "Session expired. Please request a new OTP.",
+      );
+
+      navigate("/parent/auth", {
+        replace: true,
+      });
     }
   }, [email, type, navigate]);
 
-  // Prevent UI rendering crash if elements are missing
+  // ------------------------------------------------------------
+  // TIMER
+  // ------------------------------------------------------------
+
+  useEffect(() => {
+    if (!email || !type || timer <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const expiry =
+        sessionStorage.getItem("otp_expiry");
+
+      if (!expiry) {
+        setTimer(0);
+        return;
+      }
+
+      const remaining = Math.max(
+        0,
+        Math.floor(
+          (Number(expiry) - Date.now()) / 1000,
+        ),
+      );
+
+      setTimer(remaining);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [email, type, timer]);
+
+  // ------------------------------------------------------------
+  // INVALID SESSION
+  // ------------------------------------------------------------
+
   if (!email || !type) {
     return null;
   }
 
-  // ---------------- TIMER ----------------
-useEffect(() => {
-  if (timer <= 0) return;
-  const interval = setInterval(() => {
-    const expiry =
-      sessionStorage.getItem("otp_expiry");
+  // ------------------------------------------------------------
+  // INPUT CHANGE
+  // ------------------------------------------------------------
 
-    if (!expiry) {
-      setTimer(0);
+  const handleChange = (
+    value: string,
+    index: number,
+  ) => {
+    if (!/^[0-9]?$/.test(value)) {
       return;
     }
 
-    const remaining = Math.max(
-      0,
-      Math.floor(
-        (Number(expiry) - Date.now()) / 1000
-      )
-    );
-
-    setTimer(remaining);
-
-    
-  }, 1000);
-
-  return () => clearInterval(interval);
-}, [timer]);
-
-  // ---------------- INPUT HANDLERS ----------------
-  const handleChange = (value: string, index: number) => {
-    if (!/^[0-9]?$/.test(value)) return;
-
     const newOtp = [...otp];
+
     newOtp[index] = value;
+
     setOtp(newOtp);
 
     if (value && index < 3) {
@@ -105,109 +153,195 @@ useEffect(() => {
     }
   };
 
+  // ------------------------------------------------------------
+  // BACKSPACE
+  // ------------------------------------------------------------
+
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
+    if (
+      e.key === "Backspace" &&
+      !otp[index] &&
+      index > 0
+    ) {
       inputs.current[index - 1]?.focus();
       setActiveIndex(index - 1);
     }
   };
 
-  // ---------------- VERIFY OTP ----------------
-  const handleVerify = async (e: React.FormEvent) => {
+  // ------------------------------------------------------------
+  // VERIFY OTP
+  // ------------------------------------------------------------
+
+  const handleVerify = async (
+    e: React.FormEvent,
+  ) => {
     e.preventDefault();
+
     const code = otp.join("");
 
     if (code.length !== 4) {
       setShake(true);
-      setTimeout(() => setShake(false), 400);
+
+      setTimeout(() => {
+        setShake(false);
+      }, 400);
+
       return;
     }
 
     setLoading(true);
 
-    const result = await dispatch(
-      verifyOtp({
-        role: "parent",
-        email: email,
-        otp: code,
-        type: type,
-      })
-    );
-
-    if (verifyOtp.fulfilled.match(result)) {
-      const payload = result.payload;
-
-      toast.success(
-        type === "REGISTRATION" ? "Registration successful" : "OTP verified"
+    try {
+      const result = await dispatch(
+        verifyOtp({
+          role: "parent",
+          email,
+          otp: code,
+          type,
+        }),
       );
 
-      
-      
+      if (!verifyOtp.fulfilled.match(result)) {
+        toast.error(
+          result.payload ||
+            "OTP verification failed",
+        );
+
+        return;
+      }
+
+      const payload = result.payload;
+
+      // --------------------------------------------------------
+      // IMPORTANT:
+      // Remove OTP session only AFTER successful verification
+      // --------------------------------------------------------
+
       sessionStorage.removeItem("otp_type");
       sessionStorage.removeItem("otp_expiry");
 
+      toast.success(
+        type === "REGISTRATION"
+          ? "Registration successful"
+          : "OTP verified",
+      );
+
+      // --------------------------------------------------------
+      // FORGOT PASSWORD
+      // --------------------------------------------------------
 
       if (payload.type === "FORGOT_PASSWORD") {
-        sessionStorage.setItem("reset_token", payload.resetToken);
-        setLoading(false);
+        sessionStorage.setItem(
+          "reset_token",
+          payload.resetToken,
+        );
+
         navigate("/parent/reset-password", {
-          state: { email },
+          state: {
+            email,
+          },
+          replace: true,
         });
-      } else {
-        setLoading(false);
-        navigate("/parent/auth");
+
+        return;
       }
-    } else {
+
+      // --------------------------------------------------------
+      // REGISTRATION
+      // --------------------------------------------------------
+
+      navigate("/parent/auth", {
+        replace: true,
+      });
+    } catch {
+      toast.error(
+        "Something went wrong. Please try again.",
+      );
+    } finally {
       setLoading(false);
-      toast.error(result.payload || "OTP verification failed");
     }
   };
 
-  // ---------------- RESEND OTP ----------------
+  // ------------------------------------------------------------
+  // RESEND OTP
+  // ------------------------------------------------------------
+
   const handleResend = async () => {
     setResendLoading(true);
-    const result = await dispatch(
-      resendOtp({
-        role: "parent",
-        email: email,
-        type: type,
-      })
-    );
-    setResendLoading(false);
 
-    if (resendOtp.fulfilled.match(result)) {
+    try {
+      const result = await dispatch(
+        resendOtp({
+          role: "parent",
+          email,
+          type,
+        }),
+      );
+
+      if (!resendOtp.fulfilled.match(result)) {
+        toast.error(
+          result.payload ||
+            "Failed to resend OTP",
+        );
+
+        return;
+      }
+
       toast.success("OTP resent");
 
       const expiry = Date.now() + 60000;
 
       sessionStorage.setItem(
         "otp_expiry",
-        expiry.toString()
+        expiry.toString(),
       );
+
       setTimer(60);
-    } else {
-      toast.error(result.payload || "Failed to resend OTP");
+      setOtp(["", "", "", ""]);
+      setActiveIndex(0);
+
+      inputs.current[0]?.focus();
+    } catch {
+      toast.error(
+        "Something went wrong. Please try again.",
+      );
+    } finally {
+      setResendLoading(false);
     }
   };
+
+  // ------------------------------------------------------------
+  // UI
+  // ------------------------------------------------------------
 
   return (
     <AuthLayout>
       <AuthCard>
         <div className="flex flex-col items-center">
+
           <div className="flex justify-center mb-4">
-            <img src={icon} alt="otp" className="w-16 h-16" />
+            <img
+              src={icon}
+              alt="otp"
+              className="w-16 h-16"
+            />
           </div>
 
-          <h2 className="font-mochiy text-xl text-[#1a3a6d] mb-6">Enter OTP</h2>
+          <h2 className="font-mochiy text-xl text-[#1a3a6d] mb-6">
+            Enter OTP
+          </h2>
 
           <p className="text-sm text-gray-600 mb-6 text-center">
             Enter the 4-digit code sent to your email
           </p>
 
-          <form onSubmit={handleVerify} className="w-full">
+          <form
+            onSubmit={handleVerify}
+            className="w-full"
+          >
             <div
               className={`flex justify-center gap-4 mb-6 ${
                 shake ? "animate-bounce" : ""
@@ -216,15 +350,28 @@ useEffect(() => {
               {otp.map((digit, index) => (
                 <input
                   key={index}
-                  ref={(el) => {
-                    if (el) inputs.current[index] = el;
+                  ref={(element) => {
+                    if (element) {
+                      inputs.current[index] =
+                        element;
+                    }
                   }}
                   value={digit}
                   type="text"
+                  inputMode="numeric"
                   maxLength={1}
-                  onChange={(e) => handleChange(e.target.value, index)}
-                  onFocus={() => setActiveIndex(index)}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  onChange={(e) =>
+                    handleChange(
+                      e.target.value,
+                      index,
+                    )
+                  }
+                  onFocus={() =>
+                    setActiveIndex(index)
+                  }
+                  onKeyDown={(e) =>
+                    handleKeyDown(e, index)
+                  }
                   className={`w-14 h-14 text-center rounded-xl text-xl ${
                     activeIndex === index
                       ? "bg-white ring-2 ring-blue-400 scale-105"
@@ -238,25 +385,36 @@ useEffect(() => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-full text-white transition ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-700 hover:bg-green-800"
               }`}
             >
-              {loading ? "Verifying..." : "Verify OTP"}
+              {loading
+                ? "Verifying..."
+                : "Verify OTP"}
             </button>
           </form>
 
           <div className="mt-5">
             {timer > 0 ? (
-              <p className="text-gray-500">Resend OTP in {timer}s</p>
+              <p className="text-gray-500">
+                Resend OTP in {timer}s
+              </p>
             ) : (
               <button
+                type="button"
                 onClick={handleResend}
                 disabled={resendLoading}
                 className={`underline transition ${
-                  resendLoading ? "text-gray-400 cursor-not-allowed" : "text-blue-700"
+                  resendLoading
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-blue-700 hover:text-blue-900"
                 }`}
               >
-                {resendLoading ? "Sending..." : "Resend OTP"}
+                {resendLoading
+                  ? "Sending..."
+                  : "Resend OTP"}
               </button>
             )}
           </div>

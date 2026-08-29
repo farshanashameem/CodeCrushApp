@@ -5,7 +5,6 @@ import { IRefreshTokenUseCase } from '@/Application/Common/Interfaces/IRefreshTo
 import { ILogoutUseCase } from '@/Application/Common/Interfaces/ILogoutUseCase';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { GetMeInputDTO } from '@/Application/Common/dto/getMe.dto';
-import logger from '@/Infrastructure/Services/Logger';
 import { env } from '@/Infrastructure/Config/env';
 import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { AppError } from '@/Domain/Errors/app.error';
@@ -53,7 +52,7 @@ export class AuthController {
         try {
 
             const refreshToken = req.cookies.refreshToken;
-            logger.info( `Refresh cookie: ${refreshToken}`);
+           
 
             const tokens = await this._refreshTokenUseCase.execute({token: refreshToken});
 

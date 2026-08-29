@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 import AdminDashboardLayout from "../../../layouts/AdminDashboardLayout";
@@ -13,13 +13,16 @@ import RevenueReportSection from "./sections/RevenueReportSection/RevenueReportS
 
 import type { ReportRange } from "../../../../Types/reports";
 import { reportDateSchema } from "../../../../Lib/validation";
-import { exportChildReport
-  ,exportGameReport,
-   exportLevelReport,
-    exportRevenueReport,
-     exportUserReport } from "../../../../redux/Slices/reportSlice";
+import {
+  exportChildReport,
+  exportGameReport,
+  exportLevelReport,
+  exportRevenueReport,
+  exportUserReport,
+} from "../../../../redux/Slices/reportSlice";
 
 import type { AppDispatch, RootState } from "../../../../redux/store";
+
 const ReportPage = () => {
   // Values user is editing
   const [dateRange, setDateRange] = useState<ReportRange>("month");
@@ -34,20 +37,23 @@ const ReportPage = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { exportLoading } = useSelector(
-    (state: RootState) => state.report
-  );
+  const { exportLoading } = useSelector((state: RootState) => state.report);
 
-  const [activeTab, setActiveTab] = useState< "user" | "child" | "game" | "level" | "revenue" >("user");
-  
-  // Automatically apply predefined ranges
-  useEffect(() => {
-    if (dateRange !== "custom") {
-      setAppliedRange(dateRange);
+  const [activeTab, setActiveTab] = useState<
+    "user" | "child" | "game" | "level" | "revenue"
+  >("user");
+
+  // Handle date range change
+  const handleDateRangeChange = (value: ReportRange) => {
+    setDateRange(value);
+
+    // Automatically apply predefined ranges
+    if (value !== "custom") {
+      setAppliedRange(value);
       setAppliedFromDate("");
       setAppliedToDate("");
     }
-  }, [dateRange]);
+  };
 
   const handleApply = () => {
     const result = reportDateSchema.safeParse({
@@ -68,45 +74,44 @@ const ReportPage = () => {
   };
 
   const handleExport = () => {
- const params = {
-  range: appliedRange,
-  from: appliedFromDate || undefined,
-  to: appliedToDate || undefined,
-  ...(activeTab === "level" && selectedGame
-    ? { gameId: selectedGame }
-    : {}),
-};
+    const params = {
+      range: appliedRange,
+      from: appliedFromDate || undefined,
+      to: appliedToDate || undefined,
+      ...(activeTab === "level" && selectedGame
+        ? { gameId: selectedGame }
+        : {}),
+    };
 
+    switch (activeTab) {
+      case "user":
+        dispatch(exportUserReport(params));
+        break;
 
-  switch (activeTab) {
-    case "user":
-      dispatch(exportUserReport(params));
-      break;
+      case "child":
+        dispatch(exportChildReport(params));
+        break;
 
-    case "child":
-      dispatch(exportChildReport(params));
-      break;
+      case "game":
+        dispatch(exportGameReport(params));
+        break;
 
-    case "game":
-      dispatch(exportGameReport(params));
-      break;
+      case "level":
+        dispatch(exportLevelReport(params));
+        break;
 
-    case "level":
-      dispatch(exportLevelReport(params));
-      break;
-
-    case "revenue":
-      dispatch(exportRevenueReport(params));
-      break;
-  }
-};
+      case "revenue":
+        dispatch(exportRevenueReport(params));
+        break;
+    }
+  };
 
   return (
     <AdminDashboardLayout pageTitle="Reports">
       <div className="space-y-6">
         <ReportHeader
           dateRange={dateRange}
-          onDateRangeChange={setDateRange}
+          onDateRangeChange={handleDateRangeChange}
           fromDate={fromDate}
           toDate={toDate}
           onFromDateChange={setFromDate}
@@ -116,73 +121,71 @@ const ReportPage = () => {
           exportLoading={exportLoading}
         />
 
-      
-
-         <div className="rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 p-2 shadow-lg">
-         <div className="flex flex-wrap gap-2">
+        <div className="rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 p-2 shadow-lg">
+          <div className="flex flex-wrap gap-2">
             {[
-               { id: "user", label: "👤 User" },
-               { id: "child", label: "🧒 Child" },
-               { id: "game", label: "🎮 Game" },
-               { id: "level", label: "⭐ Level" },
-               { id: "revenue", label: "💰 Revenue" },
+              { id: "user", label: "👤 User" },
+              { id: "child", label: "🧒 Child" },
+              { id: "game", label: "🎮 Game" },
+              { id: "level", label: "⭐ Level" },
+              { id: "revenue", label: "💰 Revenue" },
             ].map((tab) => (
-               <button
-               key={tab.id}
-               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-               className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
                   activeTab === tab.id
-                     ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg"
-                     : "bg-white/60 text-slate-700 hover:bg-white"
-               }`}
-               >
-               {tab.label}
-               </button>
+                    ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg"
+                    : "bg-white/60 text-slate-700 hover:bg-white"
+                }`}
+              >
+                {tab.label}
+              </button>
             ))}
-         </div>
-         </div>
+          </div>
+        </div>
 
-         {activeTab === "user" && (
-         <UserReportSection
+        {activeTab === "user" && (
+          <UserReportSection
             dateRange={appliedRange}
             fromDate={appliedFromDate}
             toDate={appliedToDate}
-         />
-         )}
+          />
+        )}
 
-         {activeTab === "child" && (
-         <ChildReportSection
+        {activeTab === "child" && (
+          <ChildReportSection
             dateRange={appliedRange}
             fromDate={appliedFromDate}
             toDate={appliedToDate}
-         />
-         )}
+          />
+        )}
 
-         {activeTab === "game" && (
-         <GameReportSection
+        {activeTab === "game" && (
+          <GameReportSection
             dateRange={appliedRange}
             fromDate={appliedFromDate}
             toDate={appliedToDate}
-         />
-         )}
+          />
+        )}
 
-         {activeTab === "level" && (
-         <LevelReportSection
+        {activeTab === "level" && (
+          <LevelReportSection
             dateRange={appliedRange}
             fromDate={appliedFromDate}
             toDate={appliedToDate}
             selectedGame={selectedGame}
             onGameChange={setSelectedGame}
-         />
-         )}
+          />
+        )}
 
-         {activeTab === "revenue" && (
-         <RevenueReportSection
+        {activeTab === "revenue" && (
+          <RevenueReportSection
             dateRange={appliedRange}
             fromDate={appliedFromDate}
             toDate={appliedToDate}
-         />
-         )}
+          />
+        )}
       </div>
     </AdminDashboardLayout>
   );

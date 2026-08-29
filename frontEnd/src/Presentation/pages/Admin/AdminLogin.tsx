@@ -25,8 +25,12 @@ export default function Login() {
       await login("admin", { email, password });
       toast.success("Login successful!");
       navigate(ROUTES.ADMIN.DASHBOARD);
-    } catch (err: any) {
-      toast.error(err || "Login failed");
+    } catch (err: unknown) {
+      const message = typeof err === "string"
+        ? err
+        : "Login failed";
+
+        toast.error(message);
     }
   };
 

@@ -26,7 +26,7 @@ const AuthPage = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [animate, setAnimate] = useState(false);
+  
   const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -38,13 +38,11 @@ useEffect(() => {
   if (location.state?.message) {
     toast.error(location.state.message);
   }
-}, []);
+}, [location.state]);
 
   const { loading } = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    setAnimate(true);
-  }, []);
+  
 
   const validate = () => {
     try {
@@ -130,11 +128,7 @@ useEffect(() => {
   return (
     <AuthLayout>
       <AuthCard>
-        <div
-          className={`flex flex-col items-center transition-all duration-700 ${
-            animate ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
+        <div className="flex flex-col items-center animate-fade-in">
           <div className="mb-4">
             <img src={icon} className="w-16 h-16" />
           </div>

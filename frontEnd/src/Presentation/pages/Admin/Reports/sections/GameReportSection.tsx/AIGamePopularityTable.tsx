@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import { Download, Sparkles } from "lucide-react";
+import { Download,  } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
 import TableCard from "../../components/TableCard";

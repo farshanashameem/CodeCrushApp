@@ -4,6 +4,7 @@ import type { AppDispatch, RootState } from "../../../../redux/store";
 import { createImage, fetchImages } from "../../../../redux/Slices/imageSlice";
 import toast from "react-hot-toast";
 import { imageSchema } from "../../../../Lib/Imagevalidator";
+import { ZodError } from "zod";
 
 interface UploadImageFormProps {
   isOpen: boolean;
@@ -52,12 +53,18 @@ const UploadImageForm = ({ isOpen, onClose }: UploadImageFormProps) => {
       setName("");
       setFile(null);
       onClose();
-    } catch (error: any) {
-      toast.error(
-        error?.issues?.[0]?.message ||
-          error?.message ||
-          "Failed to upload image",
-      );
+    } catch (error: unknown) {
+      if (error instanceof ZodError) {
+        toast.error(error.issues[0]?.message ?? "Invalid image name");
+        return;
+      }
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.error("Failed to upload image");
     }
   };
 

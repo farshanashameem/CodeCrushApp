@@ -21,41 +21,24 @@ import AuthLayout from "../../layouts/AuthLayout";
 import ConfirmationModal from "../../SharedComponents/ConfirmationModal";
 
 import { avatarMap } from "../../../Constants/avatarMap";
+import { gameImages } from "../../../Constants/gameImages";
+
 import {
-  
   fetchGames,
   startChildSession,
 } from "../../../redux/Slices/childGameSlice";
 
-import mouseTracker from "../../../assets/games/MouseTrackers.png";
-import colorSorter from "../../../assets/games/ColourSorterSafari.png";
-import typingTitans from "../../../assets/games/TypingTitans.png";
-import picturepuzzler from "../../../assets/games/PicturePuzzlers.png";
-
 import toast from "react-hot-toast";
 
-const ALL_GAMES = [
-  {
-    name: "Mouse Trackers",
-    color: "bg-orange-400",
-    image: mouseTracker,
-  },
-  {
-    name: "Typing Titans",
-    color: "bg-blue-400",
-    image: typingTitans,
-  },
-  {
-    name: "Colour Sorter Safari",
-    color: "bg-purple-400",
-    image: colorSorter,
-  },
-  {
-    name: "Picture Puzzlers",
-    color: "bg-pink-400",
-    image: picturepuzzler,
-  },
-];
+// ==========================================================
+// TYPES
+// ==========================================================
+
+// Get the exact type of one game entry from selectedChild.games.
+// This avoids using `any`.
+type ChildGameProgress = NonNullable<
+  NonNullable<RootState["childManagement"]["selectedChild"]>["games"]
+>[number];
 
 const ChildProgressPage = () => {
   const navigate = useNavigate();
@@ -77,12 +60,25 @@ const ChildProgressPage = () => {
 
   const { games } = useSelector((state: RootState) => state.childGame);
 
+  const [gamesLoading, setGamesLoading] = useState(true);
+
   useEffect(() => {
-  
-  dispatch(fetchGames())
-    .unwrap()
-   
-}, [dispatch]);
+    const loadGames = async () => {
+      try {
+        setGamesLoading(true);
+
+        await dispatch(fetchGames()).unwrap();
+      } catch (error) {
+        console.error("Failed to fetch games:", error);
+
+        toast.error("Failed to load games");
+      } finally {
+        setGamesLoading(false);
+      }
+    };
+
+    loadGames();
+  }, [dispatch]);
 
   // ==========================================================
   // REVIEW STATE
@@ -90,7 +86,7 @@ const ChildProgressPage = () => {
 
   const {
     selectedReview: review,
-    reviews,    
+    reviews,
     loading: reviewLoading,
   } = useSelector((state: RootState) => state.gameReview);
 
@@ -157,8 +153,13 @@ const ChildProgressPage = () => {
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
 
-    if (h > 0) return `${h}h ${m}m ${s}s`;
-    if (m > 0) return `${m}m ${s}s`;
+    if (h > 0) {
+      return `${h}h ${m}m ${s}s`;
+    }
+
+    if (m > 0) {
+      return `${m}m ${s}s`;
+    }
 
     return `${s}s`;
   };
@@ -288,28 +289,16 @@ const ChildProgressPage = () => {
   // CALCULATE REVIEW SUMMARY
   // ==========================================================
 
-  /*
-   * Calculate these values directly from the reviews array.
-   *
-   */
-
-  const validReviews = Array.isArray(reviews)
-    ? reviews.filter(
-        (item: any) =>
-          typeof item?.rating === "number" &&
-          item.rating >= 1 &&
-          item.rating <= 5,
-      )
-    : [];
+  const validReviews = reviews.filter(
+    (item) => item.rating >= 1 && item.rating <= 5,
+  );
 
   const calculatedTotalReviews = validReviews.length;
 
   const calculatedAverageRating =
     calculatedTotalReviews > 0
-      ? validReviews.reduce(
-          (sum: number, item: any) => sum + Number(item.rating),
-          0,
-        ) / calculatedTotalReviews
+      ? validReviews.reduce((sum, item) => sum + item.rating, 0) /
+        calculatedTotalReviews
       : 0;
 
   // ==========================================================
@@ -327,7 +316,6 @@ const ChildProgressPage = () => {
       // No review -> ADD mode
 
       setRating(0);
-
       setReviewText("");
     }
 
@@ -444,41 +432,29 @@ const ChildProgressPage = () => {
   // GAMES MAP
   // ==========================================================
 
-  const gamesMap: Record<string, any> = {};
 
-  (child.games || []).forEach((g) => {
-    gamesMap[g.gameName] = g;
-  });
+  const gamesMap: Record<string, ChildGameProgress> = {};
 
-  const AllGamesMap: Record<string, any> = {};
-  (games || []).forEach((g) => {
-    AllGamesMap[g.name] = g;
+  (child.games || []).forEach((gameProgress) => {
+    gamesMap[gameProgress.gameName] = gameProgress;
   });
 
   // ==========================================================
   // SELECTED GAME
   // ==========================================================
 
-  const selectedGame = ALL_GAMES.find(
-    (game) => game.name === gamesMap[selectedReviewGame || ""]?.gameName,
+  const selectedGame = games.find(
+    (game) => String(game.id) === String(selectedReviewGame),
   );
 
   // ==========================================================
   // OTHER REVIEWS
   // ==========================================================
 
-  /*
-   * IMPORTANT:
-   *
-   * The current child's review is already displayed in
-   * "Your Child's Review".
-   *
-   * Therefore it MUST be removed from "Other Reviews".
-   */
-
-  const otherReviews = Array.isArray(reviews)
-    ? reviews.filter((item: any) => String(item.childId) !== String(child.id))
-    : [];
+ const otherReviews = reviews.filter(
+  (item) => String(item.id) !== String(review?.id),
+);
+ 
 
   return (
     <AuthLayout>
@@ -586,136 +562,147 @@ const ChildProgressPage = () => {
         ================================================== */}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          {ALL_GAMES.map((game, index) => {
-            const played = gamesMap[game.name];
-            const gameData = AllGamesMap[game.name];
+          {gamesLoading ? (
+            <div className="col-span-2 md:col-span-4 flex justify-center items-center py-16">
+              <p className="text-gray-400 font-medium">Loading games...</p>
+            </div>
+          ) : games.length === 0 ? (
+            <div className="col-span-2 md:col-span-4 flex justify-center items-center py-16">
+              <p className="text-gray-400 font-medium">No games available.</p>
+            </div>
+          ) : (
+            games.map((game, index) => {
+              const played = gamesMap[game.name];
 
-            const averageScore = played?.totalAttempts
-              ? Math.round(played.totalScore / played.totalAttempts)
-              : 0;
+              const averageScore = played?.totalAttempts
+                ? Math.round(played.totalScore / played.totalAttempts)
+                : 0;
 
-            const averageStars = played?.totalAttempts
-              ? played.totalStars / played.totalAttempts
-              : 0;
+              const averageStars = played?.totalAttempts
+                ? played.totalStars / played.totalAttempts
+                : 0;
 
-            /*
-             * Game review API needs gameId.
-             */
+              /*
+               * This is the actual ID returned
+               * from fetchGames().
+               */
 
-            const gameId = gameData?.id;
+              const gameId = game.id;
 
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
-              >
-                {/* IMAGE */}
+              return (
+                <div
+                  key={game.id || index}
+                  className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
+                >
+                  {/* IMAGE */}
 
-                <div className="h-28 bg-gray-50 relative overflow-hidden border-b border-gray-100">
-                  <img
-                    src={game.image}
-                    alt={game.name}
-                    className="w-full h-full object-fit group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <div className="h-28 bg-gray-50 relative overflow-hidden border-b border-gray-100">
+                    <img
+                      src={gameImages[game.image] || game.image}
+                      alt={game.name}
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    />
 
-                  {played && (
-                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full text-[9px] text-white font-mochiy tracking-wider">
-                      LVL {played.currentLevel}
-                    </div>
-                  )}
-                </div>
-
-                {/* CONTENT */}
-
-                <div className="p-4 flex-1 flex flex-col">
-                  <h4 className="font-bold text-[#1a3a6d] text-sm mb-2 truncate text-center uppercase">
-                    {game.name}
-                  </h4>
-
-                  {played ? (
-                    <>
-                      {/* STARS */}
-
-                      <div className="flex justify-center gap-0.5 mb-3">
-                        {[...Array(3)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`text-base ${
-                              i < Math.round(averageStars)
-                                ? "text-amber-400"
-                                : "text-gray-200"
-                            }`}
-                          >
-                            ★
-                          </span>
-                        ))}
+                    {played && (
+                      <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full text-[9px] text-white font-mochiy tracking-wider">
+                        LVL {played.currentLevel}
                       </div>
+                    )}
+                  </div>
 
-                      {/* STATISTICS */}
+                  {/* CONTENT */}
 
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between bg-gray-50 px-2.5 py-1.5 rounded-xl">
-                          <span className="text-[9px] font-bold text-gray-400 uppercase">
-                            Average Score
-                          </span>
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h4 className="font-bold text-[#1a3a6d] text-sm mb-2 truncate text-center uppercase">
+                      {game.name}
+                    </h4>
 
-                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">
-                            {averageScore || "-"}
-                          </span>
+                    {played ? (
+                      <>
+                        {/* STARS */}
+
+                        <div className="flex justify-center gap-0.5 mb-3">
+                          {[...Array(3)].map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-base ${
+                                i < Math.round(averageStars)
+                                  ? "text-amber-400"
+                                  : "text-gray-200"
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
                         </div>
 
-                        <div className="flex justify-between bg-gray-50 px-2.5 py-1.5 rounded-xl">
-                          <span className="text-[9px] font-bold text-gray-400 uppercase">
-                            Play Time
-                          </span>
+                        {/* STATISTICS */}
 
-                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">
-                            {formatTime(played.playTime)}
-                          </span>
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between bg-gray-50 px-2.5 py-1.5 rounded-xl">
+                            <span className="text-[9px] font-bold text-gray-400 uppercase">
+                              Average Score
+                            </span>
+
+                            <span className="text-[10px] font-mochiy text-[#1a3a6d]">
+                              {averageScore || "-"}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between bg-gray-50 px-2.5 py-1.5 rounded-xl">
+                            <span className="text-[9px] font-bold text-gray-400 uppercase">
+                              Play Time
+                            </span>
+
+                            <span className="text-[10px] font-mochiy text-[#1a3a6d]">
+                              {formatTime(played.playTime)}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between bg-gray-50 px-2.5 py-1.5 rounded-xl">
+                            <span className="text-[9px] font-bold text-gray-400 uppercase">
+                              Attempts
+                            </span>
+
+                            <span className="text-[10px] font-mochiy text-[#1a3a6d]">
+                              {played.totalAttempts}
+                            </span>
+                          </div>
                         </div>
 
-                        <div className="flex justify-between bg-gray-50 px-2.5 py-1.5 rounded-xl">
-                          <span className="text-[9px] font-bold text-gray-400 uppercase">
-                            Attempts
-                          </span>
-
-                          <span className="text-[10px] font-mochiy text-[#1a3a6d]">
-                            {played.totalAttempts}
-                          </span>
-                        </div>
+                        <p className="text-center text-[9px] font-semibold text-gray-400 mt-2.5 pt-2 border-t border-gray-50 uppercase">
+                          Last Played: {formatDate(played.lastPlayed)}
+                        </p>
+                      </>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center min-h-[120px]">
+                        <p className="text-center text-xs text-gray-400 italic bg-gray-50 w-full py-4 rounded-xl border border-dashed">
+                          Not yet unlocked
+                        </p>
                       </div>
+                    )}
 
-                      <p className="text-center text-[9px] font-semibold text-gray-400 mt-2.5 pt-2 border-t border-gray-50 uppercase">
-                        Last Played: {formatDate(played.lastPlayed)}
-                      </p>
-                    </>
-                  ) : (
-                    <div className="flex-1 flex items-center justify-center min-h-[120px]">
-                      <p className="text-center text-xs text-gray-400 italic bg-gray-50 w-full py-4 rounded-xl border border-dashed">
-                        Not yet unlocked
-                      </p>
-                    </div>
-                  )}
+                    {/* SHOW REVIEWS */}
 
-                  {/* SHOW REVIEWS */}
+                    <button
+                      onClick={() => {
+                        if (!gameId) {
+                          toast.error("Game ID is not available");
+                          return;
+                        }
 
-                  <button
-                    onClick={() => {
-                      if (!gameId) {
-                        toast.error("Game ID is not available");
-                        return;
-                      }
-
-                      handleShowReviews(gameId);
-                    }}
-                    className="mt-4 w-full py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed text-[#1a3a6d] font-mochiy text-[10px] transition-all"
-                  >
-                    ⭐ Show Reviews
-                  </button>
+                        handleShowReviews(gameId);
+                      }}
+                      disabled={gamesLoading || !gameId}
+                      className="mt-4 w-full py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed text-[#1a3a6d] font-mochiy text-[10px] transition-all"
+                    >
+                      {gamesLoading ? "Loading..." : "⭐ Show Reviews"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         {/* ==================================================
@@ -725,9 +712,7 @@ const ChildProgressPage = () => {
         {isReviewOpen && selectedReviewGame && (
           <div className="mb-16">
             <div className="bg-white rounded-3xl border border-blue-100 shadow-md p-6 md:p-8">
-              {/* ==================================================
-                  REVIEW HEADER
-              ================================================== */}
+              {/* REVIEW HEADER */}
 
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -748,9 +733,7 @@ const ChildProgressPage = () => {
                 </button>
               </div>
 
-              {/* ==================================================
-                  SUMMARY
-              ================================================== */}
+              {/* SUMMARY */}
 
               {!reviewLoading && (
                 <div className="flex flex-wrap gap-4 mb-8">
@@ -780,9 +763,7 @@ const ChildProgressPage = () => {
                 </div>
               )}
 
-              {/* ==================================================
-                  LOADING
-              ================================================== */}
+              {/* LOADING */}
 
               {reviewLoading ? (
                 <div className="py-10 text-center text-gray-400">
@@ -791,17 +772,15 @@ const ChildProgressPage = () => {
               ) : (
                 <>
                   {/* ==================================================
-                      YOUR CHILD'S REVIEW
-                  ================================================== */}
+                        YOUR CHILD'S REVIEW
+                    ================================================== */}
 
                   <div className="mb-8">
                     <h3 className="font-mochiy text-[#1a3a6d] text-sm uppercase mb-3">
                       Your Child's Review
                     </h3>
 
-                    {/* ==================================================
-                        EDIT / ADD MODE
-                    ================================================== */}
+                    {/* EDIT / ADD MODE */}
 
                     {isEditingReview ? (
                       <div className="bg-blue-50/50 rounded-2xl border border-blue-100 p-5">
@@ -836,7 +815,8 @@ const ChildProgressPage = () => {
                         />
 
                         <p className="text-right text-[10px] text-gray-400 mt-1">
-                          {reviewText.length}/500
+                          {reviewText.length}
+                          /500
                         </p>
 
                         <div className="flex justify-end gap-3 mt-4">
@@ -857,9 +837,7 @@ const ChildProgressPage = () => {
                         </div>
                       </div>
                     ) : review ? (
-                      /* ==================================================
-                          CURRENT CHILD'S REVIEW
-                      ================================================== */
+                      /* CURRENT CHILD'S REVIEW */
 
                       <div className="bg-blue-50/50 rounded-2xl border border-blue-100 p-5">
                         <div className="flex items-center justify-between">
@@ -899,9 +877,7 @@ const ChildProgressPage = () => {
                         )}
                       </div>
                     ) : (
-                      /* ==================================================
-                          NO CURRENT CHILD REVIEW
-                      ================================================== */
+                      /* NO CURRENT CHILD REVIEW */
 
                       <div className="bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-6 text-center">
                         <p className="text-sm text-gray-400 italic mb-4">
@@ -920,7 +896,7 @@ const ChildProgressPage = () => {
 
                   {/* ==================================================
                         OTHER CHILDREN'S REVIEWS
-                   ================================================== */}
+                    ================================================== */}
 
                   <div>
                     <h3 className="font-mochiy text-[#1a3a6d] text-sm uppercase mb-3">
@@ -934,16 +910,16 @@ const ChildProgressPage = () => {
                     ) : (
                       <div
                         className="
-        space-y-3
-        max-h-[420px]
-        overflow-y-auto
-        pr-2
-        scrollbar-thin
-        scrollbar-thumb-blue-200
-        scrollbar-track-gray-100
-      "
+                            space-y-3
+                            max-h-[420px]
+                            overflow-y-auto
+                            pr-2
+                            scrollbar-thin
+                            scrollbar-thumb-blue-200
+                            scrollbar-track-gray-100
+                          "
                       >
-                        {otherReviews.map((item: any, index: number) => (
+                        {otherReviews.map((item, index) => (
                           <div
                             key={item.id || index}
                             className="bg-gray-50 rounded-2xl border border-gray-100 p-4"

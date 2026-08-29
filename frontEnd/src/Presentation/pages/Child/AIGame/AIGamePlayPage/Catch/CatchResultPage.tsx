@@ -10,6 +10,7 @@ import type {
 interface CatchResultPageProps {
   game: CatchGameData;
   result: CatchResult;
+  onRetry: () => void;
 }
 
 /* ===================================================================== */
@@ -18,7 +19,7 @@ interface CatchResultPageProps {
 
 const CatchResultPage = ({
   game,
-  result,
+  result,onRetry
 }: CatchResultPageProps) => {
   const percentage =
     result.totalRequired > 0
@@ -241,13 +242,43 @@ const CatchResultPage = ({
           {/* DONE BUTTON */}
           {/* ===================================================== */}
 
+        <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {/* Retry */}
+          <button
+            type="button"
+            onClick={onRetry}
+            className="
+              w-full
+              rounded-2xl
+              border-4
+              border-white
+              bg-gradient-to-r
+              from-green-400
+              to-emerald-500
+              px-6
+              py-4
+              font-mochiy
+              text-base
+              text-white
+              shadow-[0_6px_0_#059669]
+              transition-all
+              duration-200
+              hover:-translate-y-1
+              active:translate-y-1
+              active:shadow-[0_3px_0_#059669]
+              md:text-lg
+            "
+          >
+            🔄 Retry
+          </button>
+
+          {/* Done */}
           <button
             type="button"
             onClick={() => {
               window.history.back();
             }}
             className="
-              mt-7
               w-full
               rounded-2xl
               border-4
@@ -272,6 +303,7 @@ const CatchResultPage = ({
           >
             🎉 Done!
           </button>
+        </div>
         </div>
       </main>
     </div>

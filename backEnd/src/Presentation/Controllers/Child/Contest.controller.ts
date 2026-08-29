@@ -8,11 +8,10 @@ import { IGetContestLeaderboardUseCase } from '@/Application/Child/Interfaces/Co
 import { IGetContestProgressUseCase } from '@/Application/Child/Interfaces/Contest/IGetContestProgress.usecase';
 import { IGetJoinedContestsUseCase } from '@/Application/Child/Interfaces/Contest/IGetJoinedcontests.usecase';
 import { IJoinContestUseCase } from '@/Application/Child/Interfaces/Contest/IJoinContest.usecase';
-import { IUpdateContestProgressUseCase } from '@/Application/Child/Interfaces/Contest/IUpdateContestProgress.usecase';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { AppError } from '@/Domain/Errors/app.error';
 import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
-import {  contestProgressSchema } from '@/Presentation/Validators/ChildContestValidator';
+
 import { contestIdSchema } from '@/Presentation/Validators/ContestValidator';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import { NextFunction, Request, Response } from 'express';
@@ -23,7 +22,6 @@ export class ChildContestController {
         private _joinContest: IJoinContestUseCase,
         private _getJoinedContests: IGetJoinedContestsUseCase,
         private _getContestProgress: IGetContestProgressUseCase,
-        private _updateContestProgress: IUpdateContestProgressUseCase,
         private  _getContestLeaderboard: IGetContestLeaderboardUseCase,
         private _getCompletedParticipants: IGetCompletedParticipantsUseCase
     ) {}
@@ -116,36 +114,7 @@ export class ChildContestController {
         }
     };
 
-     /**
-     * Update child's contest progress
-     */
-
-    updateContestProgress = async ( req: Request, res: Response, next: NextFunction ) : Promise< Response | void > => {
-        try{
-
-             const { contestId } = contestIdSchema.parse ( req.params );
-            const childId = req.childId;
-            if( !childId ) {
-                throw new AppError( authMessages.error.CHILD_NOT_FOUND, StatusCodes.NOT_FOUND );
-            }
-             const stats = contestProgressSchema.parse(req.body);
-             const payload = {
-                childId,
-                contestId,
-                ...stats,
-            };
-            const result =  await this._updateContestProgress.execute(payload);
-             return sendSuccess(
-                res,
-                StatusCodes.OK,
-                authMessages.success.CONTEST_PROGRESS_UPDATED_SUCCESSFULLY,
-                result
-            );                         
-
-        }catch( error ){
-            next( error );
-        }
-    };
+    
 
      /**
      * Get contest leaderboard

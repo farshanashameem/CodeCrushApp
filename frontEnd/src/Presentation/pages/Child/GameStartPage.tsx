@@ -15,7 +15,7 @@ const GameStartPage = () => {
   const { gameId, levelId } = useParams();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { selectedGame, selectedLevelProgress, loading } = useSelector(
+  const { selectedGame, selectedLevelProgress } = useSelector(
     (state: RootState) => state.childGame
   );
 

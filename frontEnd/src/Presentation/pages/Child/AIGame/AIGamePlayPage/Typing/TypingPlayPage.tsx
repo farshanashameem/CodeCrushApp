@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import TypingResultPage from "./TypingResultPage";
 
@@ -33,15 +33,94 @@ export interface TypingResult {
 const AI_GAME_DATA_KEY = "aiGameData";
 
 /* ===================================================================== */
+/* GAME LOADER */
+/* ===================================================================== */
+
+const loadTypingGame = (): {
+  game: TypingGameData | null;
+  error: string;
+} => {
+  const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
+
+  if (!storedGame) {
+    return {
+      game: null,
+      error: "Game data not found. Please create a new game.",
+    };
+  }
+
+  try {
+    const parsedGame: TypingGameData = JSON.parse(storedGame);
+
+    /* --------------------------------------------------------------- */
+    /* BASIC VALIDATION */
+    /* --------------------------------------------------------------- */
+
+    if (
+      parsedGame.gameType !== "TYPING" ||
+      !Array.isArray(parsedGame.words) ||
+      parsedGame.words.length === 0
+    ) {
+      return {
+        game: null,
+        error: "This game cannot be played right now.",
+      };
+    }
+
+    /* --------------------------------------------------------------- */
+    /* WORD COUNT VALIDATION */
+    /* --------------------------------------------------------------- */
+
+    if (
+      !Number.isInteger(parsedGame.wordCount) ||
+      parsedGame.wordCount < 1 ||
+      parsedGame.words.length !== parsedGame.wordCount
+    ) {
+      return {
+        game: null,
+        error: "Invalid typing game word count.",
+      };
+    }
+
+    /* --------------------------------------------------------------- */
+    /* WORD VALIDATION */
+    /* --------------------------------------------------------------- */
+
+    const hasInvalidWord = parsedGame.words.some(
+      (word) => typeof word !== "string" || !word.trim(),
+    );
+
+    if (hasInvalidWord) {
+      return {
+        game: null,
+        error: "Some typing game words are invalid.",
+      };
+    }
+
+    return {
+      game: parsedGame,
+      error: "",
+    };
+  } catch {
+    return {
+      game: null,
+      error: "Something went wrong while loading your game.",
+    };
+  }
+};
+
+/* ===================================================================== */
 /* COMPONENT */
 /* ===================================================================== */
 
 const TypingPlayPage = () => {
   /* ================================================================= */
-  /* STATE */
+  /* INITIAL GAME DATA */
   /* ================================================================= */
 
-  const [game, setGame] = useState<TypingGameData | null>(null);
+  const [{ game: initialGame, error: initialError }] = useState(loadTypingGame);
+
+  const [game] = useState<TypingGameData | null>(initialGame);
 
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
@@ -53,40 +132,11 @@ const TypingPlayPage = () => {
 
   const [typedWords, setTypedWords] = useState<string[]>([]);
 
-  const [timeLeft, setTimeLeft] = useState(0);
-
   const [result, setResult] = useState<TypingResult | null>(null);
 
-  const [error, setError] = useState("");
+  const [error] = useState(initialError);
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  /* ================================================================= */
-  /* LOAD GAME DATA */
-  /* ================================================================= */
-
-  useEffect(() => {
-    const storedGame = sessionStorage.getItem(AI_GAME_DATA_KEY);
-
-    if (!storedGame) {
-      setError("Game data not found. Please create a new game.");
-      return;
-    }
-
-    try {
-      const parsedGame: TypingGameData = JSON.parse(storedGame);
-
-      if (parsedGame.gameType !== "TYPING" || !parsedGame.words?.length) {
-        setError("This game cannot be played right now.");
-        return;
-      }
-
-      setGame(parsedGame);
-      setTimeLeft(parsedGame.timeLimit);
-    } catch {
-      setError("Something went wrong while loading your game.");
-    }
-  }, []);
 
   /* ================================================================= */
   /* CURRENT WORD */
@@ -95,40 +145,6 @@ const TypingPlayPage = () => {
   const currentWord = game?.words[currentWordIndex] ?? "";
 
   const totalWords = game?.words.length ?? 0;
-
-  /* ================================================================= */
-  /* TIMER */
-  /* ================================================================= */
-
-  useEffect(() => {
-    if (!game || result || timeLeft <= 0) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setTimeLeft((previousTime) => {
-        if (previousTime <= 1) {
-          return 0;
-        }
-
-        return previousTime - 1;
-      });
-    }, 1000);
-
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, [game, result, timeLeft]);
-
-  /* ================================================================= */
-  /* FOCUS INPUT */
-  /* ================================================================= */
-
-  useEffect(() => {
-    if (game && !result) {
-      inputRef.current?.focus();
-    }
-  }, [game, currentWordIndex, result]);
 
   /* ================================================================= */
   /* FINISH GAME */
@@ -156,16 +172,14 @@ const TypingPlayPage = () => {
   };
 
   /* ================================================================= */
-  /* TIMER FINISHED */
+  /* FOCUS INPUT */
   /* ================================================================= */
 
   useEffect(() => {
-    if (!game || result || timeLeft !== 0) {
-      return;
+    if (game && !result) {
+      inputRef.current?.focus();
     }
-
-    finishGame();
-  }, [game, result, timeLeft]);
+  }, [game, currentWordIndex, result]);
 
   /* ================================================================= */
   /* HANDLE TYPING */
@@ -176,18 +190,19 @@ const TypingPlayPage = () => {
 
     setTypedText(value);
 
-    /*
-     * Count a mistake when the typed text
-     * no longer matches the beginning of the word.
-     */
+    /* --------------------------------------------------------------- */
+    /* MISTAKE */
+    /* --------------------------------------------------------------- */
+
     if (!currentWord.toLowerCase().startsWith(value.toLowerCase())) {
       setMistakes((previousMistakes) => previousMistakes + 1);
       return;
     }
 
-    /*
-     * Word completed.
-     */
+    /* --------------------------------------------------------------- */
+    /* WORD COMPLETED */
+    /* --------------------------------------------------------------- */
+
     if (value.toLowerCase() === currentWord.toLowerCase()) {
       const updatedTypedWords = [...typedWords, value];
 
@@ -199,10 +214,18 @@ const TypingPlayPage = () => {
 
       const isLastWord = currentWordIndex === totalWords - 1;
 
+      /* ------------------------------------------------------------- */
+      /* LAST WORD */
+      /* ------------------------------------------------------------- */
+
       if (isLastWord) {
         finishGame(updatedCorrectWords, mistakes, updatedTypedWords);
         return;
       }
+
+      /* ------------------------------------------------------------- */
+      /* NEXT WORD */
+      /* ------------------------------------------------------------- */
 
       setCurrentWordIndex((previousIndex) => previousIndex + 1);
     }
@@ -245,11 +268,34 @@ const TypingPlayPage = () => {
   }
 
   /* ================================================================= */
+/* RETRY GAME */
+/* ================================================================= */
+
+const handleRetry = () => {
+  if (!game) {
+    return;
+  }
+
+  setCurrentWordIndex(0);
+  setTypedText("");
+  setCorrectWords(0);
+  setMistakes(0);
+  setTypedWords([]);
+  setResult(null);
+
+  /*
+   * Focus the typing input again.
+   */
+  window.setTimeout(() => {
+    inputRef.current?.focus();
+  }, 0);
+};
+  /* ================================================================= */
   /* RESULT */
   /* ================================================================= */
 
   if (result) {
-    return <TypingResultPage game={game} result={result} />;
+    return <TypingResultPage game={game} result={result} onRetry={handleRetry}/>;
   }
 
   /* ================================================================= */
@@ -267,16 +313,6 @@ const TypingPlayPage = () => {
       </div>
     );
   }
-
-  /* ================================================================= */
-  /* TIMER DISPLAY */
-  /* ================================================================= */
-
-  const minutes = Math.floor(timeLeft / 60);
-
-  const seconds = timeLeft % 60;
-
-  const formattedTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
   /* ================================================================= */
   /* PROGRESS */
@@ -335,31 +371,12 @@ const TypingPlayPage = () => {
           </div>
 
           {/* ===================================================== */}
-          {/* WORD / TIMER */}
+          {/* WORD COUNT */}
           {/* ===================================================== */}
 
-          <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="mb-5 flex justify-center">
             <div className="rounded-full bg-indigo-100 px-4 py-2 text-xs font-black text-indigo-600 md:text-sm">
               Word {currentWordIndex + 1} / {totalWords}
-            </div>
-
-            <div
-              className={`
-                rounded-full
-                px-4
-                py-2
-                text-xs
-                font-black
-                shadow-sm
-                md:text-sm
-                ${
-                  timeLeft <= 10
-                    ? "bg-red-100 text-red-600"
-                    : "bg-green-100 text-green-600"
-                }
-              `}
-            >
-              ⏱️ {formattedTime}
             </div>
           </div>
 

@@ -1,7 +1,24 @@
+import type {
+  Contest
+} from "../../../../Types/ContestManagement";
 import { formatDate } from "./contestUtils";
+import type { AvailableContest } from "../../../../Types/ChildContest";
+interface JoinedContest {
+  contestId: string;
+  title: string;
+  description: string;
+  type: string;
+  gameIds?: string[];
+  startDate: string;
+  endDate: string;
+  completed?: boolean;
+  score?: number;
+  stars?: number;
+  levelsCompleted?: number;
+}
 
 interface ContestListProps {
-  contests: any[];
+  contests: AvailableContest[];
   loading: boolean;
   emptyIcon: string;
   emptyText: string;
@@ -9,13 +26,13 @@ interface ContestListProps {
 }
 
 interface JoinedContestListProps {
-  contests: any[];
+  contests: JoinedContest[];
   loading: boolean;
   onContestClick: (id: string) => void;
 }
 
 interface ContestCardProps {
-  contest: any;
+  contest: Contest | AvailableContest | JoinedContest;
   joined: boolean;
   onClick: () => void;
 }
@@ -32,12 +49,7 @@ export const ContestList = ({
   }
 
   if (!contests.length) {
-    return (
-      <EmptyState
-        icon={emptyIcon}
-        text={emptyText}
-      />
-    );
+    return <EmptyState icon={emptyIcon} text={emptyText} />;
   }
 
   return (
@@ -47,9 +59,7 @@ export const ContestList = ({
           key={contest.id}
           contest={contest}
           joined={false}
-          onClick={() =>
-            onContestClick(contest.id)
-          }
+          onClick={() => onContestClick(contest.id)}
         />
       ))}
     </div>
@@ -66,12 +76,7 @@ export const JoinedContestList = ({
   }
 
   if (!contests.length) {
-    return (
-      <EmptyState
-        icon="🎮"
-        text="You haven't joined any contests yet!"
-      />
-    );
+    return <EmptyState icon="🎮" text="You haven't joined any contests yet!" />;
   }
 
   return (
@@ -81,9 +86,7 @@ export const JoinedContestList = ({
           key={contest.contestId}
           contest={contest}
           joined
-          onClick={() =>
-            onContestClick(contest.contestId)
-          }
+          onClick={() => onContestClick(contest.contestId)}
         />
       ))}
     </div>
@@ -134,7 +137,7 @@ const ContestCard = ({
         </p>
 
         <div className="flex flex-wrap gap-2 mt-4">
-          {contest.gameIds?.map((gameId: string) => (
+          {contest.gameIds?.map((gameId) => (
             <span
               key={gameId}
               className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold"
@@ -160,9 +163,7 @@ const ContestCard = ({
 
 export const LoadingState = () => (
   <div className="py-20 text-center">
-    <div className="text-5xl animate-bounce">
-      🏆
-    </div>
+    <div className="text-5xl animate-bounce">🏆</div>
 
     <p className="mt-4 text-slate-500 font-bold">
       Loading contests...
@@ -178,9 +179,7 @@ export const EmptyState = ({
   text: string;
 }) => (
   <div className="bg-white rounded-[2rem] border-4 border-dashed border-indigo-200 py-20 text-center">
-    <div className="text-6xl">
-      {icon}
-    </div>
+    <div className="text-6xl">{icon}</div>
 
     <p className="mt-5 text-slate-500 font-bold">
       {text}

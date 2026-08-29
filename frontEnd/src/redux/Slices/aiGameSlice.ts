@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AxiosError } from "axios";
 
 import api from "../../Lib/axios";
 import { API_ROUTES } from "../../Constants/api.routes";
@@ -8,11 +9,46 @@ import type {
     CreateAIGamePayload,
 } from "../../Types/aiGame";
 
+/* =========================================================
+   State
+========================================================= */
+
 interface AIGameState {
     game: AIGameConfig | null;
     loading: boolean;
     error: string | null;
 }
+
+/* =========================================================
+   API Error
+========================================================= */
+
+interface ApiErrorResponse {
+    message?: string;
+}
+
+/* =========================================================
+   Error Helper
+========================================================= */
+
+const getErrorMessage = (
+    error: unknown,
+    fallbackMessage: string
+): string => {
+    if (error instanceof AxiosError) {
+        const responseData = error.response?.data as
+            | ApiErrorResponse
+            | undefined;
+
+        return responseData?.message ?? fallbackMessage;
+    }
+
+    return fallbackMessage;
+};
+
+/* =========================================================
+   Initial State
+========================================================= */
 
 const initialState: AIGameState = {
     game: null,
@@ -20,38 +56,44 @@ const initialState: AIGameState = {
     error: null,
 };
 
-/* ========================================================= */
-/* CREATE AI GAME */
-/* ========================================================= */
+/* =========================================================
+   CREATE AI GAME
+========================================================= */
 
-export const createAIGame = createAsyncThunk(
+export const createAIGame = createAsyncThunk<
+    AIGameConfig,
+    CreateAIGamePayload,
+    { rejectValue: string }
+>(
     "aiGame/createAIGame",
 
     async (
-        payload: CreateAIGamePayload,
+        payload,
         { rejectWithValue }
     ) => {
         try {
-            const response = await api.post(
+            const response = await api.post<{
+                data: AIGameConfig;
+            }>(
                 API_ROUTES.AI_GAME.GENERATE,
                 payload
             );
 
-            
-
-            return response.data?.data;
-        } catch (error: any) {
+            return response.data.data;
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to create AI game"
+                getErrorMessage(
+                    error,
+                    "Failed to create AI game"
+                )
             );
         }
     }
 );
 
-/* ========================================================= */
-/* SLICE */
-/* ========================================================= */
+/* =========================================================
+   SLICE
+========================================================= */
 
 const aiGameSlice = createSlice({
     name: "aiGame",
@@ -77,9 +119,9 @@ const aiGameSlice = createSlice({
     extraReducers: (builder) => {
         builder
 
-            /* ============================================= */
-            /* CREATE AI GAME */
-            /* ============================================= */
+            /* =============================================
+               CREATE AI GAME - PENDING
+            ============================================= */
 
             .addCase(
                 createAIGame.pending,
@@ -90,6 +132,10 @@ const aiGameSlice = createSlice({
                 }
             )
 
+            /* =============================================
+               CREATE AI GAME - SUCCESS
+            ============================================= */
+
             .addCase(
                 createAIGame.fulfilled,
                 (state, action) => {
@@ -98,21 +144,34 @@ const aiGameSlice = createSlice({
                 }
             )
 
+            /* =============================================
+               CREATE AI GAME - ERROR
+            ============================================= */
+
             .addCase(
                 createAIGame.rejected,
                 (state, action) => {
                     state.loading = false;
                     state.error =
-                        action.payload as string;
+                        action.payload ??
+                        "Failed to create AI game";
                 }
             );
     },
 });
+
+/* =========================================================
+   ACTIONS
+========================================================= */
 
 export const {
     clearAIGame,
     clearAIGameError,
     clearAIGameData,
 } = aiGameSlice.actions;
+
+/* =========================================================
+   REDUCER
+========================================================= */
 
 export default aiGameSlice.reducer;
