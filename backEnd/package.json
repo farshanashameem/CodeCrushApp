@@ -1,9 +1,11 @@
 {
  "scripts": {
   "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/Presentation/server.ts",
+  "build": "tsc && tsc-alias",
+  "start": "node dist/Presentation/server.js",
   "lint": "eslint src",
   "lint:fix": "eslint src --fix"
- },
+},
  "dependencies": {
   "@langchain/core": "^1.2.8",
   "@langchain/openai": "^1.5.8",
@@ -45,6 +47,7 @@
   "eslint": "^10.0.3",
   "globals": "^17.4.0",
   "ts-node-dev": "^2.0.0",
+  "tsc-alias": "^1.9.3",
   "tsconfig-paths": "^4.2.0",
   "typescript": "^5.9.3",
   "typescript-eslint": "^8.57.1"
