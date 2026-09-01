@@ -1,6 +1,7 @@
 import { ICreateGameReviewUseCase } from '@/Application/Child/Interfaces/Review/ICreateGameReview.usecase';
-import IGetGameReviewUseCase from '@/Application/Child/Interfaces/Review/IGetGameReview.usecase';
-import IGetGameReviewsUseCase from '@/Application/Child/Interfaces/Review/IGetGameReviews.usecase';
+import { IGetGameReviewUseCase } from '@/Application/Child/Interfaces/Review/IGetGameReview.usecase';
+import { IGetGameReviewsUseCase } from '@/Application/Child/Interfaces/Review/IGetGameReviews.usecase';
+
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';
 import { sendSuccess } from '@/Infrastructure/utils/apiResponse';
 import { createGameReviewSchema, getGameReviewSchema, getGameReviewsSchema } from '@/Presentation/Validators/GameReviewValidator';

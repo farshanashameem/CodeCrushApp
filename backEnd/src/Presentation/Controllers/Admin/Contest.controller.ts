@@ -1,4 +1,4 @@
-import ICreateContestUseCase from '@/Application/Admin/Interfaces/Contest/ICreateContest.usecase';
+import { ICreateContestUseCase } from '@/Application/Admin/Interfaces/Contest/ICreateContest.usecase';
 import { IGetAllContestsUseCase } from '@/Application/Admin/Interfaces/Contest/IGetAllContests.usecase';
 import { IGetContestUseCase } from '@/Application/Admin/Interfaces/Contest/IGetContest.usecase';
 import { IUpdateContestUseCase } from '@/Application/Admin/Interfaces/Contest/IUpdateContest.usecase';

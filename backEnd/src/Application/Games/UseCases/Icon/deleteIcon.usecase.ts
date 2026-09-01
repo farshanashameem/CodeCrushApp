@@ -11,12 +11,12 @@ export class DeleteIconUseCase implements IDeleteIconUseCase {
     ) {}
 
     async execute(input: DeleteIconInputDTO): Promise<DeleteIconOutputDTO> {
-        const icon = await this._iconRepository.findById(input.id);
+        const icon = await this._iconRepository.findById(input.iconId);
         if(!icon) {
             throw new AppError( authMessages.error.ICON_NOT_FOUND, StatusCodes.NOT_FOUND);
         }
 
-         await this._iconRepository.delete(input.id);
+         await this._iconRepository.delete(input.iconId);
 
          return {
             success: true,

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import z from 'zod';
 
 type RequestProperty = 'body' | 'query' | 'params';
 

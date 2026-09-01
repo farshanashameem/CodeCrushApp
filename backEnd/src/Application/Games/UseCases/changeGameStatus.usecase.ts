@@ -1,6 +1,6 @@
 import { IGameRepository } from '@/Domain/RepositoryInterface/IGame.repository';
 import { IChangeGameStatusUseCase } from '../Interfaces/IChangeGameStatus.usecase';
-import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from '../dto/changegameStatus.dto';
+import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from '../dto/changeGameStatus.dto';
 import { AppError } from '@/Domain/Errors/app.error';
 import { authMessages } from '@/Shared/Messages/AuthMessages';
 import StatusCodes from '@/Domain/enums/StatusCodes.enum';

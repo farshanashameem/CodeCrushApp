@@ -1,6 +1,6 @@
 import { IGameReviewRepository } from '@/Domain/RepositoryInterface/IGameReiview.repository';
-import IGetGameReviewUseCase from '../../Interfaces/Review/IGetGameReview.usecase';
 import { GetGameReviewInputDTO, GetGameReviewOutputDTO } from '../../dto/Review/GetGameReview.dto';
+import { IGetGameReviewUseCase } from '../../Interfaces/Review/IGetGameReview.usecase';
 
 export class GetGameReviewUseCase implements IGetGameReviewUseCase {
 
