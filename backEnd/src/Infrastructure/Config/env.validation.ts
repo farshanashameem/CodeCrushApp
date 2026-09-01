@@ -23,4 +23,5 @@ export const envSchema = z.object({
     CHILD_SESSION_TOKEN_MAX_AGE:z.coerce.number(),
     CHILD_SESSION_TTL:z.coerce.number(),
     OPENAI_API_KEY: z.string().min(1),
+    NODE_ENV:z.string().min(1),
 });

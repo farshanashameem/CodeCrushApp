@@ -109,7 +109,7 @@ export class ParentAuthController {
 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: false,
+                secure: env.NODE_ENV === "production",
                 sameSite: 'lax',
                 maxAge: env.JWT_REFRESH_TOKEN_MAX_AGE,
                 path: '/'
@@ -117,7 +117,7 @@ export class ParentAuthController {
 
              res.cookie('accessToken', accessToken, {
                 httpOnly: true,
-                secure: false,
+                secure: env.NODE_ENV === "production",
                 sameSite: 'lax',
                 maxAge: env.JWT_ACCESS_TOKEN_MAX_AGE,
                 path: '/'
