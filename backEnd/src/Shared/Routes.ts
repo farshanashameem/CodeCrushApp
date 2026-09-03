@@ -17,6 +17,9 @@ export const ROUTES = {
                 STATUS: '/:id/status'
             }
         },
+        DASHBOARD: {
+            STATS: '/dashboard/stats'
+        },
         CHILD_MANAGEMENT: {
             CHILDREN: {
                 BY_ID: '/children/:childId',

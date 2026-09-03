@@ -1,4 +1,4 @@
-import { adminLoginController, userManagementController, childManagementController, gameLevelController, iconManagementController, imageManagementcontroller, gameController, reportController, exportReportController, contestController } from '@/Presentation/Factory/AdminFactory';
+import { adminLoginController, userManagementController, childManagementController, gameLevelController, iconManagementController, imageManagementcontroller, gameController, reportController, exportReportController, contestController, dashBoardController } from '@/Presentation/Factory/AdminFactory';
 import { tokenService } from '@/Presentation/Factory/ParentFactory';
 import { authAdminHandler } from '@/Presentation/Middlewares/AdminAuthMiddleware';
 import { ROUTES } from '@/Shared/Routes';
@@ -10,6 +10,7 @@ const router = Express.Router();
 router.post(ROUTES.ADMIN.LOGIN, adminLoginController.login );
 
 router.use(  authAdminHandler(tokenService) );
+router.get( ROUTES.ADMIN.DASHBOARD.STATS, dashBoardController.getDashboardStats);
 router.get( ROUTES.ADMIN.USER_MANAGEMENT.USERS.BASE, userManagementController.getAllUsers);
 router.get(`${ROUTES.ADMIN.USER_MANAGEMENT.USERS.BASE}${ROUTES.ADMIN.USER_MANAGEMENT.USERS.BY_ID}`,
   userManagementController.getUserDetails

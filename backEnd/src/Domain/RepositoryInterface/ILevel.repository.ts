@@ -7,4 +7,5 @@ export interface ILevelRepository extends IBaseRepository<LevelEntity> {
     getLevelsByGameId(gameId: string ) : Promise<LevelEntity[]>;
     changeStatus( id: string, isActive: boolean) : Promise<void>;
     getLevelPerformanceReport( filter: ReportFilter, gameId?: string): Promise<LevelPerformanceReportData>;
+    countLevels(): Promise<number>;
 }

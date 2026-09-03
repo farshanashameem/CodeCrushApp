@@ -34,6 +34,9 @@ export const API_ROUTES = {
   ADMIN: {
     LOGIN: "/admin/login",
     DASHBOARD: "/admin/dashboard",
+    DASHBOARDSTATS: {
+        STATS: '/auth/admin/dashboard/stats',
+    },
     REPORTS: {
       USER: "/auth/admin/reports/users",
       CHILDREN: "/auth/admin/reports/children",
@@ -42,6 +45,7 @@ export const API_ROUTES = {
       REVENUE: "/auth/admin/reports/revenue",
       AI_GAME_POPULARITY: "/auth/admin/reports/ai-games/popularity",
     },
+    
     EXPORT_REPORTS: {
       USER_REPORT: "/auth/admin/reports/users/export",
       CHILD_REPORT: "/auth/admin/reports/children/export",

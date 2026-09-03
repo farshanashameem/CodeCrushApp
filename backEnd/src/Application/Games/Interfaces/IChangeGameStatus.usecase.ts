@@ -1,4 +1,4 @@
-import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from "../dto/changeGameStatus.dto";
+import { ChangeGameStatusInputDTO, ChangeGameStatusOutputDTO } from '../dto/changeGameStatus.dto';
 
 
 export interface IChangeGameStatusUseCase {

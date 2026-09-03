@@ -8,4 +8,5 @@ export interface IChildRepository extends IBaseRepository<ChildEntity> {
     findByParentIdAndName(parentId: string, name: string) : Promise<ChildEntity | null >
     getChildProgressReport( filter: ReportFilter) : Promise<ChildProgressReportData>
     cleanupDeleted(): Promise<void>;
+    countChildren(): Promise<number>;
 }

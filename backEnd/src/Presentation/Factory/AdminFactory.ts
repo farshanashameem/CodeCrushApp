@@ -9,6 +9,7 @@ import { GameManagementController } from '../Controllers/Game/game.controller';
 import { ReportDataController } from '../Controllers/Admin/ReportData.controller';
 import { ExportReportController } from '../Controllers/Admin/ExportReports.controller';
 import { ContestManagementController } from '../Controllers/Admin/Contest.controller';
+import { AdminDashboardController } from '../Controllers/Admin/DashBoardStats.controller';
 
 //Usecases
 import { AdminLoginUseCase } from '@/Application/Admin/UseCases/Auth/AdminLogin.useCase';
@@ -50,7 +51,7 @@ import { GetContestUseCase } from '@/Application/Admin/UseCases/Contest/GetConte
 import { UpdateContestUseCase } from '@/Application/Admin/UseCases/Contest/UpdateContest.usecase';
 import { GetAIGamePopularityReport } from '@/Application/Admin/UseCases/Reports/AIGamePopularityReport.usecase';
 import { ExportAIGamePopularityReportUseCase } from '@/Application/Admin/UseCases/Export/ExportAiGamePopularityReport.usecase';
-
+import { GetDashboardStatsUseCase } from '@/Application/Admin/UseCases/GetDashBoardStats.usecase';
 
 //Repositories
 import { ParentRepository } from '@/Infrastructure/Repositories/Parent.repository';
@@ -255,6 +256,12 @@ const exportAIGamePopularityReportUsecase = new ExportAIGamePopularityReportUseC
     excelExportService
 );
 
+const getDashboardStatsUseCase = new GetDashboardStatsUseCase(
+    parentRepository,
+    childRepository,
+    levelRepository
+);
+
 
 
 //Controllers
@@ -328,6 +335,8 @@ export const contestController = new ContestManagementController(
     updateContestUseCase
 );
 
-
+export const dashBoardController = new AdminDashboardController(
+    getDashboardStatsUseCase
+);
 
 
