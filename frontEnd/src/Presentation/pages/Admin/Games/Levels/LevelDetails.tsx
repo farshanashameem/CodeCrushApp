@@ -102,11 +102,13 @@ const LevelDetails = () => {
 
       <div className="space-y-6">
 
-        <GameHeader
-          game={selectedGame}
-          levelCount={levels.length}
-          onBack={() => navigate(-1)}
-        />
+        {selectedGame && (
+          <GameHeader
+            game={selectedGame}
+            levelCount={levels.length}
+            onBack={() => navigate(-1)}
+          />
+        )}
 
         <div className="rounded-3xl border border-white/30 bg-white/20 backdrop-blur-md p-6 shadow-xl">
 

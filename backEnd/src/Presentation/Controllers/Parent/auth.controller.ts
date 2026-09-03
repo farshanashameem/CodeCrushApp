@@ -109,16 +109,16 @@ export class ParentAuthController {
 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "none",
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'none',
                 maxAge: env.JWT_REFRESH_TOKEN_MAX_AGE,
                 path: '/'
             });
 
              res.cookie('accessToken', accessToken, {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "none",
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'none',
                 maxAge: env.JWT_ACCESS_TOKEN_MAX_AGE,
                 path: '/'
             });

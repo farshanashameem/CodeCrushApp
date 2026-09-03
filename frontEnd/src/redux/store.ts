@@ -12,7 +12,8 @@ import ReportSlice from "./Slices/reportSlice";
 import ContestManagementSlice from './Slices/contestManagementSlice'
 import ChildContestSlice from "./Slices/childContestSlice"
 import aiGameSlice from "./Slices/aiGameSlice";
-import gameReview from "./Slices/GameReviewSlice"
+import gameReview from "./Slices/GameReviewSlice";
+import adminDashboardStats from "./Slices/AdminDashboardSlice"
 
 export const store = configureStore({
     reducer: {
@@ -29,7 +30,8 @@ export const store = configureStore({
         contestManagement: ContestManagementSlice,
         childContest: ChildContestSlice,
         aiGame: aiGameSlice,
-        gameReview: gameReview
+        gameReview: gameReview,
+        dashboardStats: adminDashboardStats,
     }
 })
 

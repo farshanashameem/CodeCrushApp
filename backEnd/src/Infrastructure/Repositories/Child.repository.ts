@@ -81,6 +81,10 @@ export class ChildRepository extends BaseRepository < ChildEntity, IChild > impl
             });
         }
 
+        async countChildren(): Promise<number> {
+            return await this._model.countDocuments();
+        }
+
         private async getChildMetrics ( filter: ReportFilter ): Promise<ChildReportMetrics> {
             const totalChildren = await this._model.countDocuments({ status: { $ne: UserStatus.DELETED }});
             const activeChildren = await this._model.countDocuments({

@@ -34,14 +34,16 @@ const ManageLevels = () => {
   return (
     <AdminDashboardLayout pageTitle="LEVEL MANAGEMENT 🎯">
       <div className="space-y-6">
-        <GameHeader
-          game={selectedGame}
-          levelCount={levels.length}
-          onBack={() => navigate(-1)}
-          onAddLevel={() =>
-            navigate(`/admin/games/${gameId}/levels/create`)
-          }
-        />
+        {selectedGame && (
+          <GameHeader
+            game={selectedGame}
+            levelCount={levels.length}
+            onBack={() => navigate(-1)}
+            onAddLevel={() =>
+              navigate(`/admin/games/${gameId}/levels/create`)
+            }
+          />
+        )}
 
         {/* Content */}
         {loading ? (

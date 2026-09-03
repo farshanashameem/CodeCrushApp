@@ -80,6 +80,10 @@ export class LevelRepository extends BaseRepository<LevelEntity, ILevel> impleme
             };
          }
 
+        async countLevels(): Promise<number> {
+            return await this._model.countDocuments();
+        }
+
         private async getLevelMetrics( filter: ReportFilter,  gameId?: string ): Promise<LevelReportMetrics> {
 
             const objectGameId = gameId

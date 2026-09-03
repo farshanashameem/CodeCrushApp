@@ -188,6 +188,10 @@ export class ParentRepository extends BaseRepository<ParentEntity, IParent> impl
     );
 }
 
+    async countParents(): Promise<number> {
+        return await this._model.countDocuments();
+    }
+
     private async getUserGrowth( filter: ReportFilter ): Promise<UserGrowthPoint[]> {
         let groupFormat: string;
 

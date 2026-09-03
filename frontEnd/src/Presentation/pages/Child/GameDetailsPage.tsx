@@ -154,7 +154,7 @@ const GameDetailsPage = () => {
 
         <div className="mb-6 flex justify-between items-center">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/play")}
             className="
               bg-white
               border-4

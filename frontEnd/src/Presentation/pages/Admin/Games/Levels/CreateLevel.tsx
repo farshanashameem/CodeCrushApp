@@ -82,11 +82,13 @@ const CreateLevel = () => {
 
         {/* Game Header */}
 
-        <GameHeader
-          game={selectedGame}
-          levelCount={levels.length}
-          onBack={() => navigate(-1)}
-        />
+        {selectedGame && (
+          <GameHeader
+            game={selectedGame}
+            levelCount={levels.length}
+            onBack={() => navigate(-1)}
+          />
+        )}
 
         {/* Level Information */}
 

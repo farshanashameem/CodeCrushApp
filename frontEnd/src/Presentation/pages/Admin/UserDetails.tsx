@@ -371,71 +371,80 @@ const UserDetails = () => {
               />
             </div>
 
+
             {/* Nested Individual Games Performance Board */}
-            <div className="pt-2">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-3">
-                Engine Metrics Array (Games History)
-              </h4>
+            {selectedChild.games && selectedChild.games.length > 0 && (
+              <div className="pt-2">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-3">
+                  Engine Metrics Array (Games History)
+                </h4>
 
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-slate-50 border-b">
-                        <th className="py-3 px-4">Game</th>
-                        <th className="py-3 px-4 text-center">Level</th>
-                        <th className="py-3 px-4 text-center">Avg Score</th>
-                        <th className="py-3 px-4 text-center">Avg Stars</th>
-                        <th className="py-3 px-4 text-center">Attempts</th>
-                        <th className="py-3 px-4 text-center">Play Time</th>
-                        <th className="py-3 px-4 text-center">Last Played</th>
-                      </tr>
-                    </thead>
+                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-50 border-b">
+                          <th className="py-3 px-4">Game</th>
+                          <th className="py-3 px-4 text-center">Level</th>
+                          <th className="py-3 px-4 text-center">Avg Score</th>
+                          <th className="py-3 px-4 text-center">Avg Stars</th>
+                          <th className="py-3 px-4 text-center">Attempts</th>
+                          <th className="py-3 px-4 text-center">Play Time</th>
+                          <th className="py-3 px-4 text-center">Last Played</th>
+                        </tr>
+                      </thead>
 
-                    <tbody>
-                      {selectedChild.games.map((game: ChildGame) => {
-                        const averageScore = game.totalAttempts
-                          ? Math.round(game.totalScore / game.totalAttempts)
-                          : 0;
+                      <tbody>
+                        {selectedChild.games.map((game: ChildGame) => {
+                          const averageScore = game.totalAttempts
+                            ? Math.round(game.totalScore / game.totalAttempts)
+                            : 0;
 
-                        const averageStars = game.totalAttempts
-                          ? (game.totalStars / game.totalAttempts).toFixed(1)
-                          : "0";
+                          const averageStars = game.totalAttempts
+                            ? (game.totalStars / game.totalAttempts).toFixed(1)
+                            : "0";
 
-                        return (
-                          <tr key={game.gameId}>
-                            <td>🎮 {game.gameName}</td>
+                          return (
+                            <tr key={game.gameId}>
+                              <td>🎮 {game.gameName}</td>
 
-                            <td className="text-center">{game.currentLevel}</td>
+                              <td className="text-center">
+                                {game.currentLevel}
+                              </td>
 
-                            <td className="text-center">{averageScore}</td>
+                              <td className="text-center">
+                                {averageScore}
+                              </td>
 
-                            <td className="text-center">⭐ {averageStars}/3</td>
+                              <td className="text-center">
+                                ⭐ {averageStars}/3
+                              </td>
 
-                            <td className="text-center">
-                              {game.totalAttempts}
-                            </td>
+                              <td className="text-center">
+                                {game.totalAttempts}
+                              </td>
 
-                            <td className="text-center">
-                              {formatTime(game.playTime)}
-                            </td>
+                              <td className="text-center">
+                                {formatTime(game.playTime)}
+                              </td>
 
-                            <td className="text-center">
-                              {game.lastPlayed
-                                ? new Date(
-                                    game.lastPlayed,
-                                  ).toLocaleDateString("en-IN")
-                                : "-"}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                              <td className="text-center">
+                                {game.lastPlayed
+                                  ? new Date(
+                                      game.lastPlayed,
+                                    ).toLocaleDateString("en-IN")
+                                  : "-"}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
           </div>
         )}
       </div>

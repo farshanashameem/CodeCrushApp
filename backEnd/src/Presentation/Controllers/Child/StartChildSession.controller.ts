@@ -22,7 +22,7 @@ export class StartChildSessionController {
     res.cookie('childSession', result.sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: "none",
+      sameSite: 'none',
       maxAge: env.CHILD_SESSION_TOKEN_MAX_AGE,
     });
 

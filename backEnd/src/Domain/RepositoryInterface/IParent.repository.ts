@@ -14,4 +14,5 @@ export interface IParentRepository extends IAuthRepository<ParentEntity> {
     findPremiumParentsExpiredBetween( from: Date, to: Date ): Promise<ParentEntity[]>;
     cleanupDeleted(): Promise<void>;
     cleanupExpiredPremiumSubscriptions(): Promise<void>;
+    countParents(): Promise<number>;
 }

@@ -22,12 +22,25 @@ import logo from "../../../assets/logo.png";
 import robotMain from "../../../assets/loginRobo.png"; 
 import robotMini from "../../../assets/playingRobo2.png"; 
 import BG from "../../../assets/AdminBG.png";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../../../redux/store";
+import { getDashboardStats } from "../../../redux/Slices/AdminDashboardSlice";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [loadingLogout, setLoadingLogout] = useState(false);
   const { logout } = useAuth();
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const {
+      stats,
+  } = useSelector((state: RootState) => state.dashboardStats);
+
+  useEffect(() => {
+    dispatch(getDashboardStats());
+}, [dispatch]);
   const handleLogout = async () => {
     try {
       setLoadingLogout(true);
@@ -41,39 +54,38 @@ export default function AdminDashboard() {
     }
   };
 
-  // 8. Placeholders ready for backend data mapping
   const dashboardStats = [
     {
-      title: "Active Users",
-      value: "1,200", // Map to dynamic backend data later
+      title: "Total Parents",
+      value: stats?.totalParents ?? 0,
       icon: Users,
-      color: "text-blue-500",
+      color: "text-blue-600",
       iconBg: "bg-blue-500/10 border-blue-500/20",
-      glow: "bg-blue-400/20",
+      glow: "bg-blue-500/20",
     },
     {
       title: "Total Children",
-      value: "500", // Map to dynamic backend data later
+      value: stats?.totalChildren ?? 0,
       icon: Baby,
-      color: "text-cyan-500",
-      iconBg: "bg-cyan-500/10 border-cyan-500/20",
-      glow: "bg-cyan-400/20",
+      color: "text-pink-600",
+      iconBg: "bg-pink-500/10 border-pink-500/20",
+      glow: "bg-pink-500/20",
     },
     {
       title: "Games",
-      value: "4", // Map to dynamic backend data later
+      value: stats?.totalGames ?? 0,
       icon: Gamepad2,
-      color: "text-violet-500",
+      color: "text-violet-600",
       iconBg: "bg-violet-500/10 border-violet-500/20",
-      glow: "bg-violet-400/20",
+      glow: "bg-violet-500/20",
     },
     {
       title: "Levels",
-      value: "40", // Map to dynamic backend data later
+      value: stats?.totalLevels ?? 0,
       icon: Sparkles,
-      color: "text-amber-500",
+      color: "text-amber-600",
       iconBg: "bg-amber-500/10 border-amber-500/20",
-      glow: "bg-amber-400/20",
+      glow: "bg-amber-500/20",
     },
   ];
 
